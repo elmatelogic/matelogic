@@ -574,9 +574,9 @@
 
       try {
         const res = await fetch(`${API_URL}api/validar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ expressio: rawExpr, tokens })
+          method: 'POST',[cite: 1]
+          headers: { 'Content-Type': 'application/json' },[cite: 1]
+          body: JSON.stringify({ expressio: rawExpr, tokens })[cite: 1]
         });
         const data = await res.json();[cite: 1]
 
@@ -707,7 +707,7 @@
       el.classList.add('animate-shake');[cite: 1]
     }
 
-    function openModal(id) {[cite: 1]
+    function openModal(id) {
       if (id === 'share-modal') {
         const trobades = gameState.solutions.length;
         const total = DAILY_GAME ? DAILY_GAME.total : 0;
@@ -718,7 +718,7 @@
         document.getElementById('share-modal-streak').innerText = streakState.current;
         document.getElementById('share-modal-rank').innerText = getRank(trobades, total);
       }
-      document.getElementById(id).classList.remove('hidden');[cite: 1]
+      document.getElementById(id).classList.remove('hidden');
     }
 
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }[cite: 1]
@@ -746,7 +746,7 @@
         }
       }
 
-      // 2. Còpia clàssica segura per a escriptori
+      // 2. Còpia per a escriptori
       let copiat = false;
       if (navigator.clipboard && window.isSecureContext) {
         try {
