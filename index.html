@@ -310,419 +310,419 @@
   </div>
 
   <script>
-    const API_URL = "https://matelogicbd.elmatelogic.workers.dev";[cite: 1]
+    const API_URL = "https://matelogicbd.elmatelogic.workers.dev";
 
-    let DAILY_GAME = null;[cite: 1]
-    let tokens = [];[cite: 1]
-    let usedHexIds = new Set();[cite: 1]
-    let outerPositions = [];[cite: 1]
-    let gameState = { solutions: [], score: 0 };[cite: 1]
-    let streakState = { current: 0, lastPlayedDate: "" };[cite: 1]
-    let CURRENT_CHALLENGE_ID = "";[cite: 1]
+    let DAILY_GAME = null;
+    let tokens = [];
+    let usedHexIds = new Set();
+    let outerPositions = [];
+    let gameState = { solutions: [], score: 0 };
+    let streakState = { current: 0, lastPlayedDate: "" };
+    let CURRENT_CHALLENGE_ID = "";
 
     // SINTETITZADOR AUDIO NATIU
-    let audioCtx = null;[cite: 1]
-    function getAudioContext() {[cite: 1]
-      if (!audioCtx) {[cite: 1]
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();[cite: 1]
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-      if (audioCtx.state === 'suspended') {[cite: 1]
-        audioCtx.resume();[cite: 1]
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
       }
-      return audioCtx;[cite: 1]
+      return audioCtx;
     }
 
-    function playTone(freq, type = 'sine', duration = 0.08, gainVal = 0.1) {[cite: 1]
-      try {[cite: 1]
-        const ctx = getAudioContext();[cite: 1]
-        const osc = ctx.createOscillator();[cite: 1]
-        const gain = ctx.createGain();[cite: 1]
-        osc.type = type;[cite: 1]
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);[cite: 1]
-        gain.gain.setValueAtTime(gainVal, ctx.currentTime);[cite: 1]
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);[cite: 1]
-        osc.connect(gain);[cite: 1]
-        gain.connect(ctx.destination);[cite: 1]
-        osc.start();[cite: 1]
-        osc.stop(ctx.currentTime + duration);[cite: 1]
-      } catch (e) {}[cite: 1]
+    function playTone(freq, type = 'sine', duration = 0.08, gainVal = 0.1) {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(gainVal, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
     }
 
-    function soundClick() { playTone(550, 'triangle', 0.04, 0.05); }[cite: 1]
-    function soundDelete() { playTone(240, 'sine', 0.06, 0.08); }[cite: 1]
-    function soundError() {[cite: 1]
-      playTone(180, 'sawtooth', 0.15, 0.1);[cite: 1]
-      setTimeout(() => playTone(140, 'sawtooth', 0.2, 0.1), 100);[cite: 1]
+    function soundClick() { playTone(550, 'triangle', 0.04, 0.05); }
+    function soundDelete() { playTone(240, 'sine', 0.06, 0.08); }
+    function soundError() {
+      playTone(180, 'sawtooth', 0.15, 0.1);
+      setTimeout(() => playTone(140, 'sawtooth', 0.2, 0.1), 100);
     }
-    function soundSuccess() {[cite: 1]
-      playTone(523.25, 'sine', 0.1, 0.1);[cite: 1]
-      setTimeout(() => playTone(659.25, 'sine', 0.12, 0.1), 80);[cite: 1]
-      setTimeout(() => playTone(783.99, 'sine', 0.18, 0.12), 160);[cite: 1]
+    function soundSuccess() {
+      playTone(523.25, 'sine', 0.1, 0.1);
+      setTimeout(() => playTone(659.25, 'sine', 0.12, 0.1), 80);
+      setTimeout(() => playTone(783.99, 'sine', 0.18, 0.12), 160);
     }
-    function soundTuti() {[cite: 1]
-      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {[cite: 1]
-        setTimeout(() => playTone(freq, 'triangle', 0.22, 0.15), idx * 90);[cite: 1]
+    function soundTuti() {
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+        setTimeout(() => playTone(freq, 'triangle', 0.22, 0.15), idx * 90);
       });
     }
 
     // CONFETI
-    function launchConfetti(isTuti = false) {[cite: 1]
-      if (typeof confetti !== 'function') return;[cite: 1]
-      if (isTuti) {[cite: 1]
-        confetti({[cite: 1]
-          particleCount: 120,[cite: 1]
-          spread: 80,[cite: 1]
-          origin: { y: 0.6 },[cite: 1]
-          colors: ['#e63946', '#ffd166', '#06d6a0', '#118ab2'][cite: 1]
+    function launchConfetti(isTuti = false) {
+      if (typeof confetti !== 'function') return;
+      if (isTuti) {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#e63946', '#ffd166', '#06d6a0', '#118ab2']
         });
       } else {
-        confetti({[cite: 1]
-          particleCount: 45,[cite: 1]
-          spread: 60,[cite: 1]
-          origin: { y: 0.7 }[cite: 1]
+        confetti({
+          particleCount: 45,
+          spread: 60,
+          origin: { y: 0.7 }
         });
       }
     }
 
-    function vibrate(ms = 12) {[cite: 1]
-      if (navigator.vibrate) navigator.vibrate(ms);[cite: 1]
+    function vibrate(ms = 12) {
+      if (navigator.vibrate) navigator.vibrate(ms);
     }
 
-    async function initUI() {[cite: 1]
+    async function initUI() {
       try {
         const res = await fetch(`${API_URL}/api/repte?t=${Date.now()}`, { cache: "no-store" });
-        DAILY_GAME = await res.json();[cite: 1]
+        DAILY_GAME = await res.json();
 
-        CURRENT_CHALLENGE_ID = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;[cite: 1]
-        outerPositions = [...DAILY_GAME.outer];[cite: 1]
+        CURRENT_CHALLENGE_ID = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;
+        outerPositions = [...DAILY_GAME.outer];
 
-        document.getElementById('challenge-day-label').innerText = `Repte Núm. ${DAILY_GAME.num}`;[cite: 1]
-        document.getElementById('challenge-date-label').innerText = DAILY_GAME.data;[cite: 1]
-        document.getElementById('target-value').innerText = DAILY_GAME.target;[cite: 1]
-        document.getElementById('center-val').innerText = DAILY_GAME.center;[cite: 1]
-        document.getElementById('total-solutions-count').innerText = DAILY_GAME.total;[cite: 1]
+        document.getElementById('challenge-day-label').innerText = `Repte Núm. ${DAILY_GAME.num}`;
+        document.getElementById('challenge-date-label').innerText = DAILY_GAME.data;
+        document.getElementById('target-value').innerText = DAILY_GAME.target;
+        document.getElementById('center-val').innerText = DAILY_GAME.center;
+        document.getElementById('total-solutions-count').innerText = DAILY_GAME.total;
 
-        renderOuterHexagons();[cite: 1]
-        loadSavedProgress();[cite: 1]
-        updateStreak();[cite: 1]
-        updateScoreboard();[cite: 1]
-      } catch (err) {[cite: 1]
-        showToast("Error connectant amb el servidor", "error");[cite: 1]
+        renderOuterHexagons();
+        loadSavedProgress();
+        updateStreak();
+        updateScoreboard();
+      } catch (err) {
+        showToast("Error connectant amb el servidor", "error");
       }
     }
 
-    function autoPurgeOldChallenges() {[cite: 1]
-      try {[cite: 1]
-        const keysToRemove = [];[cite: 1]
-        for (let i = 0; i < localStorage.length; i++) {[cite: 1]
-          const key = localStorage.key(i);[cite: 1]
-          if (key && key.startsWith('matelogic_d') && key !== CURRENT_CHALLENGE_ID) {[cite: 1]
-            keysToRemove.push(key);[cite: 1]
+    function autoPurgeOldChallenges() {
+      try {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('matelogic_d') && key !== CURRENT_CHALLENGE_ID) {
+            keysToRemove.push(key);
           }
         }
-        keysToRemove.forEach(k => localStorage.removeItem(k));[cite: 1]
-      } catch (e) {}[cite: 1]
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+      } catch (e) {}
     }
 
-    function loadSavedProgress() {[cite: 1]
-      autoPurgeOldChallenges();[cite: 1]
-      try {[cite: 1]
-        const raw = localStorage.getItem(CURRENT_CHALLENGE_ID);[cite: 1]
-        if (raw) {[cite: 1]
-          const parsed = JSON.parse(raw);[cite: 1]
-          if (parsed && parsed.challengeId === CURRENT_CHALLENGE_ID) {[cite: 1]
-            gameState.solutions = parsed.solutions || [];[cite: 1]
-            gameState.score = parsed.score || 0;[cite: 1]
+    function loadSavedProgress() {
+      autoPurgeOldChallenges();
+      try {
+        const raw = localStorage.getItem(CURRENT_CHALLENGE_ID);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.challengeId === CURRENT_CHALLENGE_ID) {
+            gameState.solutions = parsed.solutions || [];
+            gameState.score = parsed.score || 0;
           }
         }
-        const rawStreak = localStorage.getItem('matelogic_streak');[cite: 1]
-        if (rawStreak) streakState = JSON.parse(rawStreak);[cite: 1]
-      } catch (e) {}[cite: 1]
+        const rawStreak = localStorage.getItem('matelogic_streak');
+        if (rawStreak) streakState = JSON.parse(rawStreak);
+      } catch (e) {}
     }
 
-    function persistProgress() {[cite: 1]
-      try {[cite: 1]
-        localStorage.setItem(CURRENT_CHALLENGE_ID, JSON.stringify({[cite: 1]
-          challengeId: CURRENT_CHALLENGE_ID,[cite: 1]
-          solutions: gameState.solutions,[cite: 1]
-          score: gameState.score[cite: 1]
+    function persistProgress() {
+      try {
+        localStorage.setItem(CURRENT_CHALLENGE_ID, JSON.stringify({
+          challengeId: CURRENT_CHALLENGE_ID,
+          solutions: gameState.solutions,
+          score: gameState.score
         }));
-      } catch (e) {}[cite: 1]
+      } catch (e) {}
     }
 
-    function updateStreak() {[cite: 1]
-      const todayStr = DAILY_GAME.data;[cite: 1]
-      if (gameState.solutions.length > 0 && streakState.lastPlayedDate !== todayStr) {[cite: 1]
-        const parts = todayStr.split('/');[cite: 1]
-        const currentD = new Date(parts[2], parts[1] - 1, parts[0]);[cite: 1]
+    function updateStreak() {
+      const todayStr = DAILY_GAME.data;
+      if (gameState.solutions.length > 0 && streakState.lastPlayedDate !== todayStr) {
+        const parts = todayStr.split('/');
+        const currentD = new Date(parts[2], parts[1] - 1, parts[0]);
 
-        if (streakState.lastPlayedDate) {[cite: 1]
-          const lParts = streakState.lastPlayedDate.split('/');[cite: 1]
-          const lastD = new Date(lParts[2], lParts[1] - 1, lParts[0]);[cite: 1]
-          const diffDays = Math.round((currentD - lastD) / (1000 * 60 * 60 * 24));[cite: 1]
+        if (streakState.lastPlayedDate) {
+          const lParts = streakState.lastPlayedDate.split('/');
+          const lastD = new Date(lParts[2], lParts[1] - 1, lParts[0]);
+          const diffDays = Math.round((currentD - lastD) / (1000 * 60 * 60 * 24));
 
-          if (diffDays === 1) streakState.current += 1;[cite: 1]
-          else if (diffDays > 1) streakState.current = 1;[cite: 1]
+          if (diffDays === 1) streakState.current += 1;
+          else if (diffDays > 1) streakState.current = 1;
         } else {
-          streakState.current = 1;[cite: 1]
+          streakState.current = 1;
         }
-        streakState.lastPlayedDate = todayStr;[cite: 1]
-        localStorage.setItem('matelogic_streak', JSON.stringify(streakState));[cite: 1]
+        streakState.lastPlayedDate = todayStr;
+        localStorage.setItem('matelogic_streak', JSON.stringify(streakState));
       }
-      document.getElementById('streak-counter').innerText = streakState.current;[cite: 1]
+      document.getElementById('streak-counter').innerText = streakState.current;
     }
 
-    function getRank(count, total) {[cite: 1]
-      if (!total) return "Principiant";[cite: 1]
-      const pct = (count / total) * 100;[cite: 1]
-      if (pct === 100) return "Geni Matemàtic 👑";[cite: 1]
-      if (pct >= 70) return "Mestre 🎖️";[cite: 1]
-      if (pct >= 45) return "Hàbil ⚡";[cite: 1]
-      if (pct >= 20) return "Afeccionat 💡";[cite: 1]
-      return "Principiant";[cite: 1]
+    function getRank(count, total) {
+      if (!total) return "Principiant";
+      const pct = (count / total) * 100;
+      if (pct === 100) return "Geni Matemàtic 👑";
+      if (pct >= 70) return "Mestre 🎖️";
+      if (pct >= 45) return "Hàbil ⚡";
+      if (pct >= 20) return "Afeccionat 💡";
+      return "Principiant";
     }
 
-    function renderOuterHexagons() {[cite: 1]
-      outerPositions.forEach((val, idx) => {[cite: 1]
-        const btn = document.getElementById(`hex-${idx}`);[cite: 1]
-        if (btn) {[cite: 1]
-          btn.innerText = val;[cite: 1]
-          const hexId = `hex-${idx}`;[cite: 1]
-          if (usedHexIds.has(hexId)) btn.classList.add('used');[cite: 1]
-          else btn.classList.remove('used');[cite: 1]
+    function renderOuterHexagons() {
+      outerPositions.forEach((val, idx) => {
+        const btn = document.getElementById(`hex-${idx}`);
+        if (btn) {
+          btn.innerText = val;
+          const hexId = `hex-${idx}`;
+          if (usedHexIds.has(hexId)) btn.classList.add('used');
+          else btn.classList.remove('used');
         }
       });
-      const centerBtn = document.getElementById('hex-center');[cite: 1]
-      if (usedHexIds.has('hex-center')) centerBtn.classList.add('used');[cite: 1]
-      else centerBtn.classList.remove('used');[cite: 1]
+      const centerBtn = document.getElementById('hex-center');
+      if (usedHexIds.has('hex-center')) centerBtn.classList.add('used');
+      else centerBtn.classList.remove('used');
     }
 
-    function shuffleOuterHexagons() {[cite: 1]
-      soundClick();[cite: 1]
-      vibrate(10);[cite: 1]
-      for (let i = outerPositions.length - 1; i > 0; i--) {[cite: 1]
-        const j = Math.floor(Math.random() * (i + 1));[cite: 1]
-        [outerPositions[i], outerPositions[j]] = [outerPositions[j], outerPositions[i]];[cite: 1]
+    function shuffleOuterHexagons() {
+      soundClick();
+      vibrate(10);
+      for (let i = outerPositions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [outerPositions[i], outerPositions[j]] = [outerPositions[j], outerPositions[i]];
       }
-      renderOuterHexagons();[cite: 1]
-      showToast("Dígits barallats!", "info");[cite: 1]
+      renderOuterHexagons();
+      showToast("Dígits barallats!", "info");
     }
 
-    function updateDisplay() {[cite: 1]
-      document.getElementById('display-text').innerText = tokens.map(t => t.display).join(' ');[cite: 1]
+    function updateDisplay() {
+      document.getElementById('display-text').innerText = tokens.map(t => t.display).join(' ');
     }
 
-    function appendChar(char) {[cite: 1]
-      soundClick();[cite: 1]
-      vibrate(8);[cite: 1]
-      if (tokens.length >= 20) return showToast("Operació massa llarga", "warning");[cite: 1]
-      let normalized = char;[cite: 1]
-      let displayChar = char;[cite: 1]
-      if (char === '×' || char === '*') { normalized = '*'; displayChar = '×'; }[cite: 1]
-      if (char === '÷' || char === '/') { normalized = '/'; displayChar = '÷'; }[cite: 1]
-      if (char === '−' || char === '-') { normalized = '-'; displayChar = '−'; }[cite: 1]
-      tokens.push({ type: 'op', val: normalized, display: displayChar, id: null });[cite: 1]
-      updateDisplay();[cite: 1]
+    function appendChar(char) {
+      soundClick();
+      vibrate(8);
+      if (tokens.length >= 20) return showToast("Operació massa llarga", "warning");
+      let normalized = char;
+      let displayChar = char;
+      if (char === '×' || char === '*') { normalized = '*'; displayChar = '×'; }
+      if (char === '÷' || char === '/') { normalized = '/'; displayChar = '÷'; }
+      if (char === '−' || char === '-') { normalized = '-'; displayChar = '−'; }
+      tokens.push({ type: 'op', val: normalized, display: displayChar, id: null });
+      updateDisplay();
     }
 
-    function handleHexClick(index) {[cite: 1]
-      soundClick();[cite: 1]
-      vibrate(10);[cite: 1]
-      const hexId = `hex-${index}`;[cite: 1]
-      if (usedHexIds.has(hexId)) return;[cite: 1]
-      const lastToken = tokens[tokens.length - 1];[cite: 1]
-      if (lastToken && lastToken.type === 'num') return showToast("Cal un operador (+, −, ×, ÷)", "warning");[cite: 1]
-      const val = outerPositions[index];[cite: 1]
-      tokens.push({ type: 'num', val: val.toString(), display: val.toString(), id: hexId });[cite: 1]
-      usedHexIds.add(hexId);[cite: 1]
-      renderOuterHexagons();[cite: 1]
-      updateDisplay();[cite: 1]
+    function handleHexClick(index) {
+      soundClick();
+      vibrate(10);
+      const hexId = `hex-${index}`;
+      if (usedHexIds.has(hexId)) return;
+      const lastToken = tokens[tokens.length - 1];
+      if (lastToken && lastToken.type === 'num') return showToast("Cal un operador (+, −, ×, ÷)", "warning");
+      const val = outerPositions[index];
+      tokens.push({ type: 'num', val: val.toString(), display: val.toString(), id: hexId });
+      usedHexIds.add(hexId);
+      renderOuterHexagons();
+      updateDisplay();
     }
 
-    function handleHexCenterClick() {[cite: 1]
-      soundClick();[cite: 1]
-      vibrate(12);[cite: 1]
-      const hexId = 'hex-center';[cite: 1]
-      if (usedHexIds.has(hexId)) return;[cite: 1]
-      const lastToken = tokens[tokens.length - 1];[cite: 1]
-      if (lastToken && lastToken.type === 'num') return showToast("Cal un operador (+, −, ×, ÷)", "warning");[cite: 1]
-      tokens.push({ type: 'num', val: DAILY_GAME.center.toString(), display: DAILY_GAME.center.toString(), id: hexId });[cite: 1]
-      usedHexIds.add(hexId);[cite: 1]
-      renderOuterHexagons();[cite: 1]
-      updateDisplay();[cite: 1]
+    function handleHexCenterClick() {
+      soundClick();
+      vibrate(12);
+      const hexId = 'hex-center';
+      if (usedHexIds.has(hexId)) return;
+      const lastToken = tokens[tokens.length - 1];
+      if (lastToken && lastToken.type === 'num') return showToast("Cal un operador (+, −, ×, ÷)", "warning");
+      tokens.push({ type: 'num', val: DAILY_GAME.center.toString(), display: DAILY_GAME.center.toString(), id: hexId });
+      usedHexIds.add(hexId);
+      renderOuterHexagons();
+      updateDisplay();
     }
 
-    function handleDelete() {[cite: 1]
-      soundDelete();[cite: 1]
-      vibrate(8);[cite: 1]
-      const last = tokens.pop();[cite: 1]
-      if (last && last.id) {[cite: 1]
-        usedHexIds.delete(last.id);[cite: 1]
-        renderOuterHexagons();[cite: 1]
+    function handleDelete() {
+      soundDelete();
+      vibrate(8);
+      const last = tokens.pop();
+      if (last && last.id) {
+        usedHexIds.delete(last.id);
+        renderOuterHexagons();
       }
-      updateDisplay();[cite: 1]
+      updateDisplay();
     }
 
-    async function handleSubmit() {[cite: 1]
-      vibrate(15);[cite: 1]
-      const displayContainer = document.getElementById('display-container');[cite: 1]
-      if (tokens.length === 0) return showToast("Escriu una operació primer", "warning");[cite: 1]
+    async function handleSubmit() {
+      vibrate(15);
+      const displayContainer = document.getElementById('display-container');
+      if (tokens.length === 0) return showToast("Escriu una operació primer", "warning");
 
-      const rawExpr = tokens.map(t => t.val).join('');[cite: 1]
-      const submitBtn = document.getElementById('submit-btn');[cite: 1]
-      submitBtn.disabled = true;[cite: 1]
+      const rawExpr = tokens.map(t => t.val).join('');
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
 
-      try {[cite: 1]
-        const res = await fetch(`${API_URL}/api/validar`, {[cite: 1]
-          method: 'POST',[cite: 1]
-          headers: { 'Content-Type': 'application/json' },[cite: 1]
-          body: JSON.stringify({ expressio: rawExpr, tokens })[cite: 1]
+      try {
+        const res = await fetch(`${API_URL}/api/validar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ expressio: rawExpr, tokens })
         });
-        const data = await res.json();[cite: 1]
+        const data = await res.json();
 
-        if (!data.ok) {[cite: 1]
-          soundError();[cite: 1]
-          shakeElement(displayContainer);[cite: 1]
-          showToast(data.msg, "error");[cite: 1]
-          return;[cite: 1]
+        if (!data.ok) {
+          soundError();
+          shakeElement(displayContainer);
+          showToast(data.msg, "error");
+          return;
         }
 
-        if (gameState.solutions.some(s => s.canonic === data.canonic)) {[cite: 1]
-          soundError();[cite: 1]
-          shakeElement(displayContainer);[cite: 1]
-          showToast("Ja havies trobat aquesta operació!", "warning");[cite: 1]
-          return;[cite: 1]
+        if (gameState.solutions.some(s => s.canonic === data.canonic)) {
+          soundError();
+          shakeElement(displayContainer);
+          showToast("Ja havies trobat aquesta operació!", "warning");
+          return;
         }
 
-        const expressioVisual = tokens.map(t => t.display).join(' ');[cite: 1]
-        gameState.solutions.push({[cite: 1]
-          expression: expressioVisual,[cite: 1]
-          canonic: data.canonic,[cite: 1]
-          points: data.punts,[cite: 1]
-          esTuti: data.esTuti,[cite: 1]
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })[cite: 1]
+        const expressioVisual = tokens.map(t => t.display).join(' ');
+        gameState.solutions.push({
+          expression: expressioVisual,
+          canonic: data.canonic,
+          points: data.punts,
+          esTuti: data.esTuti,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
-        gameState.score += data.punts;[cite: 1]
+        gameState.score += data.punts;
 
-        persistProgress();[cite: 1]
-        updateStreak();[cite: 1]
-        updateScoreboard();[cite: 1]
+        persistProgress();
+        updateStreak();
+        updateScoreboard();
 
-        if (data.esTuti) {[cite: 1]
-          soundTuti();[cite: 1]
-          vibrate([30, 50, 30, 50, 60]);[cite: 1]
-          launchConfetti(true);[cite: 1]
-          showToast("🌟 TUTI MATEMÀTIC! Els 7 nombres usats! +20pts", "success");[cite: 1]
+        if (data.esTuti) {
+          soundTuti();
+          vibrate([30, 50, 30, 50, 60]);
+          launchConfetti(true);
+          showToast("🌟 TUTI MATEMÀTIC! Els 7 nombres usats! +20pts", "success");
         } else {
-          soundSuccess();[cite: 1]
-          launchConfetti(false);[cite: 1]
-          showToast(`Operació vàlida! +${data.punts} pts`, "success");[cite: 1]
+          soundSuccess();
+          launchConfetti(false);
+          showToast(`Operació vàlida! +${data.punts} pts`, "success");
         }
 
-        tokens = [];[cite: 1]
-        usedHexIds.clear();[cite: 1]
-        renderOuterHexagons();[cite: 1]
-        updateDisplay();[cite: 1]
+        tokens = [];
+        usedHexIds.clear();
+        renderOuterHexagons();
+        updateDisplay();
 
-      } catch (err) {[cite: 1]
-        soundError();[cite: 1]
-        showToast("Error de connexió", "error");[cite: 1]
+      } catch (err) {
+        soundError();
+        showToast("Error de connexió", "error");
       } finally {
-        submitBtn.disabled = false;[cite: 1]
+        submitBtn.disabled = false;
       }
     }
 
-    function updateScoreboard() {[cite: 1]
-      const trobades = gameState.solutions.length;[cite: 1]
-      const total = DAILY_GAME ? DAILY_GAME.total : 0;[cite: 1]
+    function updateScoreboard() {
+      const trobades = gameState.solutions.length;
+      const total = DAILY_GAME ? DAILY_GAME.total : 0;
 
-      document.getElementById('solutions-count').innerText = trobades;[cite: 1]
-      document.getElementById('score-counter').innerText = gameState.score;[cite: 1]
-      document.getElementById('modal-total-count').innerText = trobades;[cite: 1]
-      document.getElementById('modal-total-score').innerText = gameState.score;[cite: 1]
+      document.getElementById('solutions-count').innerText = trobades;
+      document.getElementById('score-counter').innerText = gameState.score;
+      document.getElementById('modal-total-count').innerText = trobades;
+      document.getElementById('modal-total-score').innerText = gameState.score;
 
-      const pct = total ? Math.min(Math.round((trobades / total) * 100), 100) : 0;[cite: 1]
-      document.getElementById('rank-progress').innerText = pct;[cite: 1]
-      document.getElementById('rank-bar').style.width = `${pct}%`;[cite: 1]
-      document.getElementById('rank-label').innerText = getRank(trobades, total);[cite: 1]
+      const pct = total ? Math.min(Math.round((trobades / total) * 100), 100) : 0;
+      document.getElementById('rank-progress').innerText = pct;
+      document.getElementById('rank-bar').style.width = `${pct}%`;
+      document.getElementById('rank-label').innerText = getRank(trobades, total);
 
-      const listContainer = document.getElementById('solutions-list-container');[cite: 1]
-      listContainer.innerHTML = '';[cite: 1]
-      if (trobades === 0) {[cite: 1]
-        listContainer.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs">Encara no has trobat cap operació vàlida avui.</div>`;[cite: 1]
+      const listContainer = document.getElementById('solutions-list-container');
+      listContainer.innerHTML = '';
+      if (trobades === 0) {
+        listContainer.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs">Encara no has trobat cap operació vàlida avui.</div>`;
       } else {
-        gameState.solutions.slice().reverse().forEach((sol, index) => {[cite: 1]
-          const item = document.createElement('div');[cite: 1]
-          item.className = `flex items-center justify-between p-2.5 ${sol.esTuti ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800' : 'bg-slate-50 dark:bg-slate-700/50 border-slate-200/80 dark:border-slate-700'} border rounded-xl text-xs font-mono font-bold text-slate-700 dark:text-slate-200`;[cite: 1]
-          item.innerHTML = `<span><span class="text-slate-400 text-[10px] mr-1.5">#${trobades - index}</span>${sol.expression} = <span class="text-brand-blueDark dark:text-sky-300">${DAILY_GAME.target}</span> ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-black">+${sol.points} pts</span>`;[cite: 1]
-          listContainer.appendChild(item);[cite: 1]
+        gameState.solutions.slice().reverse().forEach((sol, index) => {
+          const item = document.createElement('div');
+          item.className = `flex items-center justify-between p-2.5 ${sol.esTuti ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800' : 'bg-slate-50 dark:bg-slate-700/50 border-slate-200/80 dark:border-slate-700'} border rounded-xl text-xs font-mono font-bold text-slate-700 dark:text-slate-200`;
+          item.innerHTML = `<span><span class="text-slate-400 text-[10px] mr-1.5">#${trobades - index}</span>${sol.expression} = <span class="text-brand-blueDark dark:text-sky-300">${DAILY_GAME.target}</span> ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-black">+${sol.points} pts</span>`;
+          listContainer.appendChild(item);
         });
       }
     }
 
-    async function openYesterdayModal() {[cite: 1]
+    async function openYesterdayModal() {
       try {
         const res = await fetch(`${API_URL}/api/ahir?t=${Date.now()}`, { cache: "no-store" });
-        const data = await res.json();[cite: 1]
-        document.getElementById('yesterday-subtitle').innerText = `Repte Núm. ${data.num} (${data.data})`;[cite: 1]
-        document.getElementById('yesterday-target').innerText = data.target;[cite: 1]
-        document.getElementById('yesterday-center').innerText = data.center;[cite: 1]
+        const data = await res.json();
+        document.getElementById('yesterday-subtitle').innerText = `Repte Núm. ${data.num} (${data.data})`;
+        document.getElementById('yesterday-target').innerText = data.target;
+        document.getElementById('yesterday-center').innerText = data.center;
 
-        const listContainer = document.getElementById('yesterday-list-container');[cite: 1]
-        listContainer.innerHTML = '';[cite: 1]
-        data.solucions.forEach((expr, idx) => {[cite: 1]
-          const item = document.createElement('div');[cite: 1]
-          item.className = "p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 rounded-lg flex items-center justify-between";[cite: 1]
-          item.innerHTML = `<span><span class="text-slate-400 text-[10px] mr-1.5">#${idx + 1}</span>${expr}</span> <strong class="text-brand-blueDark dark:text-sky-300">= ${data.target}</strong>`;[cite: 1]
-          listContainer.appendChild(item);[cite: 1]
+        const listContainer = document.getElementById('yesterday-list-container');
+        listContainer.innerHTML = '';
+        data.solucions.forEach((expr, idx) => {
+          const item = document.createElement('div');
+          item.className = "p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 rounded-lg flex items-center justify-between";
+          item.innerHTML = `<span><span class="text-slate-400 text-[10px] mr-1.5">#${idx + 1}</span>${expr}</span> <strong class="text-brand-blueDark dark:text-sky-300">= ${data.target}</strong>`;
+          listContainer.appendChild(item);
         });
-        openModal('yesterday-modal');[cite: 1]
-      } catch (err) {[cite: 1]
-        showToast("No s'ha pogut carregar la solució d'ahir", "error");[cite: 1]
+        openModal('yesterday-modal');
+      } catch (err) {
+        showToast("No s'ha pogut carregar la solució d'ahir", "error");
       }
     }
 
-    function showToast(message, type = "info") {[cite: 1]
-      const container = document.getElementById('toast-container');[cite: 1]
-      const toast = document.createElement('div');[cite: 1]
-      const bgStyles = {[cite: 1]
-        success: "bg-emerald-600 text-white border-emerald-700",[cite: 1]
-        error: "bg-brand-red text-white border-red-700",[cite: 1]
-        warning: "bg-amber-500 text-white border-amber-600",[cite: 1]
-        info: "bg-slate-800 text-white border-slate-900"[cite: 1]
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgStyles = {
+        success: "bg-emerald-600 text-white border-emerald-700",
+        error: "bg-brand-red text-white border-red-700",
+        warning: "bg-amber-500 text-white border-amber-600",
+        info: "bg-slate-800 text-white border-slate-900"
       };
-      toast.className = `${bgStyles[type] || bgStyles.info} border px-4 py-2.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transform transition-all duration-300 translate-y-[-10px] opacity-0 pointer-events-auto`;[cite: 1]
-      toast.innerHTML = `<span>${message}</span>`;[cite: 1]
-      container.appendChild(toast);[cite: 1]
-      setTimeout(() => toast.classList.remove('translate-y-[-10px]', 'opacity-0'), 10);[cite: 1]
-      setTimeout(() => {[cite: 1]
-        toast.classList.add('opacity-0', 'translate-y-[-10px]');[cite: 1]
-        setTimeout(() => toast.remove(), 300);[cite: 1]
-      }, 2600);[cite: 1]
+      toast.className = `${bgStyles[type] || bgStyles.info} border px-4 py-2.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transform transition-all duration-300 translate-y-[-10px] opacity-0 pointer-events-auto`;
+      toast.innerHTML = `<span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-[-10px]', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-[-10px]');
+        setTimeout(() => toast.remove(), 300);
+      }, 2600);
     }
 
-    function shakeElement(el) {[cite: 1]
-      el.classList.remove('animate-shake');[cite: 1]
-      void el.offsetWidth;[cite: 1]
-      el.classList.add('animate-shake');[cite: 1]
+    function shakeElement(el) {
+      el.classList.remove('animate-shake');
+      void el.offsetWidth;
+      el.classList.add('animate-shake');
     }
 
-    function openModal(id) {[cite: 1]
-      if (id === 'share-modal') {[cite: 1]
-        const trobades = gameState.solutions.length;[cite: 1]
-        const total = DAILY_GAME ? DAILY_GAME.total : 0;[cite: 1]
-        document.getElementById('share-modal-num').innerText = `#${DAILY_GAME.num}`;[cite: 1]
-        document.getElementById('share-modal-target').innerText = DAILY_GAME.target;[cite: 1]
-        document.getElementById('share-modal-count').innerText = trobades;[cite: 1]
-        document.getElementById('share-modal-total').innerText = total;[cite: 1]
-        document.getElementById('share-modal-score').innerText = gameState.score;[cite: 1]
-        document.getElementById('share-modal-streak').innerText = streakState.current;[cite: 1]
-        document.getElementById('share-modal-rank').innerText = getRank(trobades, total);[cite: 1]
+    function openModal(id) {
+      if (id === 'share-modal') {
+        const trobades = gameState.solutions.length;
+        const total = DAILY_GAME ? DAILY_GAME.total : 0;
+        document.getElementById('share-modal-num').innerText = `#${DAILY_GAME.num}`;
+        document.getElementById('share-modal-target').innerText = DAILY_GAME.target;
+        document.getElementById('share-modal-count').innerText = trobades;
+        document.getElementById('share-modal-total').innerText = total;
+        document.getElementById('share-modal-score').innerText = gameState.score;
+        document.getElementById('share-modal-streak').innerText = streakState.current;
+        document.getElementById('share-modal-rank').innerText = getRank(trobades, total);
       }
-      document.getElementById(id).classList.remove('hidden');[cite: 1]
+      document.getElementById(id).classList.remove('hidden');
     }
 
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }[cite: 1]
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     async function copyShareText() {
       const trobades = gameState.solutions.length;
@@ -734,7 +734,7 @@
 
       const shareText = `Matelògic #${DAILY_GAME.num} 🧮\n🎯 Meta: ${DAILY_GAME.target}\nSolucions: ${trobades}/${total} ${blocksStr}\n🎖️ Rang: ${rank}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga tu també a https://matelogic.cat`;
 
-      // 1. Prova amb el menú natiu de compartir (especialment per a telèfons)
+      // 1. Menú natiu mòbil
       if (navigator.share) {
         try {
           await navigator.share({
@@ -747,7 +747,7 @@
         }
       }
 
-      // 2. Si és un navegador d'escriptori o no suporta share(), copia al porta-retalls
+      // 2. Escriptori / Navegador clàssic
       try {
         if (navigator.clipboard && window.isSecureContext) {
           await navigator.clipboard.writeText(shareText);
@@ -779,13 +779,13 @@
     }
 
     // REGISTRE SERVICE WORKER
-    if ('serviceWorker' in navigator) {[cite: 1]
-      window.addEventListener('load', () => {[cite: 1]
-        navigator.serviceWorker.register('./sw.js').catch(() => {});[cite: 1]
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
 
-    window.addEventListener('DOMContentLoaded', initUI);[cite: 1]
+    window.addEventListener('DOMContentLoaded', initUI);
   </script>
 </body>
 </html>
