@@ -390,7 +390,6 @@
 
     async function initUI() {[cite: 1]
       try {
-        // Prevenció de memòria cau activa: sempre demana les dades actuals al servidor
         const res = await fetch(`${API_URL}/api/repte?t=${Date.now()}`, { cache: "no-store" });
         DAILY_GAME = await res.json();[cite: 1]
 
@@ -662,7 +661,7 @@
     }
 
     async function openYesterdayModal() {[cite: 1]
-      try {[cite: 1]
+      try {
         const res = await fetch(`${API_URL}/api/ahir?t=${Date.now()}`, { cache: "no-store" });
         const data = await res.json();[cite: 1]
         document.getElementById('yesterday-subtitle').innerText = `Repte Núm. ${data.num} (${data.data})`;[cite: 1]
@@ -699,7 +698,7 @@
       setTimeout(() => {[cite: 1]
         toast.classList.add('opacity-0', 'translate-y-[-10px]');[cite: 1]
         setTimeout(() => toast.remove(), 300);[cite: 1]
-      }, 2600);
+      }, 2600);[cite: 1]
     }
 
     function shakeElement(el) {[cite: 1]
@@ -725,40 +724,57 @@
 
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }[cite: 1]
 
-    function copyShareText() {[cite: 1]
-      const trobades = gameState.solutions.length;[cite: 1]
-      const total = DAILY_GAME.total;[cite: 1]
-      const rank = getRank(trobades, total);[cite: 1]
-      const blocksTotal = 5;[cite: 1]
-      const filled = total ? Math.round((trobades / total) * blocksTotal) : 0;[cite: 1]
-      const blocksStr = "🟩".repeat(filled) + "⬜".repeat(blocksTotal - filled);[cite: 1]
+    async function copyShareText() {
+      const trobades = gameState.solutions.length;
+      const total = DAILY_GAME ? DAILY_GAME.total : 0;
+      const rank = getRank(trobades, total);
+      const blocksTotal = 5;
+      const filled = total ? Math.min(Math.round((trobades / total) * blocksTotal), 100) : 0;
+      const blocksStr = "🟩".repeat(filled) + "⬜".repeat(Math.max(0, blocksTotal - filled));
 
-      const shareText = `Matelògic #${DAILY_GAME.num} 🧮\n🎯 Meta: ${DAILY_GAME.target}\nSolucions: ${trobades}/${total} ${blocksStr}\n🎖️ Rang: ${rank}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga tu també a https://matelogic.cat`;[cite: 1]
+      const shareText = `Matelògic #${DAILY_GAME.num} 🧮\n🎯 Meta: ${DAILY_GAME.target}\nSolucions: ${trobades}/${total} ${blocksStr}\n🎖️ Rang: ${rank}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga tu també a https://matelogic.cat`;
 
-      const textArea = document.createElement("textarea");[cite: 1]
-      textArea.value = shareText;[cite: 1]
-      textArea.style.position = "fixed";[cite: 1]
-      textArea.style.left = "-999999px";[cite: 1]
-      document.body.appendChild(textArea);[cite: 1]
-      textArea.focus();[cite: 1]
-      textArea.select();[cite: 1]
+      // 1. Prova amb el menú natiu de compartir (especialment per a telèfons)
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Matelògic',
+            text: shareText
+          });
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
 
-      try {[cite: 1]
-        document.execCommand('copy');[cite: 1]
-        const btn = document.getElementById('copy-btn');[cite: 1]
-        btn.innerHTML = `<span>Copiat al porta-retalls!</span>`;[cite: 1]
-        btn.classList.remove('bg-brand-red');[cite: 1]
-        btn.classList.add('bg-emerald-600');[cite: 1]
-        setTimeout(() => {[cite: 1]
-          btn.innerHTML = `<span>Copia el resultat</span>`;[cite: 1]
-          btn.classList.remove('bg-emerald-600');[cite: 1]
-          btn.classList.add('bg-brand-red');[cite: 1]
+      // 2. Si és un navegador d'escriptori o no suporta share(), copia al porta-retalls
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(shareText);
+        } else {
+          const textArea = document.createElement("textarea");
+          textArea.value = shareText;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        }
+
+        const btn = document.getElementById('copy-btn');
+        btn.innerHTML = `<span>Copiat al porta-retalls!</span>`;
+        btn.classList.remove('bg-brand-red');
+        btn.classList.add('bg-emerald-600');
+        setTimeout(() => {
+          btn.innerHTML = `<span>Copia el resultat</span>`;
+          btn.classList.remove('bg-emerald-600');
+          btn.classList.add('bg-brand-red');
         }, 2200);
-        showToast("Resultat copiat per compartir!", "success");[cite: 1]
-      } catch (err) {[cite: 1]
-        showToast("No s'ha pogut copiar automàticament", "error");[cite: 1]
-      } finally {
-        document.body.removeChild(textArea);[cite: 1]
+        showToast("Resultat copiat per compartir!", "success");
+      } catch (err) {
+        showToast("No s'ha pogut copiar el text", "error");
       }
     }
 
