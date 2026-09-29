@@ -183,13 +183,10 @@
       </button>
     </div>
 
-    <div class="mt-1 text-center">
+    <div class="mt-2 text-center">
       <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">
         Has trobat <span id="solutions-count" class="font-extrabold text-brand-red">0</span> de <span id="total-solutions-count" class="font-extrabold text-slate-800 dark:text-white">--</span> solucions.
       </p>
-      <button onclick="openModal('solutions-modal')" class="text-xs text-brand-blueDark dark:text-sky-300 font-bold hover:underline mt-0.5 inline-block">
-        Veure solucions trobades &rarr;
-      </button>
     </div>
   </main>
 
@@ -456,16 +453,22 @@
     }
 
     function renderYesterday(data) {
-      document.getElementById('yesterday-target').innerText = data.target;
-      document.getElementById('yesterday-center').innerText = data.center;
+      document.getElementById('yesterday-target').innerText = data.target || '--';
+      document.getElementById('yesterday-center').innerText = data.center || '--';
       const list = document.getElementById('yesterday-list-container');
       list.innerHTML = '';
-      (data.solucions || []).forEach((expr) => {
-        const item = document.createElement('div');
-        item.className = "p-2 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 flex justify-between";
-        item.innerHTML = `<span>${expr}</span><strong>= ${data.target}</strong>`;
-        list.appendChild(item);
-      });
+      
+      const solucions = data.solucions || [];
+      if (solucions.length === 0) {
+        list.innerHTML = '<p class="text-center text-slate-400 py-4">No hi ha solucions registrades per ahir.</p>';
+      } else {
+        solucions.forEach((expr, idx) => {
+          const item = document.createElement('div');
+          item.className = "p-2 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 flex justify-between";
+          item.innerHTML = `<span><span class="text-slate-400 text-[10px] mr-1">#${idx + 1}</span> ${expr}</span> <strong>= ${data.target}</strong>`;
+          list.appendChild(item);
+        });
+      }
       openModal('yesterday-modal');
     }
 
