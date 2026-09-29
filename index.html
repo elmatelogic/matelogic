@@ -527,7 +527,7 @@
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const total = DAILY_GAME ? DAILY_GAME.total : 0;
-      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://matelogic.cat`;
+      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://www.matelogic.cat`;
 
       if (navigator.share) {
         try {
