@@ -424,7 +424,7 @@
 
         if (data.esTuti) {
           confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-          showToast("🌟 TUTI! Tots els nombres usats! +20pts", "success");
+          showToast("🌟 TUTI! Tots els nombres utilitzats! +20pts", "success");
         } else {
           showToast(`Correcte! +${data.punts} pts`, "success");
         }
@@ -452,7 +452,7 @@
       const pct = total ? Math.min(Math.round((trobades / total) * 100), 100) : 0;
       document.getElementById('rank-progress').innerText = pct;
       document.getElementById('rank-bar').style.width = `${pct}%`;
-      document.getElementById('rank-label').innerText = pct >= 100 ? "Geni 👑" : pct >= 50 ? "Mestre 🎖️" : "Principiant";
+      document.getElementById('rank-label').innerText = pct >= 100 ? "Geni 👑" : pct >= 50 ? "Mestre/a 🎖️" : "Principiant";
 
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
