@@ -82,9 +82,25 @@
       </button>
     </div>
 
-    <!-- LOGO -->
-    <div class="flex items-center gap-1 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-      <span class="tracking-tighter font-extrabold text-2xl text-slate-900 dark:text-white">MATE<span class="text-brand-blue">LÒGIC</span></span>
+    <!-- LOGO AMB HEXÀGON COM A Ò -->
+    <div class="flex items-center cursor-pointer select-none" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+      <div class="flex items-center tracking-tight font-extrabold text-2xl">
+        <span class="text-slate-900 dark:text-white">MATE</span>
+        <span class="text-brand-blue flex items-center ml-0.5">
+          L
+          <span class="relative inline-flex items-center justify-center mx-[2px] w-6 h-6">
+            <!-- Accent obert (`) -->
+            <svg class="absolute -top-1 left-1.5 w-2 h-2 text-brand-red fill-current" viewBox="0 0 10 10">
+              <path d="M7 1L2 5L3 8L8 4Z" />
+            </svg>
+            <!-- Hexàgon vermell massís -->
+            <svg class="w-5 h-5 text-brand-red fill-current drop-shadow-xs" viewBox="0 0 24 24">
+              <polygon points="12,2 21,7.2 21,17.8 12,23 3,17.8 3,7.2"/>
+            </svg>
+          </span>
+          GIC
+        </span>
+      </div>
     </div>
 
     <!-- RATXA + COMPARTIR -->
