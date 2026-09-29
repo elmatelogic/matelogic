@@ -285,6 +285,7 @@
         loadSavedProgress();
         updateScoreboard();
       } catch (err) {
+        console.error("Error initUI:", err);
         showToast("Error carregant el repte", "error");
       }
     }
@@ -379,7 +380,10 @@
     }
 
     async function handleSubmit() {
-      if (tokens.length === 0) return;
+      if (!tokens || tokens.length === 0) {
+        showToast("Escriu una operació primer", "warning");
+        return;
+      }
       const rawExpr = tokens.map(t => t.val).join('');
       const submitBtn = document.getElementById('submit-btn');
       submitBtn.disabled = true;
@@ -388,8 +392,13 @@
         const res = await fetch(`${API_URL}api/validar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ expressio: rawExpr, tokens })
+          body: JSON.stringify({ expressio: rawExpr, tokens: tokens })
         });
+
+        if (!res.ok) {
+          throw new Error(`Error del servidor: ${res.status}`);
+        }
+
         const data = await res.json();
 
         if (!data.ok) {
@@ -426,7 +435,8 @@
         updateDisplay();
 
       } catch (err) {
-        showToast("Error validant la resposta", "error");
+        console.error("Error a handleSubmit:", err);
+        showToast("No s'ha pogut validar la jugada", "error");
       } finally {
         submitBtn.disabled = false;
       }
@@ -446,7 +456,7 @@
 
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
-      gameState.solutions.slice().reverse().forEach((sol, index) => {
+      gameState.solutions.slice().reverse().forEach((sol) => {
         const item = document.createElement('div');
         item.className = "p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs font-mono flex justify-between";
         item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME.target} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
@@ -470,6 +480,7 @@
         });
         openModal('yesterday-modal');
       } catch (err) {
+        console.error("Error openYesterdayModal:", err);
         showToast("Error carregant ahir", "error");
       }
     }
