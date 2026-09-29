@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MATELÒGIC - El joc matemàtic diari</title>
 
+  <!-- FAVICON HEXAGONAL VECTORIAL BASE64 -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBvbHlnb24gcG9pbnRzPSIxMiwxLjUgMjEuNSw3IDIxLjUsMTcgMTIsMjIuNSAyLjUsMTcgMi41LDciIGZpbGw9IiNlNjM5NDYiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIwLjciLz48dGV4dCB4PSIxMiIgeT0iMTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7iiJE8L3RleHQ+PC9zdmc+#v=2">
+
   <link rel="manifest" href="./manifest.json">
   <meta name="description" content="Troba les operacions matemàtiques correctes per assolir l'objectiu diari.">
   <meta name="theme-color" content="#e63946">
@@ -16,7 +19,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBvbHlnb24gcG9pbnRzPSIxMiwxLjUgMjEuNSw3IDIxLjUsMTcgMTIsMjIuNSAyLjUsMTcgMi41LDciIGZpbGw9IiNlNjM5NDYiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIwLjciLz48dGV4dCB4PSIxMiIgeT0iMTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7iiJE8L3RleHQ+PC9zdmc+#v=2">  
   
   <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "bb0b0097461a42fdbd85c4b1dd787d6e"}'></script><!-- End Cloudflare Web Analytics -->
-  
+ 
   <script>
     tailwind.config = {
       darkMode: 'media',
@@ -346,6 +349,34 @@
 
     function appendChar(char) {
       if (tokens.length >= 20) return;
+      const last = tokens[tokens.length - 1];
+
+      // Regles per al parèntesi obert '('
+      if (char === '(') {
+        if (last && (last.type === 'num' || last.val === ')')) {
+          return showToast("Cal un operador abans del parèntesi!", "warning");
+        }
+      }
+
+      // Regles per al parèntesi tancat ')'
+      if (char === ')') {
+        if (!last || (last.type === 'op' && last.val !== ')')) {
+          return showToast("Operació incompleta abans de tancar parèntesi", "warning");
+        }
+        const oberts = tokens.filter(t => t.val === '(').length;
+        const tancats = tokens.filter(t => t.val === ')').length;
+        if (oberts <= tancats) {
+          return showToast("No hi ha cap parèntesi per tancar!", "warning");
+        }
+      }
+
+      // Regles per a operadors binaris (+, -, *, /)
+      if (['+', '−', '×', '÷'].includes(char)) {
+        if (!last || (last.type === 'op' && last.val !== ')')) {
+          return showToast("Posa primer un número!", "warning");
+        }
+      }
+
       let raw = char;
       if (char === '×') raw = '*';
       if (char === '÷') raw = '/';
@@ -358,7 +389,11 @@
       const hexId = `hex-${index}`;
       if (usedHexIds.has(hexId)) return;
       const last = tokens[tokens.length - 1];
-      if (last && last.type === 'num') return showToast("Cal un operador!", "warning");
+      
+      if (last && (last.type === 'num' || last.val === ')')) {
+        return showToast("Cal un operador!", "warning");
+      }
+      
       const val = outerPositions[index];
       tokens.push({ type: 'num', val: val.toString(), display: val.toString(), id: hexId });
       usedHexIds.add(hexId);
@@ -370,7 +405,11 @@
       const hexId = 'hex-center';
       if (usedHexIds.has(hexId)) return;
       const last = tokens[tokens.length - 1];
-      if (last && last.type === 'num') return showToast("Cal un operador!", "warning");
+      
+      if (last && (last.type === 'num' || last.val === ')')) {
+        return showToast("Cal un operador!", "warning");
+      }
+      
       tokens.push({ type: 'num', val: DAILY_GAME.center.toString(), display: DAILY_GAME.center.toString(), id: hexId });
       usedHexIds.add(hexId);
       renderOuterHexagons();
@@ -431,7 +470,7 @@
 
         if (data.esTuti) {
           confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-          showToast("🌟 TUTI! Tots els nombres usats! +20pts", "success");
+          showToast(`🌟 TUTI! Tots els nombres usats! +${data.punts} pts`, "success");
         } else {
           showToast(`Correcte! +${data.punts} pts`, "success");
         }
@@ -528,7 +567,7 @@
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const total = DAILY_GAME ? DAILY_GAME.total : 0;
-      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://www.matelogic.cat`;
+      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://matelogic.cat`;
 
       if (navigator.share) {
         try {
