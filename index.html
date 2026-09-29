@@ -63,7 +63,7 @@
     .animate-pop { animation: pop 0.25s ease-out forwards; }
   </style>
 </head>
-<body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col justify-between items-center font-sans antialiased selection:bg-brand-blue selection:text-white">
+<body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col justify-start items-center font-sans antialiased selection:bg-brand-blue selection:text-white pb-6">
 
   <div id="toast-container" class="fixed top-5 z-50 flex flex-col gap-2 items-center pointer-events-none w-full max-w-sm px-4"></div>
 
@@ -99,7 +99,7 @@
   </header>
 
   <!-- CONTINGUT -->
-  <main class="w-full max-w-md flex-1 flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
+  <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
     <div class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider text-slate-400 px-2">
       <span id="challenge-day-label">Carregant repte...</span>
       <span id="challenge-date-label">-- / -- / ----</span>
@@ -193,16 +193,6 @@
     </div>
   </main>
 
-  <footer class="w-full text-center py-3 text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900">
-    <div class="max-w-md mx-auto flex items-center justify-center gap-3">
-      <span>Matelògic Diari</span>
-      <span>•</span>
-      <a href="javascript:void(0)" onclick="openYesterdayModal()" class="hover:underline">Solució d'ahir</a>
-      <span>•</span>
-      <a href="javascript:void(0)" onclick="openModal('info-modal')" class="hover:underline">Com es juga?</a>
-    </div>
-  </footer>
-
   <!-- MODAL INSTRUCCIONS -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 animate-pop">
@@ -260,6 +250,7 @@
     const API_URL = "https://matelogicbd.elmatelogic.workers.dev/";
 
     let DAILY_GAME = null;
+    let yesterdayCache = null;
     let tokens = [];
     let usedHexIds = new Set();
     let outerPositions = [];
@@ -424,7 +415,7 @@
 
         if (data.esTuti) {
           confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-          showToast("🌟 TUTI! Tots els nombres utilitzats! +20pts", "success");
+          showToast("🌟 TUTI! Tots els nombres usats! +20pts", "success");
         } else {
           showToast(`Correcte! +${data.punts} pts`, "success");
         }
@@ -452,7 +443,7 @@
       const pct = total ? Math.min(Math.round((trobades / total) * 100), 100) : 0;
       document.getElementById('rank-progress').innerText = pct;
       document.getElementById('rank-bar').style.width = `${pct}%`;
-      document.getElementById('rank-label').innerText = pct >= 100 ? "Geni 👑" : pct >= 50 ? "Mestre/a 🎖️" : "Principiant";
+      document.getElementById('rank-label').innerText = pct >= 100 ? "Geni 👑" : pct >= 50 ? "Mestre 🎖️" : "Principiant";
 
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
@@ -464,21 +455,30 @@
       });
     }
 
+    function renderYesterday(data) {
+      document.getElementById('yesterday-target').innerText = data.target;
+      document.getElementById('yesterday-center').innerText = data.center;
+      const list = document.getElementById('yesterday-list-container');
+      list.innerHTML = '';
+      (data.solucions || []).forEach((expr) => {
+        const item = document.createElement('div');
+        item.className = "p-2 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 flex justify-between";
+        item.innerHTML = `<span>${expr}</span><strong>= ${data.target}</strong>`;
+        list.appendChild(item);
+      });
+      openModal('yesterday-modal');
+    }
+
     async function openYesterdayModal() {
+      if (yesterdayCache) {
+        renderYesterday(yesterdayCache);
+        return;
+      }
+
       try {
         const res = await fetch(`${API_URL}api/ahir`);
-        const data = await res.json();
-        document.getElementById('yesterday-target').innerText = data.target;
-        document.getElementById('yesterday-center').innerText = data.center;
-        const list = document.getElementById('yesterday-list-container');
-        list.innerHTML = '';
-        data.solucions.forEach((expr) => {
-          const item = document.createElement('div');
-          item.className = "p-2 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 flex justify-between";
-          item.innerHTML = `<span>${expr}</span><strong>= ${data.target}</strong>`;
-          list.appendChild(item);
-        });
-        openModal('yesterday-modal');
+        yesterdayCache = await res.json();
+        renderYesterday(yesterdayCache);
       } catch (err) {
         console.error("Error openYesterdayModal:", err);
         showToast("Error carregant ahir", "error");
@@ -506,7 +506,7 @@
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const total = DAILY_GAME ? DAILY_GAME.total : 0;
-      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://elmatelogic.github.io/matelogic`;
+      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://matelogic.cat`;
 
       if (navigator.share) {
         try {
