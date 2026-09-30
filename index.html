@@ -330,7 +330,9 @@
         month: '2-digit',
         day: '2-digit'
       });
-      return formatter.format(new Date(Date.now() - 86400000));
+      const [y, m, d] = formatter.format(new Date()).split('-').map(Number);
+      const ahir = new Date(Date.UTC(y, m - 1, d - 1));
+      return formatter.format(ahir);
     }
 
     async function initUI() {
@@ -374,19 +376,25 @@
           gameState = { solutions: [], score: 0 };
         }
 
+        const todayStr = getTodayDateStr();
+        const yesterdayStr = getYesterdayDateStr();
         const rawStreak = localStorage.getItem('matelogic_streak');
+
         if (rawStreak) {
           streakState = JSON.parse(rawStreak);
-
-          // Comprovar si la ratxa ha caducat (si no ha jugat ni avui ni ahir)
-          const todayStr = getTodayDateStr();
-          const yesterdayStr = getYesterdayDateStr();
-
+          // Si no ha jugat ni avui ni ahir, la ratxa ha caducat
           if (streakState.lastPlayedDate !== todayStr && streakState.lastPlayedDate !== yesterdayStr) {
             streakState.current = 0;
           }
         } else {
           streakState = { current: 0, lastPlayedDate: "" };
+        }
+
+        // Si ja té encerts fets avui, assegurem que el comptador marqui com a mínim 1
+        if (gameState.solutions && gameState.solutions.length > 0) {
+          if (streakState.current === 0) streakState.current = 1;
+          streakState.lastPlayedDate = todayStr;
+          localStorage.setItem('matelogic_streak', JSON.stringify(streakState));
         }
 
         document.getElementById('streak-counter').innerText = streakState.current || 0;
@@ -402,18 +410,16 @@
     function updateStreakOnSuccess() {
       const todayStr = getTodayDateStr();
 
-      // Si ja s'ha comptabilitzat la jugada per avui, mantenim
-      if (streakState.lastPlayedDate === todayStr) {
+      // Si ja s'ha comptabilitzat la ratxa per avui, no tornem a sumar
+      if (streakState.lastPlayedDate === todayStr && (streakState.current || 0) > 0) {
         return;
       }
 
       const yesterdayStr = getYesterdayDateStr();
 
       if (streakState.lastPlayedDate === yesterdayStr) {
-        // La ratxa continua
         streakState.current = (streakState.current || 0) + 1;
       } else {
-        // Comença una nova ratxa
         streakState.current = 1;
       }
 
@@ -571,7 +577,7 @@
         });
         gameState.score += data.punts;
 
-        // Actualitzar i persistir la ratxa diària
+        // Actualitzar i persistir la ratxa diària correctament
         updateStreakOnSuccess();
 
         persistProgress();
