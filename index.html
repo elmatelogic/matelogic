@@ -10,23 +10,23 @@
   <meta name="keywords" content="matelògic, joc matemàtic, rusc matemàtic, xifres, joc diari català, paraulògic matemàtic, càlcul mental">
   <meta name="author" content="Matelògic">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://matelogic.cat/">
+  <link rel="canonical" href="https://www.matelogic.cat/">
   <meta name="theme-color" content="#e63946">
 
   <!-- OPEN GRAPH / SOCIAL -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://matelogic.cat/">
+  <meta property="og:url" content="https://www.matelogic.cat/">
   <meta property="og:title" content="Matelògic - El joc matemàtic diari en català">
   <meta property="og:description" content="Combina les xifres del rusc, empra el dígit central vermell i aconsegueix el número objectiu de cada dia.">
-  <meta property="og:image" content="https://matelogic.cat/og-image.png">
+  <meta property="og:image" content="https://www.matelogic.cat/og-image.png">
   <meta property="og:locale" content="ca_ES">
 
   <!-- TWITTER / X -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://matelogic.cat/">
+  <meta name="twitter:url" content="https://www.matelogic.cat/">
   <meta name="twitter:title" content="Matelògic - El repte matemàtic diari en català">
   <meta name="twitter:description" content="Troba les operacions per arribar a la meta diària. Aconseguiràs el Tuti avui?">
-  <meta name="twitter:image" content="https://matelogic.cat/og-image.png">
+  <meta name="twitter:image" content="https://www.matelogic.cat/og-image.png">
 
   <!-- DADES ESTRUCTURADES (SCHEMA.ORG) -->
   <script type="application/ld+json">
@@ -34,7 +34,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Matelògic",
-    "url": "https://matelogic.cat/",
+    "url": "https://www.matelogic.cat/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "All",
     "inLanguage": "ca",
@@ -125,18 +125,16 @@
       </button>
     </div>
 
-    <!-- LOGO AMB HEXÀGON ORIGINAL EN PUNTA AMUNT (Ò) -->
+    <!-- LOGO -->
     <div class="flex items-center cursor-pointer select-none" onclick="window.scrollTo({top:0, behavior:'smooth'})">
       <div class="flex items-center tracking-tight font-extrabold text-2xl">
         <span class="text-slate-900 dark:text-white">MATE</span>
         <span class="text-brand-blue flex items-center ml-0.5">
           <span>L</span>
           <span class="relative inline-flex items-center justify-center -mx-0.5 w-5 h-7">
-            <!-- Accent obert en català (`) -->
             <svg class="absolute -top-0.5 left-0.5 w-2.5 h-2.5 text-brand-red fill-current" viewBox="0 0 10 10">
               <path d="M2 1L8 6L7 8.5L1 3.5Z" />
             </svg>
-            <!-- Hexàgon en punta a dalt -->
             <svg class="w-5 h-5 text-brand-red fill-current drop-shadow-xs" viewBox="0 0 24 24">
               <polygon points="12,2 21,7.2 21,17.8 12,23 3,17.8 3,7.2"/>
             </svg>
@@ -291,7 +289,7 @@
       <div class="bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl text-left font-mono text-xs space-y-1">
         <p>Matelògic <span id="share-modal-num">#000</span></p>
         <p>🎯 Meta: <span id="share-modal-target">0</span></p>
-        <p>🎖️ Rang: <span id="share-modal-rank">Principiant</span></p>
+        <p>🎖️️ Rang: <span id="share-modal-rank">Principiant</span></p>
         <p>✨ Solucions: <span id="share-modal-count">0</span> / <span id="share-modal-total">0</span></p>
         <p>🔥 Ratxa: <span id="share-modal-streak">0</span> dies</p>
       </div>
@@ -323,16 +321,13 @@
       return formatter.format(new Date());
     }
 
-    function getYesterdayDateStr() {
-      const formatter = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Europe/Madrid',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-      const [y, m, d] = formatter.format(new Date()).split('-').map(Number);
-      const ahir = new Date(Date.UTC(y, m - 1, d - 1));
-      return formatter.format(ahir);
+    function calculateDayDiff(dateStr1, dateStr2) {
+      if (!dateStr1 || !dateStr2) return 999;
+      const [y1, m1, d1] = dateStr1.split('-').map(Number);
+      const [y2, m2, d2] = dateStr2.split('-').map(Number);
+      const t1 = Date.UTC(y1, m1 - 1, d1);
+      const t2 = Date.UTC(y2, m2 - 1, d2);
+      return Math.round((t1 - t2) / 86400000);
     }
 
     async function initUI() {
@@ -345,7 +340,6 @@
         CURRENT_CHALLENGE_ID = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;
         outerPositions = [...DAILY_GAME.outer];
 
-        // Reiniciar pantalla i seleccions
         tokens = [];
         usedHexIds.clear();
 
@@ -377,28 +371,33 @@
         }
 
         const todayStr = getTodayDateStr();
-        const yesterdayStr = getYesterdayDateStr();
         const rawStreak = localStorage.getItem('matelogic_streak');
 
         if (rawStreak) {
           streakState = JSON.parse(rawStreak);
-          // Si no ha jugat ni avui ni ahir, la ratxa ha caducat
-          if (streakState.lastPlayedDate !== todayStr && streakState.lastPlayedDate !== yesterdayStr) {
+          const diff = calculateDayDiff(todayStr, streakState.lastPlayedDate);
+
+          // Si fa 2 dies o més que no juga, la ratxa es posa a 0
+          if (diff >= 2) {
             streakState.current = 0;
           }
         } else {
           streakState = { current: 0, lastPlayedDate: "" };
         }
 
-        // Si ja té encerts fets avui, assegurem que el comptador marqui com a mínim 1
+        // Si l'usuari ja té solucions guardades avui, la ratxa activa és com a mínim de 1
         if (gameState.solutions && gameState.solutions.length > 0) {
-          if (streakState.current === 0) streakState.current = 1;
+          if (!streakState.current || streakState.current === 0) {
+            streakState.current = 1;
+          }
           streakState.lastPlayedDate = todayStr;
           localStorage.setItem('matelogic_streak', JSON.stringify(streakState));
         }
 
         document.getElementById('streak-counter').innerText = streakState.current || 0;
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error loadSavedProgress:", e);
+      }
     }
 
     function persistProgress() {
@@ -409,17 +408,18 @@
 
     function updateStreakOnSuccess() {
       const todayStr = getTodayDateStr();
+      const diff = calculateDayDiff(todayStr, streakState.lastPlayedDate);
 
-      // Si ja s'ha comptabilitzat la ratxa per avui, no tornem a sumar
-      if (streakState.lastPlayedDate === todayStr && (streakState.current || 0) > 0) {
-        return;
-      }
-
-      const yesterdayStr = getYesterdayDateStr();
-
-      if (streakState.lastPlayedDate === yesterdayStr) {
+      if (diff === 0) {
+        // Ja ha puntuat avui: mantenir el valor
+        if (!streakState.current || streakState.current === 0) {
+          streakState.current = 1;
+        }
+      } else if (diff === 1) {
+        // Va jugar ahir: la ratxa continua
         streakState.current = (streakState.current || 0) + 1;
       } else {
+        // Primera partida o ha passat més d'un dia
         streakState.current = 1;
       }
 
@@ -463,14 +463,12 @@
       if (tokens.length >= 20) return;
       const last = tokens[tokens.length - 1];
 
-      // Regles per al parèntesi obert '('
       if (char === '(') {
         if (last && (last.type === 'num' || last.val === ')')) {
           return showToast("Cal un operador abans del parèntesi!", "warning");
         }
       }
 
-      // Regles per al parèntesi tancat ')'
       if (char === ')') {
         if (!last || (last.type === 'op' && last.val !== ')')) {
           return showToast("Operació incompleta abans de tancar parèntesi", "warning");
@@ -482,7 +480,6 @@
         }
       }
 
-      // Regles per a operadors binaris (+, -, *, /)
       if (['+', '−', '×', '÷'].includes(char)) {
         if (!last || (last.type === 'op' && last.val !== ')')) {
           return showToast("Posa primer un número!", "warning");
@@ -577,9 +574,7 @@
         });
         gameState.score += data.punts;
 
-        // Actualitzar i persistir la ratxa diària correctament
         updateStreakOnSuccess();
-
         persistProgress();
         updateScoreboard();
 
