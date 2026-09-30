@@ -132,7 +132,7 @@
         <span class="text-brand-blue flex items-center ml-0.5">
           <span>L</span>
           <span class="relative inline-flex items-center justify-center -mx-0.5 w-5 h-7">
-            <!-- Accent obert en català (`) recolzat al vèrtex esquerre -->
+            <!-- Accent obert en català (`) -->
             <svg class="absolute -top-0.5 left-0.5 w-2.5 h-2.5 text-brand-red fill-current" viewBox="0 0 10 10">
               <path d="M2 1L8 6L7 8.5L1 3.5Z" />
             </svg>
@@ -306,13 +306,32 @@
     const API_URL = "https://matelogicbd.elmatelogic.workers.dev/";
 
     let DAILY_GAME = null;
-    let yesterdayCache = null;
     let tokens = [];
     let usedHexIds = new Set();
     let outerPositions = [];
     let gameState = { solutions: [], score: 0 };
     let streakState = { current: 0, lastPlayedDate: "" };
     let CURRENT_CHALLENGE_ID = "";
+
+    function getTodayDateStr() {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Madrid',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      return formatter.format(new Date());
+    }
+
+    function getYesterdayDateStr() {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Madrid',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      return formatter.format(new Date(Date.now() - 86400000));
+    }
 
     async function initUI() {
       try {
@@ -354,9 +373,23 @@
         } else {
           gameState = { solutions: [], score: 0 };
         }
+
         const rawStreak = localStorage.getItem('matelogic_streak');
-        if (rawStreak) streakState = JSON.parse(rawStreak);
-        document.getElementById('streak-counter').innerText = streakState.current;
+        if (rawStreak) {
+          streakState = JSON.parse(rawStreak);
+
+          // Comprovar si la ratxa ha caducat (si no ha jugat ni avui ni ahir)
+          const todayStr = getTodayDateStr();
+          const yesterdayStr = getYesterdayDateStr();
+
+          if (streakState.lastPlayedDate !== todayStr && streakState.lastPlayedDate !== yesterdayStr) {
+            streakState.current = 0;
+          }
+        } else {
+          streakState = { current: 0, lastPlayedDate: "" };
+        }
+
+        document.getElementById('streak-counter').innerText = streakState.current || 0;
       } catch (e) {}
     }
 
@@ -364,6 +397,33 @@
       try {
         localStorage.setItem(CURRENT_CHALLENGE_ID, JSON.stringify(gameState));
       } catch (e) {}
+    }
+
+    function updateStreakOnSuccess() {
+      const todayStr = getTodayDateStr();
+
+      // Si ja s'ha comptabilitzat la jugada per avui, mantenim
+      if (streakState.lastPlayedDate === todayStr) {
+        return;
+      }
+
+      const yesterdayStr = getYesterdayDateStr();
+
+      if (streakState.lastPlayedDate === yesterdayStr) {
+        // La ratxa continua
+        streakState.current = (streakState.current || 0) + 1;
+      } else {
+        // Comença una nova ratxa
+        streakState.current = 1;
+      }
+
+      streakState.lastPlayedDate = todayStr;
+
+      try {
+        localStorage.setItem('matelogic_streak', JSON.stringify(streakState));
+      } catch (e) {}
+
+      document.getElementById('streak-counter').innerText = streakState.current;
     }
 
     function renderOuterHexagons() {
@@ -511,6 +571,9 @@
         });
         gameState.score += data.punts;
 
+        // Actualitzar i persistir la ratxa diària
+        updateStreakOnSuccess();
+
         persistProgress();
         updateScoreboard();
 
@@ -577,20 +640,15 @@
     }
 
     async function openYesterdayModal() {
-      if (yesterdayCache) {
-        renderYesterday(yesterdayCache);
-        return;
-      }
-
       try {
         const res = await fetch(`${API_URL}api/ahir?t=${Date.now()}`, {
           cache: 'no-store'
         });
-        yesterdayCache = await res.json();
-        renderYesterday(yesterdayCache);
+        const dadesAhir = await res.json();
+        renderYesterday(dadesAhir);
       } catch (err) {
         console.error("Error openYesterdayModal:", err);
-        showToast("Error carregant ahir", "error");
+        showToast("Error carregant les solucions d'ahir", "error");
       }
     }
 
