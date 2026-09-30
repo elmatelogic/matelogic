@@ -10,23 +10,23 @@
   <meta name="keywords" content="matelògic, joc matemàtic, rusc matemàtic, xifres, joc diari català, paraulògic matemàtic, càlcul mental">
   <meta name="author" content="Matelògic">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://www.matelogic.cat/">
+  <link rel="canonical" href="https://matelogic.cat/">
   <meta name="theme-color" content="#e63946">
 
-  <!-- OPEN GRAPH / WHATSAPP / TELEGRAM / FACEBOOK -->
+  <!-- OPEN GRAPH / SOCIAL -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.matelogic.cat/">
+  <meta property="og:url" content="https://matelogic.cat/">
   <meta property="og:title" content="Matelògic - El joc matemàtic diari en català">
   <meta property="og:description" content="Combina les xifres del rusc, empra el dígit central vermell i aconsegueix el número objectiu de cada dia.">
-  <meta property="og:image" content="https://www.matelogic.cat/og-image.png">
+  <meta property="og:image" content="https://matelogic.cat/og-image.png">
   <meta property="og:locale" content="ca_ES">
 
   <!-- TWITTER / X -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://www.matelogic.cat/">
+  <meta name="twitter:url" content="https://matelogic.cat/">
   <meta name="twitter:title" content="Matelògic - El repte matemàtic diari en català">
   <meta name="twitter:description" content="Troba les operacions per arribar a la meta diària. Aconseguiràs el Tuti avui?">
-  <meta name="twitter:image" content="https://www.matelogic.cat/og-image.png">
+  <meta name="twitter:image" content="https://matelogic.cat/og-image.png">
 
   <!-- DADES ESTRUCTURADES (SCHEMA.ORG) -->
   <script type="application/ld+json">
@@ -34,7 +34,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Matelògic",
-    "url": "https://www.matelogic.cat/",
+    "url": "https://matelogic.cat/",
     "applicationCategory": "GameApplication",
     "operatingSystem": "All",
     "inLanguage": "ca",
@@ -136,7 +136,7 @@
             <svg class="absolute -top-0.5 left-0.5 w-2.5 h-2.5 text-brand-red fill-current" viewBox="0 0 10 10">
               <path d="M2 1L8 6L7 8.5L1 3.5Z" />
             </svg>
-            <!-- Hexàgon en punta a dalt (idèntic al rusc del joc) -->
+            <!-- Hexàgon en punta a dalt -->
             <svg class="w-5 h-5 text-brand-red fill-current drop-shadow-xs" viewBox="0 0 24 24">
               <polygon points="12,2 21,7.2 21,17.8 12,23 3,17.8 3,7.2"/>
             </svg>
@@ -316,11 +316,17 @@
 
     async function initUI() {
       try {
-        const res = await fetch(`${API_URL}api/repte`);
+        const res = await fetch(`${API_URL}api/repte?t=${Date.now()}`, {
+          cache: 'no-store'
+        });
         DAILY_GAME = await res.json();
 
         CURRENT_CHALLENGE_ID = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;
         outerPositions = [...DAILY_GAME.outer];
+
+        // Reiniciar pantalla i seleccions
+        tokens = [];
+        usedHexIds.clear();
 
         document.getElementById('challenge-day-label').innerText = `Repte Núm. ${DAILY_GAME.num}`;
         document.getElementById('challenge-date-label').innerText = DAILY_GAME.data;
@@ -331,6 +337,7 @@
         renderOuterHexagons();
         loadSavedProgress();
         updateScoreboard();
+        updateDisplay();
       } catch (err) {
         console.error("Error initUI:", err);
         showToast("Error carregant el repte", "error");
@@ -344,6 +351,8 @@
           const parsed = JSON.parse(raw);
           gameState.solutions = parsed.solutions || [];
           gameState.score = parsed.score || 0;
+        } else {
+          gameState = { solutions: [], score: 0 };
         }
         const rawStreak = localStorage.getItem('matelogic_streak');
         if (rawStreak) streakState = JSON.parse(rawStreak);
@@ -535,7 +544,7 @@
       const pct = total ? Math.min(Math.round((trobades / total) * 100), 100) : 0;
       document.getElementById('rank-progress').innerText = pct;
       document.getElementById('rank-bar').style.width = `${pct}%`;
-      document.getElementById('rank-label').innerText = pct >= 100 ? "Geni 👑" : pct >= 50 ? "Mestre 🎖️" : "Principiant";
+      document.getElementById('rank-label').innerText = pct >= 100 ? "Geni 👑" : pct >= 50 ? "Mestre/a 🎖️" : "Principiant";
 
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
@@ -574,7 +583,9 @@
       }
 
       try {
-        const res = await fetch(`${API_URL}api/ahir`);
+        const res = await fetch(`${API_URL}api/ahir?t=${Date.now()}`, {
+          cache: 'no-store'
+        });
         yesterdayCache = await res.json();
         renderYesterday(yesterdayCache);
       } catch (err) {
@@ -604,7 +615,7 @@
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const total = DAILY_GAME ? DAILY_GAME.total : 0;
-      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://matelogic.cat`;
+      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades}/${total}\n🔥 Ratxa: ${streakState.current} dies\n\nJuga a https://www.matelogic.cat`;
 
       if (navigator.share) {
         try {
