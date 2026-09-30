@@ -111,43 +111,42 @@
   <div id="toast-container" class="fixed top-5 z-50 flex flex-col gap-2 items-center pointer-events-none w-full max-w-sm px-4"></div>
 
   <!-- HEADER -->
-  <header class="w-full max-w-lg border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-4 py-2.5 flex items-center justify-between shadow-sm relative">
-    <div class="flex items-center gap-1.5 z-10">
-      <button onclick="openModal('info-modal')" aria-label="Instruccions" class="w-9 h-9 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+  <header class="w-full max-w-lg border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-3 py-2 flex items-center justify-between shadow-sm">
+    <!-- BOTONS ESQUERRA -->
+    <div class="flex items-center gap-1 shrink-0">
+      <button onclick="openModal('info-modal')" aria-label="Instruccions" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       </button>
-      <button onclick="openModal('solutions-modal')" aria-label="Solucions" class="w-9 h-9 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+      <button onclick="openModal('solutions-modal')" aria-label="Solucions" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
       </button>
-      <button onclick="openYesterdayModal()" class="px-2.5 h-8 flex items-center gap-1 rounded-full text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition-colors">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <button onclick="openYesterdayModal()" class="px-2 h-7 flex items-center gap-1 rounded-full text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition-colors">
+        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <span>Ahir</span>
       </button>
     </div>
 
-    <!-- LOGO CENTRAT ABSOLUT -->
-    <div class="absolute left-1/2 -translate-x-1/2 flex items-center cursor-pointer select-none pointer-events-auto" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-      <div class="flex items-center tracking-tight font-extrabold text-2xl">
-        <span class="text-slate-900 dark:text-white">MATE</span>
-        <span class="text-brand-blue flex items-center ml-0.5">
-          <span>L</span>
-          <span class="relative inline-flex items-center justify-center -mx-0.5 w-5 h-7">
-            <svg class="absolute -top-0.5 left-0.5 w-2.5 h-2.5 text-brand-red fill-current" viewBox="0 0 10 10">
-              <path d="M2 1L8 6L7 8.5L1 3.5Z" />
-            </svg>
-            <svg class="w-5 h-5 text-brand-red fill-current drop-shadow-xs" viewBox="0 0 24 24">
-              <polygon points="12,2 21,7.2 21,17.8 12,23 3,17.8 3,7.2"/>
-            </svg>
+    <!-- BLOC DRETA: LOGO I COMPARTIR -->
+    <div class="flex items-center gap-2">
+      <div class="flex items-center cursor-pointer select-none" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <div class="flex items-center tracking-tight font-extrabold text-xl sm:text-2xl">
+          <span class="text-slate-900 dark:text-white">MATE</span>
+          <span class="text-brand-blue flex items-center ml-0.5">
+            <span>L</span>
+            <span class="relative inline-flex items-center justify-center -mx-0.5 w-4 h-6 sm:w-5 sm:h-7">
+              <svg class="absolute -top-0.5 left-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 text-brand-red fill-current" viewBox="0 0 10 10">
+                <path d="M2 1L8 6L7 8.5L1 3.5Z" />
+              </svg>
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-brand-red fill-current drop-shadow-xs" viewBox="0 0 24 24">
+                <polygon points="12,2 21,7.2 21,17.8 12,23 3,17.8 3,7.2"/>
+              </svg>
+            </span>
+            <span>GIC</span>
           </span>
-          <span>GIC</span>
-        </span>
+        </div>
       </div>
-    </div>
-
-    <!-- COMPARTIR -->
-    <div class="flex items-center gap-2 z-10">
-      <button onclick="openModal('share-modal')" aria-label="Compartir" class="w-9 h-9 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+      <button onclick="openModal('share-modal')" aria-label="Compartir" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
       </button>
     </div>
   </header>
