@@ -13,10 +13,10 @@
   <link rel="canonical" href="https://www.matelogic.cat/">
   <meta name="theme-color" content="#e63946">
 
-  <!-- FAVICON I SUPORT PWA APPLE (iOS) -->
-  <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon.png?v=3">
-  <link rel="icon" type="image/png" sizes="16x16" href="./img/favicon.png?v=3">
-  <link rel="apple-touch-icon" href="./img/icon-192.png">
+  <!-- FAVICON I SUPORT PWA APPLE (A L'ARREL) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png?v=3">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon.png?v=3">
+  <link rel="apple-touch-icon" href="./favicon.png?v=3">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Matelògic">
@@ -133,7 +133,7 @@
       </button>
     </div>
 
-    <!-- BLOC DRETA: LOGO PNG AMPLIAT I COMPARTIR -->
+    <!-- BLOC DRETA: LOGO PNG (DES DE /IMG/) I COMPARTIR -->
     <div class="flex items-center gap-2.5">
       <div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
         <img src="./img/logo.png" 
@@ -291,10 +291,15 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARTIR AMB COMPTADOR REGRESSIU -->
+  <!-- MODAL COMPARTIR AMB EL FAVICON I COMPTADOR REGRESSIU -->
   <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop">
-      <div class="w-12 h-12 bg-red-50 text-brand-red rounded-full flex items-center justify-center mx-auto text-xl font-black">∑</div>
+      
+      <!-- ICONA DE MARCA (FAVICON EN L'ARREL) -->
+      <div class="w-14 h-14 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-2xl flex items-center justify-center mx-auto p-2.5 shadow-inner">
+        <img src="./favicon.png?v=3" alt="Matelògic" class="w-full h-full object-contain">
+      </div>
+
       <h3 class="text-lg font-black text-slate-900 dark:text-white">Comparteix el teu progrés</h3>
       
       <div class="bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl text-left font-mono text-xs space-y-1">
@@ -761,7 +766,7 @@
         solCountEl.className = "text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono";
         solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else if (pctReal >= 50) {
-        rangText = "Mestre/a 🎖️️";
+        rangText = "Mestre/a 🎖";
         solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
         solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
         solTargetDisplay.innerHTML = `/ ${objectiu}+`;
