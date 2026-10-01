@@ -877,7 +877,7 @@
       document.getElementById(id).classList.add('hidden');
     }
 
-    // COMPARTIR OPTIMITZAT PER A LA VIRALITAT (SENSE DUPLICAR EL NOM)
+    // COMPARTIR OPTIMITZAT PER A LA VIRALITAT (SENSE DUPLICAR EL NOM NI EL NUMERO)
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const objectiu = DAILY_GAME ? DAILY_GAME.total : 0;
@@ -895,8 +895,8 @@
       const teTuti = gameState.solutions.some(s => s.esTuti);
       const liniaTuti = teTuti ? '\n🌟 TUTI DESCOBERT!' : '';
 
-      // Text final sense repetir "Matelògic" al començament
-      const shareText = `#${numRepte} ⬡\n` +
+      // Text final complet i net
+      const shareText = `Matelògic #${numRepte} ⬡\n` +
                         `🎯 Objectiu: ${target}\n` +
                         `🎖️ Rang: ${rang}\n` +
                         `📊 Progrés: ${barraVisual} ${pctReal}%\n` +
@@ -904,10 +904,10 @@
                         `T'atreveixes a superar-me? 🤔\n` +
                         `👉 https://www.matelogic.cat`;
 
+      // Si s'usa navigator.share, passem el text complet NOMÉS a 'text' per evitar duplicitats de l'aplicació receptora
       if (navigator.share) {
         try {
           await navigator.share({ 
-            title: `Matelògic #${numRepte}`, 
             text: shareText 
           });
           return;
@@ -915,7 +915,7 @@
       }
 
       try {
-        await navigator.clipboard.writeText(`Matelògic ${shareText}`);
+        await navigator.clipboard.writeText(shareText);
         showToast("Resultat copiat al porta-retalls!", "success");
       } catch (e) {
         showToast("No s'ha pogut copiar", "error");
