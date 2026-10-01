@@ -671,6 +671,7 @@
         showToast("Escriu una operació primer", "warning");
         return;
       }
+
       const rawExpr = tokens.map(t => t.val).join('');
       const submitBtn = document.getElementById('submit-btn');
       submitBtn.disabled = true;
@@ -689,13 +690,13 @@
         const data = await res.json();
 
         if (!data.ok) {
-          showToast(data.msg, "error");
+          showToast(data.msg || "Operació no vàlida", "error");
           return;
         }
 
         const expressioDisplay = tokens.map(t => t.display).join(' ');
         const jaExisteix = gameState.solutions.some(s => {
-          return s.canonic === data.canonic || s.expression === expressioDisplay;
+          return (data.canonic && s.canonic === data.canonic) || s.expression === expressioDisplay;
         });
 
         if (jaExisteix) {
@@ -703,24 +704,32 @@
           return;
         }
 
+        // Assegurar valor numèric vàlid per als punts
+        const puntsGuanyats = Number(data.punts) || 1;
+
         gameState.solutions.push({
           expression: expressioDisplay,
-          canonic: data.canonic,
-          points: data.punts,
-          esTuti: data.esTuti
+          canonic: data.canonic || rawExpr,
+          points: puntsGuanyats,
+          esTuti: !!data.esTuti
         });
-        gameState.score += data.punts;
+        gameState.score += puntsGuanyats;
 
-        persistProgress();
-        updateScoreboard();
+        // Persistència i refresc del marcador de forma protegida
+        try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
+        try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
 
+        // Feedback i llançament segur de confeti
         if (data.esTuti) {
-          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-          showToast(`🌟 TUTI! Tots els nombres usats! +${data.punts} pts`, "success");
+          if (typeof confetti === 'function') {
+            try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+          }
+          showToast(`🌟 TUTI! Tots els nombres usats! +${puntsGuanyats} pts`, "success");
         } else {
-          showToast(`Correcte! +${data.punts} pts`, "success");
+          showToast(`Correcte! +${puntsGuanyats} pts`, "success");
         }
 
+        // Buidar visor i rusc
         tokens = [];
         cursorIndex = 0;
         usedHexIds.clear();
