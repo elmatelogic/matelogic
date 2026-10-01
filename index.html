@@ -158,18 +158,29 @@
       <span id="challenge-date-label">-- / -- / ----</span>
     </div>
 
-    <!-- TARGET CARD -->
-    <div class="w-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-3 shadow-sm flex items-center justify-between">
-      <div class="flex flex-col">
-        <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Objectiu</span>
-        <div class="flex items-baseline gap-2">
-          <span id="target-value" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">--</span>
-          <span class="text-xs text-brand-blueDark dark:text-sky-300 font-bold bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 px-2 py-0.5 rounded-full">Meta</span>
+    <!-- MARCADOR GAMIFICAT DE 3 COLUMNES -->
+    <div class="w-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-2.5 shadow-sm grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-700/60 text-center transition-all">
+      <!-- 1. OBJECTIU -->
+      <div class="flex flex-col items-center justify-center px-1">
+        <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Objectiu</span>
+        <span id="target-value" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">--</span>
+      </div>
+
+      <!-- 2. SOLUCIONS -->
+      <div id="solutions-box" class="flex flex-col items-center justify-center px-1 rounded-xl transition-colors">
+        <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Solucions</span>
+        <div class="flex items-baseline justify-center gap-0.5">
+          <span id="solutions-count" class="text-2xl sm:text-3xl font-black text-brand-red font-mono transition-transform">0</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">/ <span id="total-solutions-count">--</span></span>
         </div>
       </div>
-      <div class="text-right">
-        <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Punts</span>
-        <div class="text-xl font-black text-brand-red font-mono"><span id="score-counter">0</span> <span class="text-xs font-bold text-slate-400">pts</span></div>
+
+      <!-- 3. PUNTS -->
+      <div class="flex flex-col items-center justify-center px-1">
+        <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Punts</span>
+        <div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">
+          <span id="score-counter">0</span>
+        </div>
       </div>
     </div>
 
@@ -234,12 +245,6 @@
       <button id="submit-btn" onclick="handleSubmit()" class="key-3d h-12 bg-brand-red text-white font-bold text-sm rounded-full shadow-md">
         Introdueix
       </button>
-    </div>
-
-    <div class="mt-2 text-center">
-      <p id="solutions-feedback" class="text-sm font-semibold text-slate-600 dark:text-slate-300">
-        Has trobat <span id="solutions-count" class="font-extrabold text-brand-red">0</span> solucions (objectiu: <span id="total-solutions-count" class="font-extrabold text-slate-800 dark:text-white">--</span>).
-      </p>
     </div>
   </main>
 
@@ -483,7 +488,7 @@
           return;
         }
 
-        // Comprovem duplicats comparant directament l'expressió normalitzada
+        // Comprovem duplicats comparant l'expressió exacta o canònica
         const expressioDisplay = tokens.map(t => t.display).join(' ');
         const jaExisteix = gameState.solutions.some(s => {
           return s.canonic === data.canonic || s.expression === expressioDisplay;
@@ -529,8 +534,12 @@
       const trobades = gameState.solutions.length;
       const objectiu = DAILY_GAME ? DAILY_GAME.total : 0;
 
-      document.getElementById('solutions-count').innerText = trobades;
-      document.getElementById('total-solutions-count').innerText = objectiu;
+      const solCountEl = document.getElementById('solutions-count');
+      const solBoxEl = document.getElementById('solutions-box');
+      const totalSolEl = document.getElementById('total-solutions-count');
+
+      solCountEl.innerText = trobades;
+      totalSolEl.innerText = objectiu;
       document.getElementById('score-counter').innerText = gameState.score;
 
       const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
@@ -539,26 +548,25 @@
       document.getElementById('rank-progress').innerText = pctReal;
       document.getElementById('rank-bar').style.width = `${pctBarra}%`;
 
-      // Escala de rangs
+      // Escala de rangs i estil gamificat per solucions
       let rangText = "Principiant";
       if (trobades > objectiu) {
         rangText = "Euler ✨";
+        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 transition-colors";
+        solCountEl.className = "text-2xl sm:text-3xl font-black text-amber-500 font-mono";
       } else if (pctReal >= 100) {
         rangText = "Geni 🎓";
+        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 transition-colors";
+        solCountEl.className = "text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono";
       } else if (pctReal >= 50) {
         rangText = "Mestre/a 🎖️";
+        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
+        solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+      } else {
+        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
+        solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
       }
       document.getElementById('rank-label').innerText = rangText;
-
-      // Missatge dinàmic de progrés
-      const feedbackEl = document.getElementById('solutions-feedback');
-      if (trobades > objectiu) {
-        feedbackEl.innerHTML = `Has trobat <span class="font-extrabold text-brand-red">${trobades}</span> solucions! <span class="text-amber-500 font-bold">(Objectiu de ${objectiu} superat 🎉)</span>`;
-      } else if (trobades === objectiu && objectiu > 0) {
-        feedbackEl.innerHTML = `Has assolit l'objectiu de <span class="font-extrabold text-brand-red">${objectiu}</span> solucions! En pots trobar més? 😉`;
-      } else {
-        feedbackEl.innerHTML = `Has trobat <span class="font-extrabold text-brand-red">${trobades}</span> solucions (objectiu: <span id="total-solutions-count" class="font-extrabold text-slate-800 dark:text-white">${objectiu}</span>).`;
-      }
 
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
