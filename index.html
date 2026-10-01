@@ -166,12 +166,12 @@
         <span id="target-value" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">--</span>
       </div>
 
-      <!-- 2. SOLUCIONS -->
+      <!-- 2. SOLUCIONS (META OBERTA) -->
       <div id="solutions-box" class="flex flex-col items-center justify-center px-1 rounded-xl transition-colors">
         <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Solucions</span>
         <div class="flex items-baseline justify-center gap-0.5">
           <span id="solutions-count" class="text-2xl sm:text-3xl font-black text-brand-red font-mono transition-transform">0</span>
-          <span class="text-xs font-bold text-slate-400 font-mono">/ <span id="total-solutions-count">--</span></span>
+          <span id="solutions-target-display" class="text-xs font-bold text-slate-400 font-mono">/ <span id="total-solutions-count">--</span>+</span>
         </div>
       </div>
 
@@ -536,10 +536,10 @@
 
       const solCountEl = document.getElementById('solutions-count');
       const solBoxEl = document.getElementById('solutions-box');
-      const totalSolEl = document.getElementById('total-solutions-count');
+      const solTargetDisplay = document.getElementById('solutions-target-display');
 
       solCountEl.innerText = trobades;
-      totalSolEl.innerText = objectiu;
+      document.getElementById('total-solutions-count').innerText = objectiu;
       document.getElementById('score-counter').innerText = gameState.score;
 
       const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
@@ -548,23 +548,28 @@
       document.getElementById('rank-progress').innerText = pctReal;
       document.getElementById('rank-bar').style.width = `${pctBarra}%`;
 
-      // Escala de rangs i estil gamificat per solucions
+      // Escala de rangs i visualització gamificada
       let rangText = "Principiant";
       if (trobades > objectiu) {
         rangText = "Euler ✨";
+        const extra = trobades - objectiu;
         solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 transition-colors";
         solCountEl.className = "text-2xl sm:text-3xl font-black text-amber-500 font-mono";
+        solTargetDisplay.innerHTML = `<span class="text-[11px] text-amber-600 dark:text-amber-400 font-extrabold ml-1">(+${extra})</span>`;
       } else if (pctReal >= 100) {
         rangText = "Geni 🎓";
         solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 transition-colors";
         solCountEl.className = "text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono";
+        solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else if (pctReal >= 50) {
         rangText = "Mestre/a 🎖️";
         solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
         solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+        solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else {
         solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
         solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+        solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       }
       document.getElementById('rank-label').innerText = rangText;
 
@@ -631,7 +636,7 @@
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const total = DAILY_GAME ? DAILY_GAME.total : 0;
-      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades} (Obj. ${total})\n🎖️ Rang: ${document.getElementById('rank-label').innerText}\n\nJuga a https://www.matelogic.cat`;
+      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades} (Obj. ${total}+)\n🎖️ Rang: ${document.getElementById('rank-label').innerText}\n\nJuga a https://www.matelogic.cat`;
 
       if (navigator.share) {
         try {
