@@ -13,6 +13,12 @@
   <link rel="canonical" href="https://www.matelogic.cat/">
   <meta name="theme-color" content="#e63946">
 
+  <!-- SUPORT PWA APPLE (iOS) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Matelògic">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
   <!-- OPEN GRAPH / SOCIAL -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.matelogic.cat/">
@@ -248,7 +254,9 @@
 
     <!-- ACCIONS -->
     <div class="w-full grid grid-cols-3 gap-2.5 max-w-sm mt-1">
-      <button onclick="handleDelete()" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm rounded-full">
+      <!-- SUPRIMEIX AMB SUPORT PER A TOC CURT I TOC LLARG -->
+      <button id="delete-btn" 
+              class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm rounded-full active:scale-95 transition-all">
         Suprimeix
       </button>
       <button onclick="shuffleOuterHexagons()" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center">
@@ -269,7 +277,7 @@
         El dígit central vermell és <strong>obligatori</strong> a cada operació.
       </div>
       <p class="text-xs text-slate-500 dark:text-slate-400">
-        💡 <em>Pots tocar directament sobre l'operació o emprar les fletxes per desplaçar el cursor i editar al mig de la fórmula.</em>
+        💡 <em>Pots tocar sobre el visor per moure el cursor. Prem «Supr» (o mantén premut «Suprimeix») per buidar tota la pantalla.</em>
       </p>
       <button onclick="closeModal('info-modal')" class="w-full py-2.5 rounded-xl bg-brand-red text-white font-bold text-sm">Entesos</button>
     </div>
@@ -297,17 +305,25 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARTIR -->
+  <!-- MODAL COMPARTIR AMB COMPTADOR REGRESSIU -->
   <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop">
       <div class="w-12 h-12 bg-red-50 text-brand-red rounded-full flex items-center justify-center mx-auto text-xl font-black">∑</div>
       <h3 class="text-lg font-black text-slate-900 dark:text-white">Comparteix el teu progrés</h3>
+      
       <div class="bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl text-left font-mono text-xs space-y-1">
         <p>Matelògic <span id="share-modal-num">#000</span></p>
         <p>🎯 Meta: <span id="share-modal-target">0</span></p>
         <p>🎖️ Rang: <span id="share-modal-rank">Principiant</span></p>
         <p>✨ Solucions: <span id="share-modal-count">0</span> (<span id="share-modal-total">0</span>)</p>
       </div>
+
+      <!-- COMPTADOR REGRESSIU A LA MITJANIT -->
+      <div class="bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 py-2.5 px-3 rounded-xl flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Proper repte en:</span>
+        <span id="countdown-timer" class="font-mono font-bold text-sm text-brand-red">--:--:--</span>
+      </div>
+
       <button onclick="copyShareText()" id="copy-btn" class="w-full py-3 rounded-xl bg-brand-red text-white font-bold text-sm shadow-md">
         Copia o Comparteix
       </button>
@@ -320,11 +336,12 @@
 
     let DAILY_GAME = null;
     let tokens = [];
-    let cursorIndex = 0; // Posició actual del cursor per permetre edició intermèdia
+    let cursorIndex = 0;
     let usedHexIds = new Set();
     let outerPositions = [];
     let gameState = { solutions: [], score: 0 };
     let CURRENT_CHALLENGE_ID = "";
+    let countdownInterval = null;
 
     async function initUI() {
       try {
@@ -349,6 +366,7 @@
         loadSavedProgress();
         updateScoreboard();
         updateDisplay();
+        setupDeleteEvents();
       } catch (err) {
         console.error("Error initUI:", err);
         showToast("Error carregant el repte", "error");
@@ -399,12 +417,10 @@
       renderOuterHexagons();
     }
 
-    // GESTIÓ AVANÇADA DEL VISOR I ESCALAT DE TEXT
     function updateDisplay() {
       const container = document.getElementById('display-tokens');
       container.innerHTML = '';
 
-      // Ajust dinàmic de la mida de font segons la llargada
       const totalChars = tokens.reduce((acc, t) => acc + t.display.length, 0) + tokens.length;
       if (totalChars > 16) {
         container.className = "flex items-center min-w-full text-base sm:text-lg transition-all";
@@ -414,12 +430,10 @@
         container.className = "flex items-center min-w-full text-2xl sm:text-3xl transition-all";
       }
 
-      // Cursor com a element HTML
       const cursorSpan = document.createElement('span');
       cursorSpan.id = "display-cursor-el";
       cursorSpan.className = "w-2 h-6 bg-brand-red rounded-xs cursor-blink mx-0.5 inline-block shrink-0";
 
-      // Renderitzem fragments interactius per tocar i moure el cursor
       for (let i = 0; i <= tokens.length; i++) {
         if (i === cursorIndex) {
           container.appendChild(cursorSpan);
@@ -438,7 +452,6 @@
         }
       }
 
-      // Auto-scroll per mantenir el cursor sempre a la vista
       setTimeout(() => {
         const cEl = document.getElementById('display-cursor-el');
         if (cEl) {
@@ -457,7 +470,6 @@
     }
 
     function handleDisplayClick(e) {
-      // Si es clica a l'espai buit del visor
       const rect = e.currentTarget.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       if (clickX < rect.width / 3) {
@@ -467,7 +479,6 @@
       }
     }
 
-    // INSERCIÓ DE CARÀCTERS A LA POSICIÓ DEL CURSOR
     function appendChar(char) {
       if (tokens.length >= 20) return;
 
@@ -557,7 +568,7 @@
     }
 
     function handleDelete() {
-      if (cursorIndex === 0) return; // Res a esborrar a l'esquerra
+      if (cursorIndex === 0) return;
 
       const removed = tokens.splice(cursorIndex - 1, 1)[0];
       cursorIndex--;
@@ -568,7 +579,53 @@
       updateDisplay();
     }
 
-    // CONTROL AMB TECLAT FÍSIC DE L'ORDINADOR
+    function clearAllTokens() {
+      if (tokens.length === 0) return;
+      tokens = [];
+      cursorIndex = 0;
+      usedHexIds.clear();
+      renderOuterHexagons();
+      updateDisplay();
+      if (navigator.vibrate) navigator.vibrate(35);
+      showToast("Operació buidada", "warning");
+    }
+
+    function setupDeleteEvents() {
+      const btn = document.getElementById('delete-btn');
+      let pressTimer = null;
+      let isLongPress = false;
+
+      const startPress = () => {
+        isLongPress = false;
+        pressTimer = setTimeout(() => {
+          isLongPress = true;
+          clearAllTokens();
+        }, 500);
+      };
+
+      const endPress = (e) => {
+        clearTimeout(pressTimer);
+        if (!isLongPress && e.type !== 'mouseleave') {
+          handleDelete();
+        }
+      };
+
+      btn.addEventListener('mousedown', startPress);
+      btn.addEventListener('mouseup', endPress);
+      btn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+
+      btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        startPress();
+      }, { passive: false });
+
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        endPress(e);
+      }, { passive: false });
+    }
+
+    // TECLAT FÍSIC: BACKSPACE ESBORRA 1, SUPR / ESCAPE BUIDA TOT
     window.addEventListener('keydown', (e) => {
       if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
@@ -578,6 +635,8 @@
         moveCursor(1);
       } else if (e.key === 'Backspace') {
         handleDelete();
+      } else if (e.key === 'Delete' || e.key === 'Escape') {
+        clearAllTokens();
       } else if (e.key === 'Enter') {
         handleSubmit();
       } else if (['+', '-', '*', '/'].includes(e.key)) {
@@ -623,7 +682,6 @@
           return;
         }
 
-        // Comprovem duplicats comparant l'expressió exacta o canònica
         const expressioDisplay = tokens.map(t => t.display).join(' ');
         const jaExisteix = gameState.solutions.some(s => {
           return s.canonic === data.canonic || s.expression === expressioDisplay;
@@ -684,7 +742,6 @@
       document.getElementById('rank-progress').innerText = pctReal;
       document.getElementById('rank-bar').style.width = `${pctBarra}%`;
 
-      // Escala de rangs i visualització gamificada
       let rangText = "Principiant";
       if (trobades > objectiu) {
         rangText = "Euler ✨";
@@ -752,6 +809,26 @@
       }
     }
 
+    function updateCountdown() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+
+      const diff = tomorrow - now;
+      if (diff <= 0) {
+        document.getElementById('countdown-timer').innerText = "00:00:00";
+        return;
+      }
+
+      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+
+      const el = document.getElementById('countdown-timer');
+      if (el) el.innerText = `${h}:${m}:${s}`;
+    }
+
     function openModal(id) {
       if (id === 'share-modal') {
         const trobades = gameState.solutions.length;
@@ -761,11 +838,19 @@
         document.getElementById('share-modal-count').innerText = trobades;
         document.getElementById('share-modal-total').innerText = total;
         document.getElementById('share-modal-rank').innerText = document.getElementById('rank-label').innerText;
+        
+        updateCountdown();
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(updateCountdown, 1000);
       }
       document.getElementById(id).classList.remove('hidden');
     }
 
     function closeModal(id) {
+      if (id === 'share-modal' && countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
       document.getElementById(id).classList.add('hidden');
     }
 
@@ -796,6 +881,15 @@
       t.innerText = msg;
       cont.appendChild(t);
       setTimeout(() => t.remove(), 2500);
+    }
+
+    // REGISTRE DEL SERVICE WORKER PER A PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.error("Error registrant SW:", err);
+        });
+      });
     }
 
     window.addEventListener('DOMContentLoaded', initUI);
