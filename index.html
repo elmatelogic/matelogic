@@ -136,7 +136,7 @@
       </button>
     </div>
 
-    <!-- BLOC DRETA: LOGO PNG (DES DE /IMG/) I COMPARTIR -->
+    <!-- BLOC DRETA: LOGO PNG OPTIMITZAT I COMPARTIR -->
     <div class="flex items-center gap-2.5">
       <div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
         <img src="./img/logo.png" 
@@ -877,10 +877,32 @@
       document.getElementById(id).classList.add('hidden');
     }
 
+    // COMPARTIR OPTIMITZAT PER A LA VIRALITAT (EMOJIS I PROVOCACIÓ)
     async function copyShareText() {
       const trobades = gameState.solutions.length;
-      const total = DAILY_GAME ? DAILY_GAME.total : 0;
-      const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : ''} 🧮\n🎯 Meta: ${DAILY_GAME ? DAILY_GAME.target : ''}\n✨ Solucions: ${trobades} (Obj. ${total}+)\n🎖️ Rang: ${document.getElementById('rank-label').innerText}\n\nJuga a https://www.matelogic.cat`;
+      const objectiu = DAILY_GAME ? DAILY_GAME.total : 0;
+      const numRepte = DAILY_GAME ? DAILY_GAME.num : '001';
+      const target = DAILY_GAME ? DAILY_GAME.target : '--';
+      const rang = document.getElementById('rank-label').innerText;
+      
+      // Barra visual de 5 blocs basat en el percentatge assolit
+      const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
+      const plens = Math.min(5, Math.floor(pctReal / 20));
+      const buits = Math.max(0, 5 - plens);
+      const barraVisual = '🟥'.repeat(plens) + '⬜'.repeat(buits);
+
+      // Comprovar si s'ha caçat el Tuti (tots els nombres)
+      const teTuti = gameState.solutions.some(s => s.esTuti);
+      const liniaTuti = teTuti ? '\n🌟 TUTI DESCOBERT!' : '';
+
+      // Text final atractiu per a xarxes i grups de WhatsApp
+      const shareText = `Matelògic #${numRepte} ⬡\n` +
+                        `🎯 Objectiu: ${target}\n` +
+                        `🎖️ Rang: ${rang}\n` +
+                        `📊 Progrés: ${barraVisual} ${pctReal}%\n` +
+                        `✨ Solucions: ${trobades} (${objectiu}+)${liniaTuti}\n\n` +
+                        `T'atreveixes a superar-me? 🤔\n` +
+                        `👉 https://www.matelogic.cat`;
 
       if (navigator.share) {
         try {
@@ -891,7 +913,7 @@
 
       try {
         await navigator.clipboard.writeText(shareText);
-        showToast("Copiat al porta-retalls!", "success");
+        showToast("Resultat copiat al porta-retalls!", "success");
       } catch (e) {
         showToast("No s'ha pogut copiar", "error");
       }
