@@ -13,11 +13,13 @@
   <link rel="canonical" href="https://www.matelogic.cat/">
   <meta name="theme-color" content="#e63946">
 
-  <!-- SUPORT PWA APPLE (iOS) -->
+  <!-- FAVICON I SUPORT PWA APPLE (iOS) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.png?v=2">
+  <link rel="apple-touch-icon" href="favicon.png?v=2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Matelògic">
-  <link rel="apple-touch-icon" href="icon-192.png">
 
   <!-- OPEN GRAPH / SOCIAL -->
   <meta property="og:type" content="website">
@@ -49,16 +51,13 @@
   }
   </script>
 
-  <!-- FAVICON HEXAGONAL VECTORIAL BASE64 -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBvbHlnb24gcG9pbnRzPSIxMiwxLjUgMjEuNSw3IDIxLjUsMTcgMTIsMjIuNSAyLjUsMTcgMi41LDciIGZpbGw9IiNlNjM5NDYiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIwLjciLz48dGV4dCB4PSIxMiIgeT0iMTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7iiJE8L3RleHQ+PC9zdmc+#v=2">
-
   <link rel="manifest" href="./manifest.json">
 
   <!-- SCRIPTS EXTERNS I FONTS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 
   <!-- CLOUDFLARE WEB ANALYTICS -->
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "bb0b0097461a42fdbd85c4b1dd787d6e"}'></script>
@@ -134,24 +133,12 @@
       </button>
     </div>
 
-    <!-- BLOC DRETA: LOGO I COMPARTIR -->
+    <!-- BLOC DRETA: LOGO PNG I COMPARTIR -->
     <div class="flex items-center gap-2">
       <div class="flex items-center cursor-pointer select-none" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-        <div class="flex items-center tracking-tight font-extrabold text-xl sm:text-2xl">
-          <span class="text-slate-900 dark:text-white">MATE</span>
-          <span class="text-brand-blue flex items-center ml-0.5">
-            <span>L</span>
-            <span class="relative inline-flex items-center justify-center -mx-0.5 w-4 h-6 sm:w-5 sm:h-7">
-              <svg class="absolute -top-0.5 left-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 text-brand-red fill-current" viewBox="0 0 10 10">
-                <path d="M2 1L8 6L7 8.5L1 3.5Z" />
-              </svg>
-              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-brand-red fill-current drop-shadow-xs" viewBox="0 0 24 24">
-                <polygon points="12,2 21,7.2 21,17.8 12,23 3,17.8 3,7.2"/>
-              </svg>
-            </span>
-            <span>GIC</span>
-          </span>
-        </div>
+        <img src="logo.png" 
+             alt="Matelògic" 
+             class="h-7 sm:h-8 w-auto object-contain">
       </div>
       <button onclick="openModal('share-modal')" aria-label="Compartir" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
@@ -254,7 +241,6 @@
 
     <!-- ACCIONS -->
     <div class="w-full grid grid-cols-3 gap-2.5 max-w-sm mt-1">
-      <!-- SUPRIMEIX AMB SUPORT PER A TOC CURT I TOC LLARG -->
       <button id="delete-btn" 
               class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm rounded-full active:scale-95 transition-all">
         Suprimeix
@@ -277,7 +263,7 @@
         El dígit central vermell és <strong>obligatori</strong> a cada operació.
       </div>
       <p class="text-xs text-slate-500 dark:text-slate-400">
-        💡 <em>Pots tocar sobre el visor per moure el cursor. Prem «Supr» (o mantén premut «Suprimeix») per buidar tota la pantalla.</em>
+        💡 <em>Pots tocar sobre el visor per moure el cursor. Mantén premut «Suprimeix» (o la tecla Retrocés al teclat) per buidar tota la pantalla.</em>
       </p>
       <button onclick="closeModal('info-modal')" class="w-full py-2.5 rounded-xl bg-brand-red text-white font-bold text-sm">Entesos</button>
     </div>
@@ -625,18 +611,27 @@
       }, { passive: false });
     }
 
-    // TECLAT FÍSIC: BACKSPACE ESBORRA 1, SUPR / ESCAPE BUIDA TOT
+    // GESTIÓ DEL TECLAT FÍSIC: BACKSPACE ESBORRA 1 (O BUIDA AMB LONG-PRESS)
+    let backspaceTimer = null;
+    let backspaceLongPressed = false;
+
     window.addEventListener('keydown', (e) => {
       if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
-      if (e.key === 'ArrowLeft') {
+      if (e.key === 'Backspace') {
+        if (!backspaceTimer) {
+          backspaceLongPressed = false;
+          backspaceTimer = setTimeout(() => {
+            backspaceLongPressed = true;
+            clearAllTokens();
+          }, 500);
+        }
+      } else if (e.key === 'Escape') {
+        clearAllTokens();
+      } else if (e.key === 'ArrowLeft') {
         moveCursor(-1);
       } else if (e.key === 'ArrowRight') {
         moveCursor(1);
-      } else if (e.key === 'Backspace') {
-        handleDelete();
-      } else if (e.key === 'Delete' || e.key === 'Escape') {
-        clearAllTokens();
       } else if (e.key === 'Enter') {
         handleSubmit();
       } else if (['+', '-', '*', '/'].includes(e.key)) {
@@ -652,6 +647,17 @@
           const idx = outerPositions.findIndex((v, i) => v === val && !usedHexIds.has(`hex-${i}`));
           if (idx !== -1) handleHexClick(idx);
         }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'Backspace') {
+        clearTimeout(backspaceTimer);
+        backspaceTimer = null;
+        if (!backspaceLongPressed) {
+          handleDelete();
+        }
+        backspaceLongPressed = false;
       }
     });
 
