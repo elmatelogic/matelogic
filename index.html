@@ -261,18 +261,62 @@
     </div>
   </main>
 
-  <!-- MODAL INSTRUCCIONS -->
+  <!-- MODAL INSTRUCCIONS I CONTACTE -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 animate-pop">
-      <h3 class="text-lg font-black text-slate-900 dark:text-white">Com jugar?</h3>
-      <p class="text-xs text-slate-600 dark:text-slate-300">Troba fórmules que donin exactament el Número Objectiu.</p>
-      <div class="bg-red-50 dark:bg-red-950/40 p-2.5 rounded-lg text-xs text-red-900 dark:text-red-300 font-medium">
-        El dígit central vermell és <strong>obligatori</strong> a cada operació.
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-pop">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
+        <h3 class="text-lg font-black text-slate-900 dark:text-white">Com jugar?</h3>
+        <button onclick="closeModal('info-modal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
-      <p class="text-xs text-slate-500 dark:text-slate-400">
-        💡 <em>Pots tocar sobre el visor per moure el cursor. Mantén premut «Suprimeix» (o la tecla Retrocés al teclat) per buidar tota la pantalla.</em>
-      </p>
-      <button onclick="closeModal('info-modal')" class="w-full py-2.5 rounded-xl bg-brand-red text-white font-bold text-sm">Entesos</button>
+
+      <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+        <!-- REGLES BÀSIQUES -->
+        <div>
+          <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider mb-1">Regles bàsiques</h4>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Troba operacions que donin exactament el <strong>Número Objectiu</strong>.</li>
+            <li>El dígit central vermell és <strong class="text-brand-red">obligatori</strong> a cada operació.</li>
+            <li>Pots usar cada casella del rusc com a màxim <strong>una vegada</strong> per càlcul.</li>
+          </ul>
+        </div>
+
+        <!-- META I RANGS -->
+        <div>
+          <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider mb-1">Meta oberta i rànquing</h4>
+          <p class="leading-relaxed">
+            L'objectiu diari indica una xifra de referència (ex: <em>22+</em>), però sovint <strong>hi ha moltes més solucions possibles</strong>! Si superes el total establert, assoliràs el rang secret <strong>Euler ✨</strong>.
+          </p>
+        </div>
+
+        <!-- EL TUTI -->
+        <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 p-2.5 rounded-xl">
+          <h4 class="font-bold text-amber-900 dark:text-amber-300 text-xs flex items-center gap-1 mb-1">
+            <span>🌟</span> El Tuti (i més d'un!)
+          </h4>
+          <p class="text-amber-800 dark:text-amber-200 text-[11px] leading-relaxed">
+            Aconsegueixes un <strong>Tuti</strong> si arribes a l'objectiu utilitzant <strong>tots 7 dígits</strong> del rusc alhora. Si trobes noves fórmules que també els emprin tots, pots desbloquejar <strong>múltiples Tutis</strong> en un mateix dia.
+          </p>
+        </div>
+
+        <!-- TRUCS DE TECLAT I CONTROL -->
+        <div class="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-xl space-y-1">
+          <p>💡 <strong>Control:</strong> Toca el visor per desplaçar el cursor.</p>
+          <p>🧹 <strong>Buidar ràpid:</strong> Mantén premut «Suprimeix» (o la tecla Retrocés) per esborrar tota la línia.</p>
+        </div>
+
+        <!-- CONTACTE -->
+        <div class="border-t border-slate-100 dark:border-slate-700/60 pt-3 text-center">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-1">Dubtes, suggeriments o solucions curioses?</p>
+          <a href="mailto:hola@matelogic.cat" class="inline-flex items-center gap-1 text-xs font-bold text-brand-red hover:underline">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            hola@matelogic.cat
+          </a>
+        </div>
+      </div>
+
+      <button onclick="closeModal('info-modal')" class="w-full py-2.5 rounded-xl bg-brand-red text-white font-bold text-xs uppercase tracking-wider shadow-sm active:scale-98 transition-all">
+        Entesos, a jugar!
+      </button>
     </div>
   </div>
 
@@ -799,6 +843,7 @@
       }
       document.getElementById('rank-label').innerText = rangText;
 
+      // LLISTA DE SOLUCIONS
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
       gameState.solutions.slice().reverse().forEach((sol) => {
