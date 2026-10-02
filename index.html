@@ -474,7 +474,6 @@
     }
 
     function appendChar(char) {
-      // SENSE LÍMIT ESTRICTE DE 20 CARÀCTERS
       const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
@@ -618,7 +617,7 @@
       }, { passive: false });
     }
 
-    // GESTIÓ DEL TECLAT FÍSIC: BACKSPACE ESBORRA 1 (O BUIDA AMB LONG-PRESS)
+    // GESTIÓ DEL TECLAT FÍSIC
     let backspaceTimer = null;
     let backspaceLongPressed = false;
 
@@ -697,8 +696,16 @@
         }
 
         const expressioDisplay = tokens.map(t => t.display).join(' ');
+        const expressioNeta = rawExpr.replace(/\s+/g, '');
+
+        // DETECCIÓ ROBUSTA DE DUPLICATS: PERMET TOTS ELS TUTIS QUE SIGUIN FORMULACIONS DIFERENTS
         const jaExisteix = gameState.solutions.some(s => {
-          return (data.canonic && s.canonic === data.canonic) || s.expression === expressioDisplay;
+          const sExpr = (s.raw || s.expression || '').replace(/\s+/g, '');
+          if (sExpr === expressioNeta || s.expression === expressioDisplay) return true;
+          if (data.canonic && typeof data.canonic === 'string' && data.canonic !== 'tuti' && s.canonic === data.canonic) {
+            return true;
+          }
+          return false;
         });
 
         if (jaExisteix) {
@@ -711,17 +718,18 @@
 
         gameState.solutions.push({
           expression: expressioDisplay,
+          raw: expressioNeta,
           canonic: data.canonic || rawExpr,
           points: puntsGuanyats,
           esTuti: !!data.esTuti
         });
         gameState.score += puntsGuanyats;
 
-        // Persistència i refresc del marcador de forma protegida
+        // Persistència i refresc del marcador
         try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
         try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
 
-        // Feedback i llançament segur de confeti
+        // Feedback i confeti segur
         if (data.esTuti) {
           if (typeof confetti === 'function') {
             try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
@@ -788,12 +796,13 @@
       }
       document.getElementById('rank-label').innerText = rangText;
 
+      // LLISTA DE SOLUCIONS (MOSTRA CADA TUTI AMB LA SEVA ESTRELLA)
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
       gameState.solutions.slice().reverse().forEach((sol) => {
         const item = document.createElement('div');
-        item.className = "p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs font-mono flex justify-between";
-        item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME.target} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
+        item.className = "p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs font-mono flex justify-between items-center";
+        item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME ? DAILY_GAME.target : ''} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
         listContainer.appendChild(item);
       });
     }
@@ -884,17 +893,19 @@
       const target = DAILY_GAME ? DAILY_GAME.target : '--';
       const rang = document.getElementById('rank-label').innerText;
       
-      // Barra visual de 5 blocs basat en el percentatge assolit
       const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
       const plens = Math.min(5, Math.floor(pctReal / 20));
       const buits = Math.max(0, 5 - plens);
       const barraVisual = '🟥'.repeat(plens) + '⬜'.repeat(buits);
 
-      // Comprovar si s'ha caçat el Tuti (tots els nombres)
-      const teTuti = gameState.solutions.some(s => s.esTuti);
-      const liniaTuti = teTuti ? '\n🌟 TUTI DESCOBERT!' : '';
+      const tutisCount = gameState.solutions.filter(s => s.esTuti).length;
+      let liniaTuti = '';
+      if (tutisCount > 1) {
+        liniaTuti = `\n🌟 ${tutisCount} TUTIS DESCOBERTS!`;
+      } else if (tutisCount === 1) {
+        liniaTuti = '\n🌟 TUTI DESCOBERT!';
+      }
 
-      // Text final net
       const shareText = `Matelògic #${numRepte} ⬡\n` +
                         `🎯 Objectiu: ${target}\n` +
                         `🎖️ Rang: ${rang}\n` +
@@ -903,7 +914,6 @@
                         `T'atreveixes a superar-me? 🤔\n` +
                         `👉 https://www.matelogic.cat`;
 
-      // Si s'usa navigator.share, passem el text complet NOMÉS a 'text' per evitar duplicitats de l'aplicació receptora
       if (navigator.share) {
         try {
           await navigator.share({ 
