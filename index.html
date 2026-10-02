@@ -474,8 +474,7 @@
     }
 
     function appendChar(char) {
-      if (tokens.length >= 20) return;
-
+      // SENSE LÍMIT ESTRICTE DE 20 CARÀCTERS
       const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
@@ -877,7 +876,7 @@
       document.getElementById(id).classList.add('hidden');
     }
 
-    // COMPARTIR OPTIMITZAT PER A LA VIRALITAT (SENSE DUPLICAR EL NOM NI EL NUMERO)
+    // COMPARTIR NET SENSE DUPLICATS
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const objectiu = DAILY_GAME ? DAILY_GAME.total : 0;
@@ -895,7 +894,7 @@
       const teTuti = gameState.solutions.some(s => s.esTuti);
       const liniaTuti = teTuti ? '\n🌟 TUTI DESCOBERT!' : '';
 
-      // Text final complet i net
+      // Text final net
       const shareText = `Matelògic #${numRepte} ⬡\n` +
                         `🎯 Objectiu: ${target}\n` +
                         `🎖️ Rang: ${rang}\n` +
