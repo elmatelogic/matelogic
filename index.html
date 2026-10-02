@@ -21,15 +21,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Matelògic">
 
-  <!-- OPEN GRAPH / SOCIAL (1200x630 PANORÀMIC PER A XARXES I MISSATGERIA) -->
+  <!-- OPEN GRAPH / SOCIAL (AMB SUPORT ESPECÍFIC PER A APPLE IOS I WHATSAPP) -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Matelògic">
   <meta property="og:url" content="https://www.matelogic.cat/">
   <meta property="og:title" content="Matelògic - El joc matemàtic diari en català">
   <meta property="og:description" content="Combina les xifres del rusc, empra el dígit central vermell i aconsegueix el número objectiu de cada dia.">
+  
   <meta property="og:image" content="https://www.matelogic.cat/img/og-image.png">
+  <meta property="og:image:secure_url" content="https://www.matelogic.cat/img/og-image.png">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Taulell de joc de Matelògic">
   <meta property="og:locale" content="ca_ES">
 
   <!-- TWITTER / X -->
@@ -698,7 +702,7 @@
         const expressioDisplay = tokens.map(t => t.display).join(' ');
         const expressioNeta = rawExpr.replace(/\s+/g, '');
 
-        // DETECCIÓ ROBUSTA DE DUPLICATS: PERMET TOTS ELS TUTIS QUE SIGUIN FORMULACIONS DIFERENTS
+        // DETECCIÓ ROBUSTA DE DUPLICATS
         const jaExisteix = gameState.solutions.some(s => {
           const sExpr = (s.raw || s.expression || '').replace(/\s+/g, '');
           if (sExpr === expressioNeta || s.expression === expressioDisplay) return true;
@@ -713,7 +717,6 @@
           return;
         }
 
-        // Assegurar valor numèric vàlid per als punts
         const puntsGuanyats = Number(data.punts) || 1;
 
         gameState.solutions.push({
@@ -725,7 +728,7 @@
         });
         gameState.score += puntsGuanyats;
 
-        // Persistència i refresc del marcador
+        // Persistència i refresc
         try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
         try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
 
@@ -796,7 +799,6 @@
       }
       document.getElementById('rank-label').innerText = rangText;
 
-      // LLISTA DE SOLUCIONS (MOSTRA CADA TUTI AMB LA SEVA ESTRELLA)
       const listContainer = document.getElementById('solutions-list-container');
       listContainer.innerHTML = '';
       gameState.solutions.slice().reverse().forEach((sol) => {
