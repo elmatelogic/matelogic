@@ -906,21 +906,25 @@
 
         const puntsGuanyats = Number(data.punts) || 1;
 
+        // DETECCIÓ ROBUSTA DEL TUTI (RESPOSTA DEL WORKER O 7 DÍGITS ÚNICS USATS)
+        const digitsUsats = tokens.filter(t => t.type === 'num').length;
+        const esTutiReal = !!(data.esTuti || data.tuti || digitsUsats === 7);
+
         gameState.solutions.push({
           expression: expressioDisplay,
           raw: expressioNeta,
           canonic: data.canonic || rawExpr,
           points: puntsGuanyats,
-          esTuti: !!data.esTuti
+          esTuti: esTutiReal
         });
         gameState.score += puntsGuanyats;
 
-        // Persistència i refresc
+        // Persistència i actualització immediata de la interfície
         try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
         try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
 
         // Feedback i confeti segur
-        if (data.esTuti) {
+        if (esTutiReal) {
           if (typeof confetti === 'function') {
             try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
           }
@@ -946,80 +950,88 @@
 
     function updateScoreboard() {
       const trobades = gameState.solutions.length;
-      const objectiu = DAILY_GAME ? DAILY_GAME.total : 0;
+      const objectiu = (DAILY_GAME && DAILY_GAME.total) ? DAILY_GAME.total : 22;
 
       const solCountEl = document.getElementById('solutions-count');
       const solBoxEl = document.getElementById('solutions-box');
       const solTargetDisplay = document.getElementById('solutions-target-display');
 
-      solCountEl.innerText = trobades;
-      document.getElementById('total-solutions-count').innerText = objectiu;
-      document.getElementById('score-counter').innerText = gameState.score;
+      if (solCountEl) solCountEl.innerText = trobades;
+      const totalSolEl = document.getElementById('total-solutions-count');
+      if (totalSolEl) totalSolEl.innerText = objectiu;
+      const scoreCounter = document.getElementById('score-counter');
+      if (scoreCounter) scoreCounter.innerText = gameState.score;
 
       const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
       const pctBarra = Math.min(pctReal, 100);
 
-      document.getElementById('rank-bar').style.width = `${pctBarra}%`;
+      const rankBar = document.getElementById('rank-bar');
+      if (rankBar) rankBar.style.width = `${pctBarra}%`;
 
       let rangText = "Principiant";
       if (trobades > objectiu) {
         rangText = "Euler ✨";
         const extra = trobades - objectiu;
-        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 transition-colors";
-        solCountEl.className = "text-2xl sm:text-3xl font-black text-amber-500 font-mono";
-        solTargetDisplay.innerHTML = `<span class="text-[11px] text-amber-600 dark:text-amber-400 font-extrabold ml-1">(+${extra})</span>`;
+        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 transition-colors";
+        if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-amber-500 font-mono";
+        if (solTargetDisplay) solTargetDisplay.innerHTML = `<span class="text-[11px] text-amber-600 dark:text-amber-400 font-extrabold ml-1">(+${extra})</span>`;
       } else if (pctReal >= 100) {
         rangText = "Geni 🎓";
-        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 transition-colors";
-        solCountEl.className = "text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono";
-        solTargetDisplay.innerHTML = `/ ${objectiu}+`;
+        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 transition-colors";
+        if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono";
+        if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else if (pctReal >= 50) {
         rangText = "Mestre/a 🎖";
-        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
-        solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
-        solTargetDisplay.innerHTML = `/ ${objectiu}+`;
+        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
+        if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+        if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else {
-        solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
-        solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
-        solTargetDisplay.innerHTML = `/ ${objectiu}+`;
+        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
+        if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+        if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       }
-      document.getElementById('rank-label').innerText = rangText;
+      const rankLabel = document.getElementById('rank-label');
+      if (rankLabel) rankLabel.innerText = rangText;
 
-      // ACTUALITZACIÓ SEGURA DEL TEXT DE LA PÍNDOLA DE WHATSAPP
+      // 1. ACTUALITZACIÓ EN TEMPS REAL DEL BOTÓ DE COMPARTIR
       const pillShareText = document.getElementById('pill-share-text');
       if (pillShareText) {
-        pillShareText.textContent = `Comparteix [${trobades}/${objectiu || '--'}+]`;
+        pillShareText.textContent = `Comparteix [${trobades}/${objectiu}+]`;
       }
 
-      // ACTUALITZACIÓ DE L'ESTRELLA DEL TUTI
-      const tutisCount = gameState.solutions.filter(s => s.esTuti).length;
+      // 2. ACTUALITZACIÓ EN TEMPS REAL DE L'ESTRELLA DEL TUTI
+      const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
       const tutiBadge = document.getElementById('tuti-badge');
       const tutiCountEl = document.getElementById('tuti-count');
-      if (tutisCount > 0) {
-        if (!tutiBadge.classList.contains('actiu')) {
-          tutiBadge.classList.add('actiu', 'tuti-animacio');
+      
+      if (tutiBadge && tutiCountEl) {
+        if (tutisCount > 0) {
+          tutiBadge.classList.add('actiu');
+          tutiBadge.classList.add('tuti-animacio');
+          tutiCountEl.innerText = tutisCount > 1 ? `x${tutisCount}` : '';
           setTimeout(() => tutiBadge.classList.remove('tuti-animacio'), 650);
+        } else {
+          tutiBadge.classList.remove('actiu');
+          tutiCountEl.innerText = '';
         }
-        tutiCountEl.innerText = tutisCount > 1 ? `x${tutisCount}` : '';
-      } else {
-        tutiBadge.classList.remove('actiu');
-        tutiCountEl.innerText = '';
       }
 
-      // LLISTA DE SOLUCIONS
+      // Llista de solucions
       const listContainer = document.getElementById('solutions-list-container');
-      listContainer.innerHTML = '';
-      gameState.solutions.slice().reverse().forEach((sol) => {
-        const item = document.createElement('div');
-        item.className = "p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs font-mono flex justify-between items-center";
-        item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME ? DAILY_GAME.target : ''} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
-        listContainer.appendChild(item);
-      });
+      if (listContainer) {
+        listContainer.innerHTML = '';
+        gameState.solutions.slice().reverse().forEach((sol) => {
+          const item = document.createElement('div');
+          item.className = "p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs font-mono flex justify-between items-center";
+          item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME ? DAILY_GAME.target : ''} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
+          listContainer.appendChild(item);
+        });
+      }
     }
 
     // ACCIÓ EN FER CLIC A L'ESTRELLA
     function clickTutiBadge() {
-      const tutisCount = gameState.solutions.filter(s => s.esTuti).length;
+      const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
       if (tutisCount === 0) {
         showToast("🌟 Troba una fórmula que empri els 7 dígits alhora!", "warning");
       } else {
@@ -1108,7 +1120,7 @@
     // COMPARTIR NET SENSE DUPLICATS (WHATSAPP EN MÒBIL / PORTAPAPERS EN ESCRIPTORI)
     async function copyShareText() {
       const trobades = gameState.solutions.length;
-      const objectiu = DAILY_GAME ? DAILY_GAME.total : 0;
+      const objectiu = (DAILY_GAME && DAILY_GAME.total) ? DAILY_GAME.total : 22;
       const numRepte = DAILY_GAME ? DAILY_GAME.num : '001';
       const target = DAILY_GAME ? DAILY_GAME.target : '--';
       const rang = document.getElementById('rank-label').innerText;
@@ -1118,7 +1130,7 @@
       const buits = Math.max(0, 5 - plens);
       const barraVisual = '🟥'.repeat(plens) + '⬜'.repeat(buits);
 
-      const tutisCount = gameState.solutions.filter(s => s.esTuti).length;
+      const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
       let liniaTuti = '';
       if (tutisCount > 1) {
         liniaTuti = `\n🌟 ${tutisCount} TUTIS DESCOBERTS!`;
