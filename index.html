@@ -907,7 +907,7 @@
         try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
         try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
 
-        // Feedback i confeti segur
+        // Feedback i confeti
         if (esTutiReal) {
           if (typeof confetti === 'function') {
             try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
@@ -983,7 +983,7 @@
         pillShareText.textContent = `Comparteix [${trobades}/${objectiu}+]`;
       }
 
-      // ACTUALITZACIÓ EN TEMPS REAL DE L'ESTRELLA DEL TUTI
+      // ACTUALITZACIÓ EN TEMPS REAL DE L'ESTRELLA DEL TUTI (x1, x2, x3...)
       const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
       const tutiBadge = document.getElementById('tuti-badge');
       const tutiCountEl = document.getElementById('tuti-count');
@@ -992,7 +992,7 @@
         if (tutisCount > 0) {
           tutiBadge.classList.add('actiu');
           tutiBadge.classList.add('tuti-animacio');
-          tutiCountEl.innerText = tutisCount > 1 ? `x${tutisCount}` : '';
+          tutiCountEl.innerText = `x${tutisCount}`;
           setTimeout(() => tutiBadge.classList.remove('tuti-animacio'), 650);
         } else {
           tutiBadge.classList.remove('actiu');
@@ -1013,7 +1013,7 @@
       }
     }
 
-    // ACCIÓ EN FER CLIC A L'ESTRELLA (CONCORDANÇA GRAMATICAL EXACTA)
+    // ACCIÓ EN FER CLIC A L'ESTRELLA
     function clickTutiBadge() {
       const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
       if (tutisCount === 0) {
