@@ -119,60 +119,94 @@
     .display-scroll::-webkit-scrollbar { display: none; }
     .display-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* ESTRELLA DEL TUTI */
+    /* =========================================================
+       ESTRELLA DEL TUTI ULTRA-DESTACADA
+       ========================================================= */
     .tuti-badge {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      padding: 3px 8px;
+      gap: 4px;
+      padding: 3px 9px;
       border-radius: 9999px;
-      background: rgba(148, 163, 184, 0.15);
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px dashed rgba(148, 163, 184, 0.35);
       color: #94a3b8;
-      transition: all 0.35s ease;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
       user-select: none;
-    }
-    .tuti-badge .tuti-star-icon {
-      width: 17px;
-      height: 17px;
-      fill: transparent;
-      stroke: currentColor;
-      stroke-width: 2;
-      transition: all 0.3s ease;
-    }
-    .tuti-badge .tuti-count {
-      font-weight: 800;
-      font-size: 0.75rem;
-      display: none;
-    }
-    .tuti-badge.actiu {
-      color: #f59e0b;
-      background: rgba(245, 158, 11, 0.18);
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
-    }
-    .tuti-badge.actiu .tuti-star-icon {
-      fill: #f59e0b;
-    }
-    .tuti-badge.actiu .tuti-count {
-      display: inline-block;
-      color: #f59e0b;
-    }
-    @keyframes batecEstrella {
-      0% { transform: scale(1); }
-      35% { transform: scale(1.3) rotate(12deg); filter: drop-shadow(0 0 8px #fbbf24); }
-      70% { transform: scale(0.95) rotate(-6deg); }
-      100% { transform: scale(1) rotate(0deg); }
-    }
-    .tuti-animacio {
-      animation: batecEstrella 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
     }
 
-    /* PÍNDOLA DISCRETA DE COMPARTIR A WHATSAPP */
+    .tuti-badge .tuti-star-icon {
+      width: 18px;
+      height: 18px;
+      fill: transparent;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+    }
+
+    .tuti-badge .tuti-count {
+      font-weight: 800;
+      font-size: 0.76rem;
+      line-height: 1;
+      display: none;
+      background: #f59e0b;
+      color: #78350f;
+      padding: 2px 5px;
+      border-radius: 999px;
+      letter-spacing: -0.3px;
+    }
+
+    /* Quan està ACTIVA (Primer Tuti i posteriors) */
+    .tuti-badge.actiu {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 1px solid #f59e0b;
+      color: #b45309;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.55), 0 2px 5px rgba(180, 83, 9, 0.25);
+      transform: scale(1.04);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .tuti-badge.actiu {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+        border: 1px solid #f59e0b;
+        color: #fbbf24;
+        box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
+      }
+    }
+
+    .tuti-badge.actiu .tuti-star-icon {
+      fill: #f59e0b;
+      stroke: #d97706;
+      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.8));
+    }
+
+    .tuti-badge.actiu .tuti-count {
+      display: inline-block;
+    }
+
+    /* Efecte pols lluminós en aconseguir-lo */
+    @keyframes tutiExplosio {
+      0% { transform: scale(0.9); }
+      40% { transform: scale(1.35) rotate(15deg); box-shadow: 0 0 24px rgba(245, 158, 11, 0.9); }
+      75% { transform: scale(0.98) rotate(-5deg); }
+      100% { transform: scale(1.04) rotate(0deg); }
+    }
+
+    .tuti-animacio {
+      animation: tutiExplosio 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* =========================================================
+       PÍNDOLA DE COMPARTIR A WHATSAPP
+       ========================================================= */
     .btn-share-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 5px 12px;
-      background: #f0fdf4; /* Verd molt suau */
+      background: #f0fdf4;
       border: 1px solid #bbf7d0;
       color: #166534;
       border-radius: 9999px;
@@ -183,6 +217,7 @@
       box-shadow: 0 1px 3px rgba(22, 101, 52, 0.08);
       user-select: none;
     }
+
     @media (prefers-color-scheme: dark) {
       .btn-share-pill {
         background: rgba(22, 101, 52, 0.22);
@@ -191,22 +226,26 @@
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
       }
     }
+
     .btn-share-pill:hover {
       background: #dcfce7;
       border-color: #86efac;
       transform: translateY(-1px);
     }
+
     @media (prefers-color-scheme: dark) {
       .btn-share-pill:hover {
         background: rgba(22, 101, 52, 0.35);
       }
     }
+
     .btn-share-pill:active {
       transform: scale(0.97);
     }
+
     .btn-share-pill svg {
-      width: 14px;
-      height: 14px;
+      width: 15px;
+      height: 15px;
       fill: currentColor;
       flex-shrink: 0;
     }
@@ -232,7 +271,7 @@
       </button>
 
       <!-- INDICADOR TUTI INTEGRAT -->
-      <div id="tuti-badge" class="tuti-badge" title="Tutis descoberts avui">
+      <div id="tuti-badge" class="tuti-badge" onclick="clickTutiBadge()" title="Tuti del dia">
         <svg class="tuti-star-icon" viewBox="0 0 24 24">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
@@ -292,10 +331,10 @@
         <span class="text-slate-500 dark:text-slate-400">Nivell: <strong id="rank-label" class="text-brand-red">Principiant</strong></span>
         
         <!-- PÍNDOLA DE COMPARTIR A WHATSAPP AMB FORMAT [X/TOTAL+] -->
-        <button id="pill-share-btn" onclick="copyShareText()" class="btn-share-pill" title="Comparteix la teva partida">
-          <!-- Icona oficial WhatsApp -->
-          <svg viewBox="0 0 24 24">
-            <path d="M12.031 2C6.516 2 2.02 6.495 2.02 12.01c0 1.907.537 3.738 1.558 5.323L2 22.08l4.89-1.547c1.528.91 3.29 1.477 5.14 1.477 5.517 0 10.012-4.495 10.012-10.01C22.042 6.495 17.547 2 12.031 2zm5.82 14.17c-.24.673-1.393 1.288-1.925 1.372-.51.08-1.173.114-3.766-.96-3.32-1.374-5.46-4.733-5.626-4.954-.166-.222-1.344-1.787-1.344-3.407 0-1.62.85-2.418 1.15-2.735.3-.317.653-.396.87-.396.218 0 .436.002.627.012.202.01.473-.077.74.564.275.66.936 2.28.1.018.08.18.134.39.027.6-.107.21-.16.34-.32.52-.16.18-.344.402-.49.54-.165.155-.337.324-.145.654.192.33 8.56 1.4 1.83 2.27 1.258 1.122 2.247 1.468 2.564 1.634.316.165.502.14.688-.075.186-.214.794-.925 1.006-1.242.213-.317.426-.264.717-.156.29.108 1.84.868 2.155 1.025.316.157.527.234.605.367.078.133.078.77-.162 1.443z"/>
+        <button id="pill-share-btn" onclick="copyShareText()" class="btn-share-pill" type="button" title="Comparteix la teva partida">
+          <!-- Icona oficial WhatsApp perfectament vectoritzada -->
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="shrink-0" aria-hidden="true">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.16C10.57 20.16 9.12 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.98 3.8 13.47 3.8 11.91C3.8 7.37 7.5 3.67 12.05 3.67C14.25 3.67 16.32 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.05 20.16ZM16.56 14.39C16.31 14.26 15.09 13.66 14.86 13.58C14.64 13.49 14.47 13.45 14.31 13.7C14.14 13.95 13.66 14.52 13.52 14.69C13.37 14.85 13.22 14.88 12.97 14.75C12.72 14.63 11.92 14.36 10.97 13.52C10.23 12.86 9.73 12.05 9.58 11.8C9.44 11.55 9.57 11.41 9.69 11.29C9.8 11.18 9.94 11 10.06 10.86C10.19 10.72 10.23 10.62 10.31 10.45C10.39 10.28 10.35 10.14 10.29 10.01C10.23 9.89 9.73 8.66 9.53 8.16C9.33 7.67 9.12 7.74 8.97 7.73C8.83 7.72 8.66 7.72 8.5 7.72C8.33 7.72 8.06 7.78 7.83 8.03C7.6 8.28 6.96 8.88 6.96 10.1C6.96 11.32 7.85 12.49 7.97 12.66C8.1 12.83 9.72 15.33 12.2 16.4C12.79 16.65 13.25 16.81 13.61 16.92C14.2 17.11 14.74 17.08 15.17 17.02C15.64 16.95 16.63 16.42 16.83 15.85C17.04 15.27 17.04 14.79 16.98 14.69C16.92 14.59 16.76 14.52 16.56 14.39Z"/>
           </svg>
           <span id="pill-share-text">Comparteix [0/--+]</span>
         </button>
@@ -946,10 +985,10 @@
       }
       document.getElementById('rank-label').innerText = rangText;
 
-      // ACTUALITZACIÓ DEL TEXT DE LA PÍNDOLA DE WHATSAPP (Ex: Comparteix [2/22+])
+      // ACTUALITZACIÓ SEGURA DEL TEXT DE LA PÍNDOLA DE WHATSAPP
       const pillShareText = document.getElementById('pill-share-text');
       if (pillShareText) {
-        pillShareText.innerText = `Comparteix [${trobades}/${objectiu || '--'}+]`;
+        pillShareText.textContent = `Comparteix [${trobades}/${objectiu || '--'}+]`;
       }
 
       // ACTUALITZACIÓ DE L'ESTRELLA DEL TUTI
@@ -959,7 +998,7 @@
       if (tutisCount > 0) {
         if (!tutiBadge.classList.contains('actiu')) {
           tutiBadge.classList.add('actiu', 'tuti-animacio');
-          setTimeout(() => tutiBadge.classList.remove('tuti-animacio'), 600);
+          setTimeout(() => tutiBadge.classList.remove('tuti-animacio'), 650);
         }
         tutiCountEl.innerText = tutisCount > 1 ? `x${tutisCount}` : '';
       } else {
@@ -976,6 +1015,16 @@
         item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME ? DAILY_GAME.target : ''} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
         listContainer.appendChild(item);
       });
+    }
+
+    // ACCIÓ EN FER CLIC A L'ESTRELLA
+    function clickTutiBadge() {
+      const tutisCount = gameState.solutions.filter(s => s.esTuti).length;
+      if (tutisCount === 0) {
+        showToast("🌟 Troba una fórmula que empri els 7 dígits alhora!", "warning");
+      } else {
+        showToast(`🌟 Portes ${tutisCount} ${tutisCount === 1 ? 'Tuti' : 'Tutis'} descoberts! Impressionant!`, "success");
+      }
     }
 
     function renderYesterday(data) {
@@ -1056,7 +1105,7 @@
       document.getElementById(id).classList.add('hidden');
     }
 
-    // COMPARTIR NET SENSE DUPLICATS (OBRE WHATSAPP EN MÒBIL O COPIA EN ESCRIPTORI)
+    // COMPARTIR NET SENSE DUPLICATS (WHATSAPP EN MÒBIL / PORTAPAPERS EN ESCRIPTORI)
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const objectiu = DAILY_GAME ? DAILY_GAME.total : 0;
