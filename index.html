@@ -273,12 +273,15 @@
       </div>
     </div>
 
-    <!-- LOGO -->
-    <div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-      <img src="./img/logo.png" 
-           alt="Matelògic" 
-           class="h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
-    </div>
+    <!-- LOGO RESPONSIVE CLAR / FOSC -->
+<div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+  <picture class="flex items-center">
+    <!-- Mode fosc -->
+    <source srcset="./img/logo-dark.png" media="(prefers-color-scheme: dark)">
+    <!-- Mode clar -->
+    <img src="./img/logo.png" alt="Matelògic" class="h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
+  </picture>
+</div>
   </header>
 
   <!-- CONTINGUT -->
