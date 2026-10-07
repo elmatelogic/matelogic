@@ -737,17 +737,29 @@
       updateDisplay();
     }
 
-    function handleDelete() {
-      if (cursorIndex === 0) return;
+  function handleDelete() {
+    if (cursorIndex === 0) return;
 
-      const removed = tokens.splice(cursorIndex - 1, 1)[0];
-      cursorIndex--;
-      if (removed && removed.id) {
-        usedHexIds.delete(removed.id);
-        renderOuterHexagons();
+    // Si l'element que volem esborrar és un operador intermedi entre dos números:
+    const prevToken = tokens[cursorIndex - 1];
+    const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
+    const tokenDespres = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
+
+    if (prevToken && prevToken.type === 'op' && !['(', ')'].includes(prevToken.val)) {
+      if (tokenAbans && tokenAbans.type === 'num' && tokenDespres && tokenDespres.type === 'num') {
+        showToast("No es poden ajuntar dues xifres!", "warning");
+        return;
       }
-      updateDisplay();
     }
+
+    const removed = tokens.splice(cursorIndex - 1, 1)[0];
+    cursorIndex--;
+    if (removed && removed.id) {
+      usedHexIds.delete(removed.id);
+      renderOuterHexagons();
+    }
+    updateDisplay();
+}
 
     function clearAllTokens() {
       if (tokens.length === 0) return;
