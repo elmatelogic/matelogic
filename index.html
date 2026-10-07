@@ -274,14 +274,14 @@
     </div>
 
     <!-- LOGO RESPONSIVE CLAR / FOSC -->
-<div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-  <picture class="flex items-center">
-    <!-- Mode fosc -->
-    <source srcset="./img/logo-fosc.png" media="(prefers-color-scheme: dark)">
-    <!-- Mode clar -->
-    <img src="./img/logo.png" alt="Matelògic" class="h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
-  </picture>
-</div>
+    <div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+      <picture class="flex items-center">
+        <!-- Mode fosc -->
+        <source srcset="./img/logo-fosc.png" media="(prefers-color-scheme: dark)">
+        <!-- Mode clar -->
+        <img src="./img/logo.png" alt="Matelògic" class="h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
+      </picture>
+    </div>
   </header>
 
   <!-- CONTINGUT -->
@@ -737,29 +737,28 @@
       updateDisplay();
     }
 
-  function handleDelete() {
-    if (cursorIndex === 0) return;
+    function handleDelete() {
+      if (cursorIndex === 0) return;
 
-    // Si l'element que volem esborrar és un operador intermedi entre dos números:
-    const prevToken = tokens[cursorIndex - 1];
-    const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
-    const tokenDespres = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
+      const prevToken = tokens[cursorIndex - 1];
+      const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
+      const tokenDespres = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
-    if (prevToken && prevToken.type === 'op' && !['(', ')'].includes(prevToken.val)) {
-      if (tokenAbans && tokenAbans.type === 'num' && tokenDespres && tokenDespres.type === 'num') {
-        showToast("No es poden ajuntar dues xifres!", "warning");
-        return;
+      if (prevToken && prevToken.type === 'op' && !['(', ')'].includes(prevToken.val)) {
+        if (tokenAbans && tokenAbans.type === 'num' && tokenDespres && tokenDespres.type === 'num') {
+          showToast("No es poden ajuntar dues xifres!", "warning");
+          return;
+        }
       }
-    }
 
-    const removed = tokens.splice(cursorIndex - 1, 1)[0];
-    cursorIndex--;
-    if (removed && removed.id) {
-      usedHexIds.delete(removed.id);
-      renderOuterHexagons();
+      const removed = tokens.splice(cursorIndex - 1, 1)[0];
+      cursorIndex--;
+      if (removed && removed.id) {
+        usedHexIds.delete(removed.id);
+        renderOuterHexagons();
+      }
+      updateDisplay();
     }
-    updateDisplay();
-}
 
     function clearAllTokens() {
       if (tokens.length === 0) return;
@@ -807,7 +806,6 @@
       }, { passive: false });
     }
 
-    // GESTIÓ DEL TECLAT FÍSIC
     let backspaceTimer = null;
     let backspaceLongPressed = false;
 
@@ -815,12 +813,15 @@
       if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
       if (e.key === 'Backspace') {
-        if (!backspaceTimer) {
+        e.preventDefault(); // Evita salts d'historial al navegador o autorepetició no controlada
+        if (!e.repeat) {
+          handleDelete(); // Execució immediata i protegida a la primera pulsació
           backspaceLongPressed = false;
+          if (backspaceTimer) clearTimeout(backspaceTimer);
           backspaceTimer = setTimeout(() => {
             backspaceLongPressed = true;
             clearAllTokens();
-          }, 500);
+          }, 550);
         }
       } else if (e.key === 'Escape') {
         clearAllTokens();
@@ -848,10 +849,9 @@
 
     window.addEventListener('keyup', (e) => {
       if (e.key === 'Backspace') {
-        clearTimeout(backspaceTimer);
-        backspaceTimer = null;
-        if (!backspaceLongPressed) {
-          handleDelete();
+        if (backspaceTimer) {
+          clearTimeout(backspaceTimer);
+          backspaceTimer = null;
         }
         backspaceLongPressed = false;
       }
