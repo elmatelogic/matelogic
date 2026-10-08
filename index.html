@@ -24,7 +24,6 @@
   <meta property="og:url" content="https://www.matelogic.cat/">
   <meta property="og:title" content="Matelògic - El joc matemàtic diari en català">
   <meta property="og:description" content="Combina les xifres del rusc, empra el dígit central vermell i aconsegueix el número objectiu de cada dia.">
-  
   <meta property="og:image" content="https://www.matelogic.cat/img/og-image.png">
   <meta property="og:image:secure_url" content="https://www.matelogic.cat/img/og-image.png">
   <meta property="og:image:type" content="image/png">
@@ -59,7 +58,6 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
-
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "bb0b0097461a42fdbd85c4b1dd787d6e"}'></script>
 
   <script>
@@ -112,7 +110,6 @@
     .display-scroll::-webkit-scrollbar { display: none; }
     .display-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* ESTRELLA DEL TUTI */
     .tuti-badge {
       display: inline-flex;
       align-items: center;
@@ -126,7 +123,6 @@
       user-select: none;
       cursor: pointer;
     }
-
     .tuti-badge .tuti-star-icon {
       width: 18px;
       height: 18px;
@@ -136,7 +132,6 @@
       transition: all 0.3s ease;
       filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
     }
-
     .tuti-badge .tuti-count {
       font-weight: 800;
       font-size: 0.76rem;
@@ -148,7 +143,6 @@
       border-radius: 999px;
       letter-spacing: -0.3px;
     }
-
     .tuti-badge.actiu {
       background: linear-gradient(135deg, #fef3c7, #fde68a);
       border: 1px solid #f59e0b;
@@ -156,7 +150,6 @@
       box-shadow: 0 0 16px rgba(245, 158, 11, 0.55), 0 2px 5px rgba(180, 83, 9, 0.25);
       transform: scale(1.04);
     }
-
     @media (prefers-color-scheme: dark) {
       .tuti-badge.actiu {
         background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
@@ -165,29 +158,20 @@
         box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
       }
     }
-
     .tuti-badge.actiu .tuti-star-icon {
       fill: #f59e0b;
       stroke: #d97706;
       filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.8));
     }
-
-    .tuti-badge.actiu .tuti-count {
-      display: inline-block;
-    }
-
+    .tuti-badge.actiu .tuti-count { display: inline-block; }
     @keyframes tutiExplosio {
       0% { transform: scale(0.9); }
       40% { transform: scale(1.35) rotate(15deg); box-shadow: 0 0 24px rgba(245, 158, 11, 0.9); }
       75% { transform: scale(0.98) rotate(-5deg); }
       100% { transform: scale(1.04) rotate(0deg); }
     }
+    .tuti-animacio { animation: tutiExplosio 0.65s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
-    .tuti-animacio {
-      animation: tutiExplosio 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    /* PÍNDOLA DE COMPARTIR A WHATSAPP */
     .btn-share-pill {
       display: inline-flex;
       align-items: center;
@@ -204,7 +188,6 @@
       box-shadow: 0 1px 3px rgba(22, 101, 52, 0.08);
       user-select: none;
     }
-
     @media (prefers-color-scheme: dark) {
       .btn-share-pill {
         background: rgba(22, 101, 52, 0.22);
@@ -213,29 +196,10 @@
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
       }
     }
-
-    .btn-share-pill:hover {
-      background: #dcfce7;
-      border-color: #86efac;
-      transform: translateY(-1px);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .btn-share-pill:hover {
-        background: rgba(22, 101, 52, 0.35);
-      }
-    }
-
-    .btn-share-pill:active {
-      transform: scale(0.97);
-    }
-
-    .btn-share-pill svg {
-      width: 15px;
-      height: 15px;
-      fill: currentColor;
-      flex-shrink: 0;
-    }
+    .btn-share-pill:hover { background: #dcfce7; border-color: #86efac; transform: translateY(-1px); }
+    @media (prefers-color-scheme: dark) { .btn-share-pill:hover { background: rgba(22, 101, 52, 0.35); } }
+    .btn-share-pill:active { transform: scale(0.97); }
+    .btn-share-pill svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
   </style>
 </head>
 <body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col justify-start items-center font-sans antialiased selection:bg-brand-blue selection:text-white pb-10">
@@ -360,8 +324,7 @@
     </div>
 
     <div class="w-full grid grid-cols-3 gap-2.5 max-w-sm mt-1">
-      <button id="delete-btn" 
-              class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm rounded-full active:scale-95 transition-all">
+      <button id="delete-btn" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm rounded-full active:scale-95 transition-all">
         Suprimeix
       </button>
       <button onclick="shuffleOuterHexagons()" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center">
@@ -387,7 +350,7 @@
             <li>Troba operacions que donin exactament el <strong>Nombre objectiu</strong>.</li>
             <li>El dígit central vermell és <strong class="text-brand-red">obligatori</strong> a cada operació.</li>
             <li>Pots usar cada casella del rusc com a màxim <strong>un cop</strong> per càlcul.</li>
-            <li><strong>Jerarquia d'operacions:</strong> La multiplicació i la divisió es calculen sempre abans que la suma i la resta. Fes servir els parèntesis <strong>( )</strong> per agrupar si vols alterar aquest ordre!</li>
+            <li><strong>Jerarquia d'operacions:</strong> La multiplicació i la divisió es calculen sempre abans que la suma i la resta. Fes servir els parèntesis <strong>( )</strong> si vols alterar aquest ordre!</li>
           </ul>
         </div>
 
@@ -449,25 +412,20 @@
 
   <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop">
-      
       <div class="w-14 h-14 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-2xl flex items-center justify-center mx-auto p-2.5 shadow-inner">
         <img src="./favicon.png?v=4" alt="Matelògic" class="w-full h-full object-contain">
       </div>
-
       <h3 class="text-lg font-black text-slate-900 dark:text-white">Comparteix el teu progrés</h3>
-      
       <div class="bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl text-left font-mono text-xs space-y-1">
         <p>Matelògic <span id="share-modal-num">#000</span></p>
         <p>🎯 Meta: <span id="share-modal-target">0</span></p>
         <p>🎖️ Rang: <span id="share-modal-rank">Principiant</span></p>
         <p>✨ Solucions: <span id="share-modal-count">0</span> (<span id="share-modal-total">0</span>)</p>
       </div>
-
       <div class="bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 py-2.5 px-3 rounded-xl flex items-center justify-between">
         <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Proper repte en:</span>
         <span id="countdown-timer" class="font-mono font-bold text-sm text-brand-red">--:--:--</span>
       </div>
-
       <button onclick="copyShareText()" id="copy-btn" class="w-full py-3 rounded-xl bg-brand-red text-white font-bold text-sm shadow-md">
         Copia o Comparteix
       </button>
@@ -481,7 +439,7 @@
     let DAILY_GAME = null;
     let tokens = [];
     let cursorIndex = 0;
-    let usedHexIds = new Set();
+    let usedNumbers = new Set();
     let outerPositions = [];
     let gameState = { solutions: [], score: 0 };
     let CURRENT_CHALLENGE_ID = "";
@@ -499,7 +457,7 @@
 
         tokens = [];
         cursorIndex = 0;
-        usedHexIds.clear();
+        syncUsedNumbers();
 
         document.getElementById('challenge-day-label').innerText = `Repte Núm. ${DAILY_GAME.num}`;
         document.getElementById('challenge-date-label').innerText = DAILY_GAME.data;
@@ -515,6 +473,15 @@
         console.error("Error initUI:", err);
         showToast("Error carregant el repte", "error");
       }
+    }
+
+    function syncUsedNumbers() {
+      usedNumbers.clear();
+      tokens.forEach(t => {
+        if (t.type === 'num') {
+          usedNumbers.add(parseInt(t.val, 10));
+        }
+      });
     }
 
     function loadSavedProgress() {
@@ -539,18 +506,20 @@
     }
 
     function renderOuterHexagons() {
+      syncUsedNumbers();
       outerPositions.forEach((val, idx) => {
         const btn = document.getElementById(`hex-${idx}`);
         if (btn) {
           btn.innerText = val;
-          const hexId = `hex-${idx}`;
-          if (usedHexIds.has(hexId)) btn.classList.add('used');
+          if (usedNumbers.has(val)) btn.classList.add('used');
           else btn.classList.remove('used');
         }
       });
       const centerBtn = document.getElementById('hex-center');
-      if (usedHexIds.has('hex-center')) centerBtn.classList.add('used');
-      else centerBtn.classList.remove('used');
+      if (centerBtn && DAILY_GAME) {
+        if (usedNumbers.has(DAILY_GAME.center)) centerBtn.classList.add('used');
+        else centerBtn.classList.remove('used');
+      }
     }
 
     function shuffleOuterHexagons() {
@@ -654,7 +623,6 @@
         if (char === '÷') rawChar = '/';
         if (char === '−') rawChar = '-';
 
-        // REEMPLAÇAMENT DIRECTE D'OPERADOR
         if (nextToken && nextToken.type === 'op' && nextToken.val !== '(' && nextToken.val !== ')') {
           tokens[cursorIndex] = { type: 'op', val: rawChar, display: char, id: null };
           cursorIndex++;
@@ -681,18 +649,14 @@
     }
 
     function handleHexClick(index) {
-      const hexId = `hex-${index}`;
-      if (usedHexIds.has(hexId)) return;
+      const val = outerPositions[index];
+      if (usedNumbers.has(val)) return;
 
       const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
-      // REEMPLAÇAMENT DIRECTE DE NÚMERO:
       if (nextToken && nextToken.type === 'num') {
-        if (nextToken.id) usedHexIds.delete(nextToken.id);
-        const val = outerPositions[index];
-        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString(), id: hexId };
-        usedHexIds.add(hexId);
+        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString() };
         cursorIndex++;
         renderOuterHexagons();
         updateDisplay();
@@ -706,27 +670,22 @@
         return showToast("Cal un operador abans del número següent!", "warning");
       }
 
-      const val = outerPositions[index];
-      const newToken = { type: 'num', val: val.toString(), display: val.toString(), id: hexId };
+      const newToken = { type: 'num', val: val.toString(), display: val.toString() };
       tokens.splice(cursorIndex, 0, newToken);
       cursorIndex++;
-      usedHexIds.add(hexId);
       renderOuterHexagons();
       updateDisplay();
     }
 
     function handleHexCenterClick() {
-      const hexId = 'hex-center';
-      if (usedHexIds.has(hexId)) return;
+      const val = DAILY_GAME.center;
+      if (usedNumbers.has(val)) return;
 
       const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
-      // REEMPLAÇAMENT DIRECTE AMB EL CENTRE:
       if (nextToken && nextToken.type === 'num') {
-        if (nextToken.id) usedHexIds.delete(nextToken.id);
-        tokens[cursorIndex] = { type: 'num', val: DAILY_GAME.center.toString(), display: DAILY_GAME.center.toString(), id: hexId };
-        usedHexIds.add(hexId);
+        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString() };
         cursorIndex++;
         renderOuterHexagons();
         updateDisplay();
@@ -740,10 +699,9 @@
         return showToast("Cal un operador abans del número següent!", "warning");
       }
 
-      const newToken = { type: 'num', val: DAILY_GAME.center.toString(), display: DAILY_GAME.center.toString(), id: hexId };
+      const newToken = { type: 'num', val: val.toString(), display: val.toString() };
       tokens.splice(cursorIndex, 0, newToken);
       cursorIndex++;
-      usedHexIds.add(hexId);
       renderOuterHexagons();
       updateDisplay();
     }
@@ -760,24 +718,18 @@
           tokens.splice(cursorIndex - 1, 1);
           cursorIndex--;
 
-          const numEliminat = tokens.splice(cursorIndex - 1, 1)[0];
+          tokens.splice(cursorIndex - 1, 1);
           cursorIndex--;
-          if (numEliminat && numEliminat.id) {
-            usedHexIds.delete(numEliminat.id);
-            renderOuterHexagons();
-          }
 
+          renderOuterHexagons();
           updateDisplay();
           return;
         }
       }
 
-      const removed = tokens.splice(cursorIndex - 1, 1)[0];
+      tokens.splice(cursorIndex - 1, 1);
       cursorIndex--;
-      if (removed && removed.id) {
-        usedHexIds.delete(removed.id);
-        renderOuterHexagons();
-      }
+      renderOuterHexagons();
       updateDisplay();
     }
 
@@ -785,7 +737,6 @@
       if (tokens.length === 0) return;
       tokens = [];
       cursorIndex = 0;
-      usedHexIds.clear();
       renderOuterHexagons();
       updateDisplay();
       if (navigator.vibrate) navigator.vibrate(35);
@@ -834,9 +785,9 @@
       if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
       if (e.key === 'Backspace') {
-        e.preventDefault(); 
+        e.preventDefault();
         if (!e.repeat) {
-          handleDelete(); 
+          handleDelete();
           backspaceLongPressed = false;
           if (backspaceTimer) clearTimeout(backspaceTimer);
           backspaceTimer = setTimeout(() => {
@@ -859,10 +810,10 @@
         appendChar(e.key);
       } else if (!isNaN(e.key) && e.key !== ' ') {
         const val = parseInt(e.key, 10);
-        if (DAILY_GAME && val === DAILY_GAME.center && !usedHexIds.has('hex-center')) {
+        if (DAILY_GAME && val === DAILY_GAME.center && !usedNumbers.has(val)) {
           handleHexCenterClick();
         } else {
-          const idx = outerPositions.findIndex((v, i) => v === val && !usedHexIds.has(`hex-${i}`));
+          const idx = outerPositions.findIndex((v) => v === val && !usedNumbers.has(v));
           if (idx !== -1) handleHexClick(idx);
         }
       }
@@ -925,8 +876,6 @@
         }
 
         const puntsGuanyats = Number(data.punts) || 1;
-
-        // DETECCIÓ DEL TUTI
         const digitsUsats = tokens.filter(t => t.type === 'num').length;
         const esTutiReal = !!(data.esTuti || data.tuti || digitsUsats === 7);
 
@@ -942,7 +891,6 @@
         try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
         try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
 
-        // Feedback
         if (esTutiReal) {
           if (typeof confetti === 'function') {
             try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
@@ -952,10 +900,8 @@
           showToast(`Correcte! +${puntsGuanyats} pts`, "success");
         }
 
-        // Buidar visor i rusc
         tokens = [];
         cursorIndex = 0;
-        usedHexIds.clear();
         renderOuterHexagons();
         updateDisplay();
 
@@ -1012,13 +958,11 @@
       const rankLabel = document.getElementById('rank-label');
       if (rankLabel) rankLabel.innerText = rangText;
 
-      // ACTUALITZACIÓ EN TEMPS REAL DEL BOTÓ DE COMPARTIR
       const pillShareText = document.getElementById('pill-share-text');
       if (pillShareText) {
         pillShareText.textContent = `Comparteix [${trobades}/${objectiu}+]`;
       }
 
-      // ACTUALITZACIÓ EN TEMPS REAL DE L'ESTRELLA DEL TUTI (x1, x2, x3...)
       const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
       const tutiBadge = document.getElementById('tuti-badge');
       const tutiCountEl = document.getElementById('tuti-count');
@@ -1035,7 +979,6 @@
         }
       }
 
-      // Llista de solucions
       const listContainer = document.getElementById('solutions-list-container');
       if (listContainer) {
         listContainer.innerHTML = '';
@@ -1048,7 +991,6 @@
       }
     }
 
-    // ACCIÓ EN FER CLIC A L'ESTRELLA
     function clickTutiBadge() {
       const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
       if (tutisCount === 0) {
@@ -1138,7 +1080,6 @@
       document.getElementById(id).classList.add('hidden');
     }
 
-    // COMPARTIR NET SENSE DUPLICATS (WHATSAPP EN MÒBIL / ESCRIPTORI)
     async function copyShareText() {
       const trobades = gameState.solutions.length;
       const objectiu = (DAILY_GAME && DAILY_GAME.total) ? DAILY_GAME.total : 22;
@@ -1193,7 +1134,6 @@
       setTimeout(() => t.remove(), 2500);
     }
 
-    // REGISTRE DEL SERVICE WORKER PER A PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch((err) => {
