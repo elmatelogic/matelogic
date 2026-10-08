@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Matelògic - El repte matemàtic diari en català</title>
 
-  <!-- METADADES SEO BÀSIQUES -->
   <meta name="description" content="Posa a prova la teva ment amb el Matelògic: el joc matemàtic diari en català basat en un rusc numèric. Troba les fórmules per assolir la xifra objectiu!">
   <meta name="keywords" content="matelògic, joc matemàtic, rusc matemàtic, xifres, joc diari català, paraulògic matemàtic, càlcul mental">
   <meta name="author" content="Matelògic">
@@ -13,7 +12,6 @@
   <link rel="canonical" href="https://www.matelogic.cat/">
   <meta name="theme-color" content="#e63946">
 
-  <!-- FAVICON PER A NAVEGADORS I GOOGLE SEARCH -->
   <link rel="icon" type="image/png" sizes="192x192" href="./favicon.png?v=4">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png?v=4">
   <link rel="apple-touch-icon" href="./favicon.png?v=4">
@@ -21,7 +19,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Matelògic">
 
-  <!-- OPEN GRAPH / SOCIAL -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Matelògic">
   <meta property="og:url" content="https://www.matelogic.cat/">
@@ -36,14 +33,12 @@
   <meta property="og:image:alt" content="Taulell de joc de Matelògic">
   <meta property="og:locale" content="ca_ES">
 
-  <!-- TWITTER / X -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://www.matelogic.cat/">
   <meta name="twitter:title" content="Matelògic - El repte matemàtic diari en català">
   <meta name="twitter:description" content="Troba les operacions per arribar a la meta diària. Aconseguiràs el Tuti avui?">
   <meta name="twitter:image" content="https://www.matelogic.cat/img/og-image.png">
 
-  <!-- DADES ESTRUCTURADES (SCHEMA.ORG) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -60,13 +55,11 @@
 
   <link rel="manifest" href="./manifest.json">
 
-  <!-- SCRIPTS EXTERNS I FONTS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 
-  <!-- CLOUDFLARE WEB ANALYTICS -->
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "bb0b0097461a42fdbd85c4b1dd787d6e"}'></script>
 
   <script>
@@ -249,9 +242,7 @@
 
   <div id="toast-container" class="fixed top-5 z-50 flex flex-col gap-2 items-center pointer-events-none w-full max-w-sm px-4"></div>
 
-  <!-- HEADER OPTIMITZAT -->
   <header class="w-full max-w-lg border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-3 py-2 flex items-center justify-between shadow-sm">
-    <!-- BOTONS ESQUERRA I ESTRELLA TUTI -->
     <div class="flex items-center gap-1.5 shrink-0">
       <button onclick="openModal('info-modal')" aria-label="Instruccions" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -264,7 +255,6 @@
         <span>Ahir</span>
       </button>
 
-      <!-- INDICADOR TUTI INTEGRAT -->
       <div id="tuti-badge" class="tuti-badge" onclick="clickTutiBadge()" title="Tuti del dia">
         <svg class="tuti-star-icon" viewBox="0 0 24 24">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -273,33 +263,26 @@
       </div>
     </div>
 
-    <!-- LOGO RESPONSIVE CLAR / FOSC -->
     <div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
       <picture class="flex items-center">
-        <!-- Mode fosc -->
         <source srcset="./img/logo-fosc.png" media="(prefers-color-scheme: dark)">
-        <!-- Mode clar -->
         <img src="./img/logo.png" alt="Matelògic" class="h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
       </picture>
     </div>
   </header>
 
-  <!-- CONTINGUT -->
   <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
     <div class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider text-slate-400 px-2">
       <span id="challenge-day-label">Carregant repte...</span>
       <span id="challenge-date-label">-- / -- / ----</span>
     </div>
 
-    <!-- MARCADOR GAMIFICAT DE 3 COLUMNES -->
     <div class="w-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-2.5 shadow-sm grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-700/60 text-center transition-all">
-      <!-- 1. OBJECTIU -->
       <div class="flex flex-col items-center justify-center px-1">
         <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Objectiu</span>
         <span id="target-value" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">--</span>
       </div>
 
-      <!-- 2. SOLUCIONS (META OBERTA) -->
       <div id="solutions-box" class="flex flex-col items-center justify-center px-1 rounded-xl transition-colors">
         <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Solucions</span>
         <div class="flex items-baseline justify-center gap-0.5">
@@ -308,7 +291,6 @@
         </div>
       </div>
 
-      <!-- 3. PUNTS -->
       <div class="flex flex-col items-center justify-center px-1">
         <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Punts</span>
         <div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">
@@ -317,14 +299,11 @@
       </div>
     </div>
 
-    <!-- BARRA DE RANG I BOTÓ INTEGRAT DE WHATSAPP -->
     <div class="w-full px-1 flex flex-col gap-1.5">
       <div class="flex justify-between items-center text-xs font-bold">
         <span class="text-slate-500 dark:text-slate-400">Nivell: <strong id="rank-label" class="text-brand-red">Principiant</strong></span>
         
-        <!-- PÍNDOLA DE COMPARTIR A WHATSAPP AMB FORMAT [X/TOTAL+] -->
         <button id="pill-share-btn" onclick="copyShareText()" class="btn-share-pill" type="button" title="Comparteix la teva partida">
-          <!-- Icona oficial WhatsApp -->
           <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="shrink-0" aria-hidden="true">
             <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.16C10.57 20.16 9.12 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.98 3.8 13.47 3.8 11.91C3.8 7.37 7.5 3.67 12.05 3.67C14.25 3.67 16.32 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.05 20.16ZM16.56 14.39C16.31 14.26 15.09 13.66 14.86 13.58C14.64 13.49 14.47 13.45 14.31 13.7C14.14 13.95 13.66 14.52 13.52 14.69C13.37 14.85 13.22 14.88 12.97 14.75C12.72 14.63 11.92 14.36 10.97 13.52C10.23 12.86 9.73 12.05 9.58 11.8C9.44 11.55 9.57 11.41 9.69 11.29C9.8 11.18 9.94 11 10.06 10.86C10.19 10.72 10.23 10.62 10.31 10.45C10.39 10.28 10.35 10.14 10.29 10.01C10.23 9.89 9.73 8.66 9.53 8.16C9.33 7.67 9.12 7.74 8.97 7.73C8.83 7.72 8.66 7.72 8.5 7.72C8.33 7.72 8.06 7.78 7.83 8.03C7.6 8.28 6.96 8.88 6.96 10.1C6.96 11.32 7.85 12.49 7.97 12.66C8.1 12.83 9.72 15.33 12.2 16.4C12.79 16.65 13.25 16.81 13.61 16.92C14.2 17.11 14.74 17.08 15.17 17.02C15.64 16.95 16.63 16.42 16.83 15.85C17.04 15.27 17.04 14.79 16.98 14.69C16.92 14.59 16.76 14.52 16.56 14.39Z"/>
           </svg>
@@ -337,7 +316,6 @@
       </div>
     </div>
 
-    <!-- VISOR DE L'OPERACIÓ AMB CURSOR INTERACTIU I AUTO-ESCALA -->
     <div class="w-full relative mt-0.5 flex items-center gap-1">
       <button onclick="moveCursor(-1)" aria-label="Moure cursor a l'esquerra" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
         ‹
@@ -352,7 +330,6 @@
       </button>
     </div>
 
-    <!-- RUSC -->
     <div class="honeycomb-grid my-1 select-none">
       <div class="hex-row">
         <button id="hex-0" onclick="handleHexClick(0)" class="hex-cell key-3d w-20 h-20 bg-brand-blue text-white flex items-center justify-center font-mono text-3xl font-black shadow-md">-</button>
@@ -373,7 +350,6 @@
       </div>
     </div>
 
-    <!-- OPERADORS -->
     <div class="w-full grid grid-cols-6 gap-1.5 max-w-sm mt-0.5">
       <button onclick="appendChar('+')" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">+</button>
       <button onclick="appendChar('−')" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">−</button>
@@ -383,7 +359,6 @@
       <button onclick="appendChar(')')" class="key-3d h-11 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-mono font-bold text-lg rounded-xl flex items-center justify-center">)</button>
     </div>
 
-    <!-- ACCIONS -->
     <div class="w-full grid grid-cols-3 gap-2.5 max-w-sm mt-1">
       <button id="delete-btn" 
               class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm rounded-full active:scale-95 transition-all">
@@ -398,7 +373,6 @@
     </div>
   </main>
 
-  <!-- MODAL INSTRUCCIONS I CONTACTE -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-pop">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
@@ -413,6 +387,7 @@
             <li>Troba operacions que donin exactament el <strong>Nombre objectiu</strong>.</li>
             <li>El dígit central vermell és <strong class="text-brand-red">obligatori</strong> a cada operació.</li>
             <li>Pots usar cada casella del rusc com a màxim <strong>un cop</strong> per càlcul.</li>
+            <li><strong>Jerarquia d'operacions:</strong> La multiplicació i la divisió es calculen sempre abans que la suma i la resta. Fes servir els parèntesis <strong>( )</strong> per agrupar si vols alterar aquest ordre!</li>
           </ul>
         </div>
 
@@ -452,7 +427,6 @@
     </div>
   </div>
 
-  <!-- MODAL LES MEVES SOLUCIONS -->
   <div id="solutions-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] animate-pop">
       <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions descobertes</h3>
@@ -461,7 +435,6 @@
     </div>
   </div>
 
-  <!-- MODAL AHIR -->
   <div id="yesterday-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] animate-pop">
       <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions d'ahir</h3>
@@ -474,7 +447,6 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARTIR -->
   <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop">
       
@@ -676,8 +648,24 @@
         if (!prevToken || (prevToken.type === 'op' && prevToken.val !== ')')) {
           return showToast("Posa primer un número!", "warning");
         }
-        if (nextToken && nextToken.type === 'op' && nextToken.val !== '(') {
-          return showToast("Ja hi ha un operador següent!", "warning");
+
+        let rawChar = char;
+        if (char === '×') rawChar = '*';
+        if (char === '÷') rawChar = '/';
+        if (char === '−') rawChar = '-';
+
+        // REEMPLAÇAMENT DIRECTE: Si ja hi ha un operador davant o darrere, el substituïm netament
+        if (nextToken && nextToken.type === 'op' && nextToken.val !== '(' && nextToken.val !== ')') {
+          tokens[cursorIndex] = { type: 'op', val: rawChar, display: char, id: null };
+          cursorIndex++;
+          updateDisplay();
+          return;
+        }
+
+        if (prevToken && prevToken.type === 'op' && prevToken.val !== ')') {
+          tokens[cursorIndex - 1] = { type: 'op', val: rawChar, display: char, id: null };
+          updateDisplay();
+          return;
         }
       }
 
@@ -744,13 +732,28 @@
       const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
       const tokenDespres = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
+      // Si s'esborra un operador entre dues xifres, eliminem l'operador I el nombre anterior
+      // per evitar ajuntar xifres i alliberar la casella del rusc de forma neta:
       if (prevToken && prevToken.type === 'op' && !['(', ')'].includes(prevToken.val)) {
         if (tokenAbans && tokenAbans.type === 'num' && tokenDespres && tokenDespres.type === 'num') {
-          showToast("No es poden ajuntar dues xifres!", "warning");
+          // 1. Eliminem l'operador
+          tokens.splice(cursorIndex - 1, 1);
+          cursorIndex--;
+
+          // 2. Eliminem el dígit anterior i l'alliberem del rusc
+          const numEliminat = tokens.splice(cursorIndex - 1, 1)[0];
+          cursorIndex--;
+          if (numEliminat && numEliminat.id) {
+            usedHexIds.delete(numEliminat.id);
+            renderOuterHexagons();
+          }
+
+          updateDisplay();
           return;
         }
       }
 
+      // Esborrat estàndard
       const removed = tokens.splice(cursorIndex - 1, 1)[0];
       cursorIndex--;
       if (removed && removed.id) {
