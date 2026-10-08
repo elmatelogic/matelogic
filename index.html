@@ -654,7 +654,7 @@
         if (char === '÷') rawChar = '/';
         if (char === '−') rawChar = '-';
 
-        // REEMPLAÇAMENT DIRECTE D'OPERADOR: Si el cursor és davant d'un operador, el substituïm
+        // REEMPLAÇAMENT DIRECTE D'OPERADOR
         if (nextToken && nextToken.type === 'op' && nextToken.val !== '(' && nextToken.val !== ')') {
           tokens[cursorIndex] = { type: 'op', val: rawChar, display: char, id: null };
           cursorIndex++;
@@ -662,7 +662,6 @@
           return;
         }
 
-        // Si el cursor està just després d'un operador i en premem un altre, substituïm l'anterior
         if (prevToken && prevToken.type === 'op' && prevToken.val !== ')') {
           tokens[cursorIndex - 1] = { type: 'op', val: rawChar, display: char, id: null };
           updateDisplay();
@@ -689,7 +688,6 @@
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
       // REEMPLAÇAMENT DIRECTE DE NÚMERO:
-      // Si el cursor està just davant d'un número existent, el substituïm pel nou
       if (nextToken && nextToken.type === 'num') {
         if (nextToken.id) usedHexIds.delete(nextToken.id);
         const val = outerPositions[index];
@@ -757,8 +755,6 @@
       const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
       const tokenDespres = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
-      // Si esborrem un operador entre dos números, eliminem l'operador I el número anterior
-      // per no deixar mai dues xifres enganxades i alliberar la casella al rusc:
       if (prevToken && prevToken.type === 'op' && !['(', ')'].includes(prevToken.val)) {
         if (tokenAbans && tokenAbans.type === 'num' && tokenDespres && tokenDespres.type === 'num') {
           tokens.splice(cursorIndex - 1, 1);
@@ -838,9 +834,9 @@
       if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
       if (e.key === 'Backspace') {
-        e.preventDefault(); // Evita salts d'historial al navegador o autorepetició no controlada
+        e.preventDefault(); 
         if (!e.repeat) {
-          handleDelete(); // Execució immediata i protegida a la primera pulsació
+          handleDelete(); 
           backspaceLongPressed = false;
           if (backspaceTimer) clearTimeout(backspaceTimer);
           backspaceTimer = setTimeout(() => {
@@ -913,7 +909,7 @@
         const expressioDisplay = tokens.map(t => t.display).join(' ');
         const expressioNeta = rawExpr.replace(/\s+/g, '');
 
-        // DETECCIÓ ROBUSTA DE DUPLICATS
+        // DETECCIÓ DE DUPLICATS
         const jaExisteix = gameState.solutions.some(s => {
           const sExpr = (s.raw || s.expression || '').replace(/\s+/g, '');
           if (sExpr === expressioNeta || s.expression === expressioDisplay) return true;
@@ -943,11 +939,10 @@
         });
         gameState.score += puntsGuanyats;
 
-        // Persistència i actualització immediata de la interfície
         try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
         try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
 
-        // Feedback i confeti
+        // Feedback
         if (esTutiReal) {
           if (typeof confetti === 'function') {
             try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
