@@ -654,7 +654,7 @@
         if (char === '÷') rawChar = '/';
         if (char === '−') rawChar = '-';
 
-        // REEMPLAÇAMENT DIRECTE: Si ja hi ha un operador davant o darrere, el substituïm netament
+        // REEMPLAÇAMENT DIRECTE D'OPERADOR: Si el cursor és davant d'un operador, el substituïm
         if (nextToken && nextToken.type === 'op' && nextToken.val !== '(' && nextToken.val !== ')') {
           tokens[cursorIndex] = { type: 'op', val: rawChar, display: char, id: null };
           cursorIndex++;
@@ -662,6 +662,7 @@
           return;
         }
 
+        // Si el cursor està just després d'un operador i en premem un altre, substituïm l'anterior
         if (prevToken && prevToken.type === 'op' && prevToken.val !== ')') {
           tokens[cursorIndex - 1] = { type: 'op', val: rawChar, display: char, id: null };
           updateDisplay();
@@ -687,6 +688,19 @@
       const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
+      // REEMPLAÇAMENT DIRECTE DE NÚMERO:
+      // Si el cursor està just davant d'un número existent, el substituïm pel nou
+      if (nextToken && nextToken.type === 'num') {
+        if (nextToken.id) usedHexIds.delete(nextToken.id);
+        const val = outerPositions[index];
+        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString(), id: hexId };
+        usedHexIds.add(hexId);
+        cursorIndex++;
+        renderOuterHexagons();
+        updateDisplay();
+        return;
+      }
+
       if (prevToken && (prevToken.type === 'num' || prevToken.val === ')')) {
         return showToast("Cal un operador!", "warning");
       }
@@ -710,6 +724,17 @@
       const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
+      // REEMPLAÇAMENT DIRECTE AMB EL CENTRE:
+      if (nextToken && nextToken.type === 'num') {
+        if (nextToken.id) usedHexIds.delete(nextToken.id);
+        tokens[cursorIndex] = { type: 'num', val: DAILY_GAME.center.toString(), display: DAILY_GAME.center.toString(), id: hexId };
+        usedHexIds.add(hexId);
+        cursorIndex++;
+        renderOuterHexagons();
+        updateDisplay();
+        return;
+      }
+
       if (prevToken && (prevToken.type === 'num' || prevToken.val === ')')) {
         return showToast("Cal un operador!", "warning");
       }
@@ -732,15 +757,13 @@
       const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
       const tokenDespres = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
-      // Si s'esborra un operador entre dues xifres, eliminem l'operador I el nombre anterior
-      // per evitar ajuntar xifres i alliberar la casella del rusc de forma neta:
+      // Si esborrem un operador entre dos números, eliminem l'operador I el número anterior
+      // per no deixar mai dues xifres enganxades i alliberar la casella al rusc:
       if (prevToken && prevToken.type === 'op' && !['(', ')'].includes(prevToken.val)) {
         if (tokenAbans && tokenAbans.type === 'num' && tokenDespres && tokenDespres.type === 'num') {
-          // 1. Eliminem l'operador
           tokens.splice(cursorIndex - 1, 1);
           cursorIndex--;
 
-          // 2. Eliminem el dígit anterior i l'alliberem del rusc
           const numEliminat = tokens.splice(cursorIndex - 1, 1)[0];
           cursorIndex--;
           if (numEliminat && numEliminat.id) {
@@ -753,7 +776,6 @@
         }
       }
 
-      // Esborrat estàndard
       const removed = tokens.splice(cursorIndex - 1, 1)[0];
       cursorIndex--;
       if (removed && removed.id) {
