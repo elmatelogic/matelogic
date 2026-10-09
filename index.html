@@ -88,7 +88,10 @@
     * { -webkit-tap-highlight-color: transparent; user-select: none; }
     input, textarea { user-select: auto; }
 
-    /* ESTILITZACIÓ DEL RUSC HEXAGONAL AMB OMBRA REAL DROP-SHADOW */
+    html, body {
+      overscroll-behavior-y: contain;
+    }
+
     .hex-cell {
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
       transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), filter 0.12s ease, opacity 0.15s ease;
@@ -272,7 +275,8 @@
         <span id="target-value" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">--</span>
       </div>
 
-      <div id="solutions-box" class="flex flex-col items-center justify-center px-1 rounded-xl transition-colors">
+      <!-- CAPSETA DE SOLUCIONS INTERACTIVA -->
+      <div id="solutions-box" onclick="openModal('solutions-modal')" role="button" aria-label="Veure solucions descobertes" class="flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/40 active:scale-95 select-none">
         <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Solucions</span>
         <div class="flex items-baseline justify-center gap-0.5">
           <span id="solutions-count" class="text-2xl sm:text-3xl font-black text-brand-red font-mono transition-transform">0</span>
@@ -399,7 +403,7 @@
             </svg>
           </summary>
           <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-1.5 leading-relaxed">
-            <p>Aquest joc té en compte la jerarquia d'operacions:</p>
+            <p>Tingues en compte que cal seguir la jerarquia d'operacions:</p>
             <ol class="list-decimal list-inside space-y-0.5 font-medium text-[11px] text-slate-700 dark:text-slate-300">
               <li>Primer es resol el contingut dels <strong>parèntesis ( )</strong>.</li>
               <li>Després les <strong>multiplicacions (×)</strong> i <strong>divisions (÷)</strong>.</li>
@@ -586,6 +590,7 @@
         updateScoreboard();
         updateDisplay();
         setupDeleteEvents();
+        setupBackdropCloseEvents();
       } catch (err) {
         console.error("Error initUI:", err);
         showToast("Error carregant el repte", "error");
@@ -895,6 +900,14 @@
       }, { passive: false });
     }
 
+    function setupBackdropCloseEvents() {
+      document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(modal.id);
+        });
+      });
+    }
+
     let backspaceTimer = null;
     let backspaceLongPressed = false;
 
@@ -913,6 +926,11 @@
           }, 550);
         }
       } else if (e.key === 'Escape') {
+        const modalObert = document.querySelector('[id$="-modal"]:not(.hidden)');
+        if (modalObert) {
+          closeModal(modalObert.id);
+          return;
+        }
         clearAllTokens();
       } else if (e.key === 'ArrowLeft') {
         moveCursor(-1);
@@ -1050,25 +1068,27 @@
       const rankBar = document.getElementById('rank-bar');
       if (rankBar) rankBar.style.width = `${pctBarra}%`;
 
+      const baseBoxClasses = "flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer select-none active:scale-95";
+
       let rangText = "Principiant";
       if (trobades > objectiu) {
         rangText = "Euler ✨";
         const extra = trobades - objectiu;
-        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 transition-colors";
+        if (solBoxEl) solBoxEl.className = `${baseBoxClasses} bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 hover:bg-amber-100/60 dark:hover:bg-amber-900/50`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-amber-500 font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `<span class="text-[11px] text-amber-600 dark:text-amber-400 font-extrabold ml-1">(+${extra})</span>`;
       } else if (pctReal >= 100) {
         rangText = "Geni 🎓";
-        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 transition-colors";
+        if (solBoxEl) solBoxEl.className = `${baseBoxClasses} bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/50`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else if (pctReal >= 50) {
         rangText = "Mestre/a 🎖";
-        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
+        if (solBoxEl) solBoxEl.className = `${baseBoxClasses} hover:bg-slate-50 dark:hover:bg-slate-700/40`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else {
-        if (solBoxEl) solBoxEl.className = "flex flex-col items-center justify-center px-1 rounded-xl transition-colors";
+        if (solBoxEl) solBoxEl.className = `${baseBoxClasses} hover:bg-slate-50 dark:hover:bg-slate-700/40`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       }
