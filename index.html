@@ -94,8 +94,12 @@
 
     .hex-cell {
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
       transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), filter 0.12s ease, opacity 0.15s ease;
-      filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.15)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.08));
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
     }
 
     .hex-cell-blue {
@@ -104,12 +108,12 @@
 
     .hex-cell-red {
       background: linear-gradient(180deg, #ed4b58 0%, #db2c3b 100%);
-      filter: drop-shadow(0 0 5px rgba(230, 57, 70, 0.45)) drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.08));
+      filter: drop-shadow(0 0 5px rgba(230, 57, 70, 0.45)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
     }
 
     .hex-cell:active {
       transform: translateY(3px) scale(0.96);
-      filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.2)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
     }
 
     .hex-cell.used {
@@ -368,6 +372,7 @@
     </div>
   </main>
 
+  <!-- MODAL INSTRUCCIONS AMB DESPLEGABLES -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3.5 max-h-[90vh] overflow-y-auto animate-pop">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
@@ -468,7 +473,7 @@
         <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-              <span>⌨️</span> Dreceres i controls
+              <span>⌨️</span> Dreceres i controls (ordinador)
             </span>
             <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -612,7 +617,7 @@
       const displayEl = document.getElementById('display-container');
       if (displayEl) {
         displayEl.classList.remove('animate-shake');
-        void displayEl.offsetWidth; // Força el reflux per reiniciar l'animació
+        void displayEl.offsetWidth;
         displayEl.classList.add('animate-shake');
         setTimeout(() => displayEl.classList.remove('animate-shake'), 360);
       }
@@ -1010,6 +1015,7 @@
         const expressioDisplay = tokens.map(t => t.display).join(' ');
         const expressioNeta = rawExpr.replace(/\s+/g, '');
 
+        // DETECCIÓ DE DUPLICATS
         const jaExisteix = gameState.solutions.some(s => {
           const sExpr = (s.raw || s.expression || '').replace(/\s+/g, '');
           if (sExpr === expressioNeta || s.expression === expressioDisplay) return true;
