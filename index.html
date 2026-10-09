@@ -371,7 +371,7 @@
       </div>
 
       <div class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
-        <!-- 1. REGLES BÀSIQUES (OBERT PER DEFECTE) -->
+        <!-- 1. REGLES BÀSIQUES -->
         <details open class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -509,9 +509,19 @@
     </div>
   </div>
 
+  <!-- MODAL SOLUCIONS DESCOBERTES -->
   <div id="solutions-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] animate-pop">
-      <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions descobertes</h3>
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions descobertes</h3>
+        <button onclick="closeModal('solutions-modal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
+      </div>
+
+      <!-- INCENTIU DE RANG RESTANT -->
+      <div id="solutions-target-hint" class="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/80 p-2.5 rounded-xl text-xs text-slate-600 dark:text-slate-300">
+        Carregant estat...
+      </div>
+
       <div id="solutions-list-container" class="overflow-y-auto max-h-60 pr-1 flex flex-col gap-2"></div>
       <button onclick="closeModal('solutions-modal')" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 font-bold text-sm">Tanca</button>
     </div>
@@ -592,6 +602,16 @@
       } catch (err) {
         console.error("Error initUI:", err);
         showToast("Error carregant el repte", "error");
+      }
+    }
+
+    function triggerShakeDisplay() {
+      const displayEl = document.getElementById('display-container');
+      if (displayEl) {
+        displayEl.classList.remove('animate-shake');
+        void displayEl.offsetWidth; // Força el reflux per reiniciar l'animació
+        displayEl.classList.add('animate-shake');
+        setTimeout(() => displayEl.classList.remove('animate-shake'), 360);
       }
     }
 
@@ -718,23 +738,27 @@
 
       if (char === '(') {
         if (prevToken && (prevToken.type === 'num' || prevToken.val === ')')) {
+          triggerShakeDisplay();
           return showToast("Cal un operador abans del parèntesi!", "warning");
         }
       }
 
       if (char === ')') {
         if (!prevToken || (prevToken.type === 'op' && prevToken.val !== ')')) {
+          triggerShakeDisplay();
           return showToast("Operació incompleta abans de tancar parèntesi", "warning");
         }
         const oberts = tokens.filter(t => t.val === '(').length;
         const tancats = tokens.filter(t => t.val === ')').length;
         if (oberts <= tancats) {
+          triggerShakeDisplay();
           return showToast("No hi ha cap parèntesi per tancar!", "warning");
         }
       }
 
       if (['+', '−', '×', '÷'].includes(char)) {
         if (!prevToken || (prevToken.type === 'op' && prevToken.val !== ')')) {
+          triggerShakeDisplay();
           return showToast("Posa primer un número!", "warning");
         }
 
@@ -784,9 +808,11 @@
       }
 
       if (prevToken && (prevToken.type === 'num' || prevToken.val === ')')) {
+        triggerShakeDisplay();
         return showToast("Cal un operador!", "warning");
       }
       if (nextToken && (nextToken.type === 'num' || nextToken.val === '(')) {
+        triggerShakeDisplay();
         return showToast("Cal un operador abans del número següent!", "warning");
       }
 
@@ -813,9 +839,11 @@
       }
 
       if (prevToken && (prevToken.type === 'num' || prevToken.val === ')')) {
+        triggerShakeDisplay();
         return showToast("Cal un operador!", "warning");
       }
       if (nextToken && (nextToken.type === 'num' || nextToken.val === '(')) {
+        triggerShakeDisplay();
         return showToast("Cal un operador abans del número següent!", "warning");
       }
 
@@ -967,6 +995,7 @@
 
     async function handleSubmit() {
       if (!tokens || tokens.length === 0) {
+        triggerShakeDisplay();
         showToast("Escriu una operació primer", "warning");
         return;
       }
@@ -989,6 +1018,7 @@
         const data = await res.json();
 
         if (!data.ok) {
+          triggerShakeDisplay();
           showToast(data.msg || "Operació no vàlida", "error");
           return;
         }
@@ -1007,6 +1037,7 @@
         });
 
         if (jaExisteix) {
+          triggerShakeDisplay();
           showToast("Ja havies trobat aquesta operació!", "warning");
           return;
         }
@@ -1043,6 +1074,7 @@
 
       } catch (err) {
         console.error("Error a handleSubmit:", err);
+        triggerShakeDisplay();
         showToast("No s'ha pogut validar la jugada", "error");
       } finally {
         submitBtn.disabled = false;
@@ -1072,29 +1104,42 @@
       const baseBoxClasses = "flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer select-none active:scale-95";
 
       let rangText = "Principiant";
+      let hintText = "";
+
       if (trobades > objectiu) {
         rangText = "Euler ✨";
         const extra = trobades - objectiu;
+        hintText = `✨ Has superat el repte amb <strong>+${extra} solucions extres</strong>! Ets al màxim nivell <strong>Euler</strong>!`;
         if (solBoxEl) solBoxEl.className = `${baseBoxClasses} bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 hover:bg-amber-100/60 dark:hover:bg-amber-900/50`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-amber-500 font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `<span class="text-[11px] text-amber-600 dark:text-amber-400 font-extrabold ml-1">(+${extra})</span>`;
       } else if (pctReal >= 100) {
         rangText = "Geni 🎓";
+        hintText = `🎉 Has completat l'objectiu diari! Troba <strong>1 solució més</strong> per desbloquejar el rang secret <strong>Euler ✨</strong>.`;
         if (solBoxEl) solBoxEl.className = `${baseBoxClasses} bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/50`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else if (pctReal >= 50) {
         rangText = "Mestre/a 🎖";
+        const faltaGeni = objectiu - trobades;
+        hintText = `🎖️ Molt bé! Et falten només <strong>${faltaGeni} solucions</strong> per assolir el nivell <strong>Geni 🎓</strong>.`;
         if (solBoxEl) solBoxEl.className = `${baseBoxClasses} hover:bg-slate-50 dark:hover:bg-slate-700/40`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       } else {
+        const metaMestre = Math.ceil(objectiu * 0.5);
+        const faltaMestre = metaMestre - trobades;
+        hintText = `🎯 Et falten <strong>${faltaMestre} solucions</strong> per arribar al rang <strong>Mestre/a 🎖</strong>.`;
         if (solBoxEl) solBoxEl.className = `${baseBoxClasses} hover:bg-slate-50 dark:hover:bg-slate-700/40`;
         if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
         if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
       }
+
       const rankLabel = document.getElementById('rank-label');
       if (rankLabel) rankLabel.innerText = rangText;
+
+      const hintEl = document.getElementById('solutions-target-hint');
+      if (hintEl) hintEl.innerHTML = hintText;
 
       const pillShareText = document.getElementById('pill-share-text');
       if (pillShareText) {
@@ -1120,12 +1165,16 @@
       const listContainer = document.getElementById('solutions-list-container');
       if (listContainer) {
         listContainer.innerHTML = '';
-        gameState.solutions.slice().reverse().forEach((sol) => {
-          const item = document.createElement('div');
-          item.className = "p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs font-mono flex justify-between items-center";
-          item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME ? DAILY_GAME.target : ''} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
-          listContainer.appendChild(item);
-        });
+        if (gameState.solutions.length === 0) {
+          listContainer.innerHTML = '<p class="text-center text-slate-400 py-3 text-xs">Encara no has trobat cap solució avui.</p>';
+        } else {
+          gameState.solutions.slice().reverse().forEach((sol) => {
+            const item = document.createElement('div');
+            item.className = "p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs font-mono flex justify-between items-center";
+            item.innerHTML = `<span>${sol.expression} = ${DAILY_GAME ? DAILY_GAME.target : ''} ${sol.esTuti ? '🌟' : ''}</span><span class="text-brand-red font-bold">+${sol.points}</span>`;
+            listContainer.appendChild(item);
+          });
+        }
       }
     }
 
