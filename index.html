@@ -200,6 +200,9 @@
     @media (prefers-color-scheme: dark) { .btn-share-pill:hover { background: rgba(22, 101, 52, 0.35); } }
     .btn-share-pill:active { transform: scale(0.97); }
     .btn-share-pill svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
+
+    /* Neteja visual per a summaries */
+    details summary::-webkit-details-marker { display: none; }
   </style>
 </head>
 <body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col justify-start items-center font-sans antialiased selection:bg-brand-blue selection:text-white pb-10">
@@ -336,78 +339,137 @@
     </div>
   </main>
 
+  <!-- MODAL INSTRUCCIONS AMB DESPLEGABLES -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-pop">
-      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3.5 max-h-[90vh] overflow-y-auto animate-pop">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
         <h3 class="text-lg font-black text-slate-900 dark:text-white">Com jugar?</h3>
         <button onclick="closeModal('info-modal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
 
-      <div class="space-y-4 text-xs text-slate-600 dark:text-slate-300">
-        <div>
-          <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <span>🎯</span> Regles bàsiques
-          </h4>
-          <ul class="list-disc list-inside space-y-1">
+      <div class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+        <!-- 1. REGLES BÀSIQUES (OBERT PER DEFECTE) -->
+        <details open class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
+          <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
+            <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <span>🎯</span> Regles bàsiques
+            </span>
+            <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+          <ul class="list-disc list-inside space-y-1 mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300">
             <li>Troba fórmules que donin exactament el <strong>Nombre objectiu</strong>.</li>
             <li>El dígit central vermell és <strong class="text-brand-red">obligatori</strong> a cada operació.</li>
             <li>Pots fer servir cada xifra del rusc com a màxim <strong>un sol cop</strong> per càlcul.</li>
             <li>Les divisions han de ser <strong>exactes</strong> (sense decimals).</li>
           </ul>
-        </div>
+        </details>
 
-        <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-1.5">
-          <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider flex items-center gap-1.5">
-            <span>📐</span> Jerarquia d'operacions
-          </h4>
-          <p class="leading-relaxed">
-            El càlcul mental segueix l'ordre matemàtic estàndard:
-          </p>
-          <ol class="list-decimal list-inside space-y-0.5 font-medium text-[11px] text-slate-700 dark:text-slate-300">
-            <li>Primer es resol el contingut dels <strong>parèntesis ( )</strong>.</li>
-            <li>Després les <strong>multiplicacions (×)</strong> i <strong>divisions (÷)</strong>.</li>
-            <li>Finalment les <strong>sumes (+)</strong> i <strong>restes (−)</strong>.</li>
-          </ol>
-          <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 text-[11px]">
-            <span class="font-bold text-emerald-600 dark:text-emerald-400">Exemple:</span> 
-            <span class="font-mono font-bold bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">3 + 4 × 2 = 11</span> 
-            <em>(i no pas 14)</em>.<br>Si vols sumar primer, fes servir parèntesis: 
-            <span class="font-mono font-bold bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">(3 + 4) × 2 = 14</span>.
+        <!-- 2. JERARQUIA D'OPERACIONS -->
+        <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
+          <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
+            <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <span>📐</span> Jerarquia d'operacions
+            </span>
+            <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+          <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-1.5 leading-relaxed">
+            <p>El càlcul mental segueix l'ordre matemàtic estàndard:</p>
+            <ol class="list-decimal list-inside space-y-0.5 font-medium text-[11px] text-slate-700 dark:text-slate-300">
+              <li>Primer es resol el contingut dels <strong>parèntesis ( )</strong>.</li>
+              <li>Després les <strong>multiplicacions (×)</strong> i <strong>divisions (÷)</strong>.</li>
+              <li>Finalment les <strong>sumes (+)</strong> i <strong>restes (−)</strong>.</li>
+            </ol>
+            <div class="mt-2 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 text-[11px]">
+              <span class="font-bold text-emerald-600 dark:text-emerald-400">Exemple:</span> 
+              <span class="font-mono font-bold bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">3 + 4 × 2 = 11</span> 
+              <em>(i no pas 14)</em>.<br>Si vols sumar primer, fes servir parèntesis: 
+              <span class="font-mono font-bold bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">(3 + 4) × 2 = 14</span>.
+            </div>
           </div>
-        </div>
+        </details>
 
-        <div>
-          <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider mb-1 flex items-center gap-1.5">
-            <span>📊</span> Meta oberta i rànquing
-          </h4>
-          <p class="leading-relaxed">
-            L'objectiu diari indica un <strong>nombre de referència</strong> (ex: <em>22+</em>), però sovint <strong>hi ha moltes més solucions possibles</strong>! Si superes el total establert, assoliràs el rang secret <strong>«Euler» ✨</strong>.
-          </p>
-        </div>
-
-        <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 p-2.5 rounded-xl">
-          <h4 class="font-bold text-amber-900 dark:text-amber-300 text-xs flex items-center gap-1 mb-1">
-            <span>🌟</span> El «Tuti» (i més d'un!)
-          </h4>
-          <p class="text-amber-800 dark:text-amber-200 text-[11px] leading-relaxed">
-            Aconsegueixes un <strong>«Tuti»</strong> si arribes a l'objectiu utilitzant <strong>tots els 7 dígits</strong> del rusc alhora (+20 punts extra!). Si trobes altres fórmules que també els emprin tots, pots desbloquejar <strong>múltiples «Tutis»</strong> en un sol dia.
-          </p>
-        </div>
-
-        <div class="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-xl space-y-1">
-          <p>💡 <strong>Control:</strong> Toca el visor per moure el cursor lliurement.</p>
-          <p>🧹 <strong>Buidatge ràpid:</strong> Mantén premuda la tecla «Suprimeix» (o «Retrocés») per esborrar tota la línia.</p>
-        </div>
-
-        <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-          <div class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-            <span>🔒</span> Privacitat i dades
+        <!-- 3. PROPIETAT COMMUTATIVA -->
+        <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
+          <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
+            <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <span>🔄</span> Propietat commutativa
+            </span>
+            <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+          <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-1.5 leading-relaxed text-[11px]">
+            <p>
+              Per motius didàctics i per afavorir l'exploració del càlcul, el joc té en compte la <strong>propietat commutativa</strong> de la suma i la multiplicació (l'ordre dels factors o sumands no altera el resultat final).
+            </p>
+            <div class="bg-white dark:bg-slate-800/80 p-2 rounded-xl border border-slate-200/70 dark:border-slate-700/70 space-y-1 font-mono">
+              <div><span class="text-brand-red font-bold">Suma:</span> <code>9 + 4 = 4 + 9</code></div>
+              <div><span class="text-brand-red font-bold">Producte:</span> <code>8 × 7 = 7 × 8</code></div>
+            </div>
+            <p class="text-slate-500 dark:text-slate-400">
+              Això permet a l'alumnat i als jugadors investigar diferents combinacions per estructurar un mateix raonament numèric.
+            </p>
           </div>
-          <p class="leading-relaxed">
-            El Matelògic és un servei sense ànim de lucre. Les partides i puntuacions es guarden exclusivament al teu propi dispositiu (<code class="text-[10px] font-mono">localStorage</code>). No utilitzem cookies publicitàries ni registre d'usuaris/es.
-          </p>
-        </div>
+        </details>
 
+        <!-- 4. META OBERTA I EL TUTI -->
+        <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
+          <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
+            <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <span>🌟</span> Puntuació, Euler i Tutis
+            </span>
+            <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+          <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-2 leading-relaxed">
+            <p>
+              L'objectiu indica un nombre de referència (ex: <em>22+</em>), però sovint <strong>hi ha moltes més solucions possibles</strong>! Si superes el total establert, assoliràs el rang secret <strong>«Euler» ✨</strong>.
+            </p>
+            <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-2 rounded-xl text-amber-900 dark:text-amber-200 text-[11px]">
+              <strong>🌟 El «Tuti»:</strong> L'aconsegueixes si arribes a la meta emprant <strong>tots 7 els dígits alhora</strong> (+20 punts extra!). Pots descobrir més d'un Tuti en un mateix dia.
+            </div>
+          </div>
+        </details>
+
+        <!-- 5. CONTROLS DE TECLAT -->
+        <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
+          <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
+            <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <span>⌨️</span> Dreceres i controls
+            </span>
+            <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+          <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-1 text-[11px]">
+            <p>💡 <strong>Control:</strong> Toca el visor per desplaçar el cursor entre dígits i operadors.</p>
+            <p>🧹 <strong>Buidatge ràpid:</strong> Mantén premuda la tecla «Suprimeix» (o «Retrocés») per esborrar tota la línia.</p>
+          </div>
+        </details>
+
+        <!-- 6. PRIVACITAT I COOKIES -->
+        <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
+          <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
+            <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <span>🔒</span> Privacitat i dades
+            </span>
+            <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+          <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-[11px] leading-relaxed">
+            <p>
+              El Matelògic és un servei sense ànim de lucre. Les partides i puntuacions es guarden exclusivament al teu propi dispositiu (<code class="text-[10px] font-mono">localStorage</code>). No utilitzem cookies publicitàries ni perfilat d'usuaris/es.
+            </p>
+          </div>
+        </details>
+
+        <!-- CONTACTE -->
         <div class="border-t border-slate-100 dark:border-slate-700/60 pt-2 text-center">
           <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">Dubtes, suggeriments o solucions curioses?</p>
           <a href="mailto:hola@matelogic.cat" class="inline-flex items-center gap-1 text-xs font-bold text-brand-red hover:underline">
@@ -571,7 +633,7 @@
       if (totalChars > 16) {
         container.className = "flex items-center min-w-full text-base sm:text-lg transition-all";
       } else if (totalChars > 11) {
-        container.className = "flex items-center min-w-full text-lg sm:text-xl transition-all";
+        container.className = "flex items-center min-w-刺激 text-lg sm:text-xl transition-all";
       } else {
         container.className = "flex items-center min-w-full text-2xl sm:text-3xl transition-all";
       }
