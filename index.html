@@ -87,12 +87,35 @@
   <style>
     * { -webkit-tap-highlight-color: transparent; user-select: none; }
     input, textarea { user-select: auto; }
+
+    /* ESTILITZACIÓ DEL RUSC HEXAGONAL AMB OMBRA REAL DROP-SHADOW */
     .hex-cell {
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), filter 0.15s ease, opacity 0.15s ease;
+      transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), filter 0.12s ease, opacity 0.15s ease;
+      filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.15)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.08));
     }
-    .hex-cell:active { transform: scale(0.92); filter: brightness(0.9); }
-    .hex-cell.used { opacity: 0.35 !important; pointer-events: none !important; transform: scale(0.96); }
+
+    .hex-cell-blue {
+      background: linear-gradient(180deg, #53c7eb 0%, #3bb4d9 100%);
+    }
+
+    .hex-cell-red {
+      background: linear-gradient(180deg, #ed4b58 0%, #db2c3b 100%);
+      filter: drop-shadow(0 0 5px rgba(230, 57, 70, 0.45)) drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.08));
+    }
+
+    .hex-cell:active {
+      transform: translateY(3px) scale(0.96);
+      filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.2)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .hex-cell.used {
+      opacity: 0.32 !important;
+      pointer-events: none !important;
+      transform: scale(0.95);
+      filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.08));
+    }
+
     .key-3d {
       box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1), 0 6px 12px rgba(0, 0, 0, 0.05);
       transition: all 0.12s ease;
@@ -201,7 +224,7 @@
     .btn-share-pill:active { transform: scale(0.97); }
     .btn-share-pill svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
 
-    /* Ocultar el triángulo nativo del navegador en details */
+    /* Neteja visual per a summaries */
     details summary::-webkit-details-marker { display: none; }
   </style>
 </head>
@@ -297,23 +320,24 @@
       </button>
     </div>
 
-    <div class="honeycomb-grid my-1 select-none">
+    <!-- RUSC AMB LES OMBRES I RELLEU POLITS (SENSE VORES TALLADES AL CENTRE) -->
+    <div class="honeycomb-grid my-1.5 select-none">
       <div class="hex-row">
-        <button id="hex-0" onclick="handleHexClick(0)" class="hex-cell key-3d w-20 h-20 bg-brand-blue text-white flex items-center justify-center font-mono text-3xl font-black shadow-md">-</button>
-        <button id="hex-1" onclick="handleHexClick(1)" class="hex-cell key-3d w-20 h-20 bg-brand-blue text-white flex items-center justify-center font-mono text-3xl font-black shadow-md">-</button>
+        <button id="hex-0" onclick="handleHexClick(0)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+        <button id="hex-1" onclick="handleHexClick(1)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
       </div>
 
       <div class="hex-row hex-row-offset z-10">
-        <button id="hex-2" onclick="handleHexClick(2)" class="hex-cell key-3d w-20 h-20 bg-brand-blue text-white flex items-center justify-center font-mono text-3xl font-black shadow-md">-</button>
-        <button id="hex-center" onclick="handleHexCenterClick()" class="hex-cell key-3d w-20 h-20 bg-brand-red text-white flex items-center justify-center font-mono text-3xl font-black shadow-lg border-2 border-red-300">
+        <button id="hex-2" onclick="handleHexClick(2)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+        <button id="hex-center" onclick="handleHexCenterClick()" class="hex-cell hex-cell-red w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">
           <span id="center-val">-</span>
         </button>
-        <button id="hex-3" onclick="handleHexClick(3)" class="hex-cell key-3d w-20 h-20 bg-brand-blue text-white flex items-center justify-center font-mono text-3xl font-black shadow-md">-</button>
+        <button id="hex-3" onclick="handleHexClick(3)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
       </div>
 
       <div class="hex-row">
-        <button id="hex-4" onclick="handleHexClick(4)" class="hex-cell key-3d w-20 h-20 bg-brand-blue text-white flex items-center justify-center font-mono text-3xl font-black shadow-md">-</button>
-        <button id="hex-5" onclick="handleHexClick(5)" class="hex-cell key-3d w-20 h-20 bg-brand-blue text-white flex items-center justify-center font-mono text-3xl font-black shadow-md">-</button>
+        <button id="hex-4" onclick="handleHexClick(4)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+        <button id="hex-5" onclick="handleHexClick(5)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
       </div>
     </div>
 
@@ -377,7 +401,7 @@
             </svg>
           </summary>
           <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-1.5 leading-relaxed">
-            <p>Aquest joc segueix la jerarquia d'operacions:</p>
+            <p>Aquest joc té en compte la jerarquia d'operacions:</p>
             <ol class="list-decimal list-inside space-y-0.5 font-medium text-[11px] text-slate-700 dark:text-slate-300">
               <li>Primer es resol el contingut dels <strong>parèntesis ( )</strong>.</li>
               <li>Després les <strong>multiplicacions (×)</strong> i <strong>divisions (÷)</strong>.</li>
@@ -464,7 +488,7 @@
           </summary>
           <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-[11px] leading-relaxed">
             <p>
-              El Matelògic és un servei sense ànim de lucre. Les partides i puntuacions es guarden exclusivament al teu propi dispositiu (<code class="text-[10px] font-mono">localStorage</code>). No utilitzem cookies publicitàries ni perfilat d'usuaris/es.
+              El Matelògic és un servei sense ànim de lucre. Les partides i puntuacions es guarden exclusivament al teu propi dispositiu (<code class="text-[10px] font-mono">localStorage</code>). No utilitzem cookies publicitàries ni registre d'usuaris/es.
             </p>
           </div>
         </details>
@@ -633,7 +657,7 @@
       if (totalChars > 16) {
         container.className = "flex items-center min-w-full text-base sm:text-lg transition-all";
       } else if (totalChars > 11) {
-        container.className = "flex items-center min-w-full text-lg sm:text-xl transition-all";
+        container.className = "flex items-center min-w-刺激 text-lg sm:text-xl transition-all";
       } else {
         container.className = "flex items-center min-w-full text-2xl sm:text-3xl transition-all";
       }
