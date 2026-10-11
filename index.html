@@ -102,6 +102,10 @@
       overscroll-behavior-y: contain;
     }
 
+    button {
+      touch-action: manipulation;
+    }
+
     .hex-cell {
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
       -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
@@ -240,7 +244,7 @@
     details summary::-webkit-details-marker { display: none; }
   </style>
 </head>
-<body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col justify-start items-center font-sans antialiased selection:bg-brand-blue selection:text-white pb-10">
+<body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-[100dvh] flex flex-col justify-start items-center font-sans antialiased selection:bg-brand-blue selection:text-white pb-10">
 
   <div id="toast-container" class="fixed top-5 z-50 flex flex-col gap-2 items-center pointer-events-none w-full max-w-sm px-4"></div>
 
@@ -283,7 +287,7 @@
     <div class="w-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-2.5 shadow-sm grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-700/60 text-center transition-all">
       <div class="flex flex-col items-center justify-center px-1">
         <span class="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Objectiu</span>
-        <span id="target-value" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">--</span>
+        <span id="target-value" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono transition-opacity">--</span>
       </div>
 
       <div id="solutions-box" onclick="openModal('solutions-modal')" role="button" aria-label="Veure solucions descobertes" class="group flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/40 active:scale-95 select-none">
@@ -343,7 +347,7 @@
       </button>
     </div>
 
-    <div class="honeycomb-grid my-1.5 select-none">
+    <div id="honeycomb-container" class="honeycomb-grid my-1.5 select-none transition-opacity duration-300 opacity-60">
       <div class="hex-row">
         <button id="hex-0" onclick="handleHexClick(0)" aria-label="Xifra exterior 1" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
         <button id="hex-1" onclick="handleHexClick(1)" aria-label="Xifra exterior 2" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
@@ -385,7 +389,7 @@
     </div>
   </main>
 
-  <!-- MODAL INSTRUCCIONS AMB DESPLEGABLES I SELECTOR DE TEMA -->
+  <!-- MODAL INSTRUCCIONS -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3.5 max-h-[90vh] overflow-y-auto animate-pop">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
@@ -393,7 +397,7 @@
         <button onclick="closeModal('info-modal')" aria-label="Tancar finestra d'informació" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
 
-      <!-- SELECTOR DE COLORS DEL JOC: SISTEMA / CLAR / FOSC -->
+      <!-- SELECTOR DE COLORS -->
       <div class="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-2xl flex items-center justify-between gap-1 text-xs font-bold border border-slate-200/80 dark:border-slate-700/70">
         <span class="text-[11px] text-slate-500 dark:text-slate-400 pl-2 uppercase tracking-wider">Aspecte:</span>
         <div class="inline-flex bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
@@ -608,7 +612,29 @@
     let CURRENT_CHALLENGE_ID = "";
     let countdownInterval = null;
 
-    // GESTIÓ DEL MODE CLAR / FOSC
+    function saveTokensSession() {
+      try {
+        sessionStorage.setItem('matelogic_active_tokens', JSON.stringify({ tokens, cursorIndex }));
+      } catch (e) {}
+    }
+
+    function loadTokensSession() {
+      try {
+        const raw = sessionStorage.getItem('matelogic_active_tokens');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          tokens = parsed.tokens || [];
+          cursorIndex = parsed.cursorIndex || 0;
+        }
+      } catch (e) {}
+    }
+
+    function clearTokensSession() {
+      try {
+        sessionStorage.removeItem('matelogic_active_tokens');
+      } catch (e) {}
+    }
+
     function updateThemeUI(selectedTheme) {
       const btns = {
         system: document.getElementById('theme-btn-system'),
@@ -628,7 +654,6 @@
         }
       });
 
-      // Actualitzar el logotip segons si està en mode fosc o clar
       const isDark = document.documentElement.classList.contains('dark');
       const logoEl = document.getElementById('header-logo');
       if (logoEl) {
@@ -648,7 +673,6 @@
       updateThemeUI(theme);
     }
 
-    // Escolta canvis del sistema si està en mode 'system'
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       const currentTheme = localStorage.getItem('matelogic_theme') || 'system';
       if (currentTheme === 'system') {
@@ -676,12 +700,16 @@
 
         tokens = [];
         cursorIndex = 0;
+        loadTokensSession();
         syncUsedNumbers();
 
         document.getElementById('challenge-day-label').innerText = `Repte Núm. ${DAILY_GAME.num}`;
         document.getElementById('challenge-date-label').innerText = DAILY_GAME.data;
         document.getElementById('target-value').innerText = DAILY_GAME.target;
         document.getElementById('center-val').innerText = DAILY_GAME.center;
+
+        const hContainer = document.getElementById('honeycomb-container');
+        if (hContainer) hContainer.classList.remove('opacity-60');
 
         renderOuterHexagons();
         loadSavedProgress();
@@ -691,7 +719,7 @@
         setupBackdropCloseEvents();
       } catch (err) {
         console.error("Error initUI:", err);
-        showToast("Error carregant el repte", "error");
+        showToast("Error de connexió carregant el repte", "error");
       }
     }
 
@@ -806,6 +834,8 @@
           container.appendChild(span);
         }
       }
+
+      saveTokensSession();
 
       setTimeout(() => {
         const cEl = document.getElementById('display-cursor-el');
@@ -987,6 +1017,7 @@
       if (tokens.length === 0) return;
       tokens = [];
       cursorIndex = 0;
+      clearTokensSession();
       renderOuterHexagons();
       updateDisplay();
       showToast("Operació buidada", "warning");
@@ -1150,13 +1181,14 @@
 
         tokens = [];
         cursorIndex = 0;
+        clearTokensSession();
         renderOuterHexagons();
         updateDisplay();
 
       } catch (err) {
         console.error("Error a handleSubmit:", err);
         triggerShakeDisplay();
-        showToast("No s'ha pogut validar la jugada", "error");
+        showToast("Sense connexió. Comprova la xarxa per validar", "error");
       } finally {
         submitBtn.disabled = false;
       }
@@ -1381,6 +1413,7 @@
       if (navigator.share) {
         try {
           await navigator.share({ 
+            title: `Matelògic #${numRepte}`,
             text: shareText 
           });
           return;
