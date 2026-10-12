@@ -389,7 +389,6 @@
     </div>
   </main>
 
-  <!-- MODAL INSTRUCCIONS -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3.5 max-h-[90vh] overflow-y-auto animate-pop">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
@@ -397,7 +396,6 @@
         <button onclick="closeModal('info-modal')" aria-label="Tancar finestra d'informació" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
 
-      <!-- SELECTOR DE COLORS -->
       <div class="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-2xl flex items-center justify-between gap-1 text-xs font-bold border border-slate-200/80 dark:border-slate-700/70">
         <span class="text-[11px] text-slate-500 dark:text-slate-400 pl-2 uppercase tracking-wider">Aspecte:</span>
         <div class="inline-flex bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
@@ -408,7 +406,6 @@
       </div>
 
       <div class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
-        <!-- 1. REGLES BÀSIQUES -->
         <details open class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -426,7 +423,6 @@
           </ul>
         </details>
 
-        <!-- 2. JERARQUIA D'OPERACIONS -->
         <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -452,7 +448,6 @@
           </div>
         </details>
 
-        <!-- 3. PROPIETAT COMMUTATIVA -->
         <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -476,7 +471,6 @@
           </div>
         </details>
 
-        <!-- 4. META OBERTA I EL TUTI -->
         <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -496,7 +490,6 @@
           </div>
         </details>
 
-        <!-- 5. CONTROLS DE TECLAT -->
         <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -513,7 +506,6 @@
           </div>
         </details>
 
-        <!-- 6. PRIVACITAT I COOKIES -->
         <details class="group bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 transition-colors">
           <summary class="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 cursor-pointer select-none">
             <span class="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -530,7 +522,6 @@
           </div>
         </details>
 
-        <!-- COMUNITAT WHATSAPP I CONTACTE -->
         <div class="border-t border-slate-100 dark:border-slate-700/60 pt-2.5 text-center space-y-2">
           <p class="text-[11px] text-slate-500 dark:text-slate-400">Segueix el repte diari i descobreix curiositats matemàtiques:</p>
           <div>
@@ -808,7 +799,7 @@
       if (totalChars > 16) {
         container.className = "flex items-center min-w-full text-base sm:text-lg transition-all";
       } else if (totalChars > 11) {
-        container.className = "flex items-center min-w-刺激 text-lg sm:text-xl transition-all";
+        container.className = "flex items-center min-w-full text-lg sm:text-xl transition-all";
       } else {
         container.className = "flex items-center min-w-full text-2xl sm:text-3xl transition-all";
       }
