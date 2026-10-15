@@ -34,7 +34,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://www.matelogic.cat/">
-  <meta name="twitter:title" content="Matelògic - El repte matemàtic diari en català">
+  <meta name="twitter:title" content="Matelògic - El joc matemàtic diari en català">
   <meta name="twitter:description" content="Troba les operacions per arribar a la meta diària. Aconseguiràs el Tuti avui?">
   <meta name="twitter:image" content="https://www.matelogic.cat/img/og-image.png">
 
@@ -1137,6 +1137,7 @@
       }
     });
 
+    // VALIDACIÓN LOCAL PREVIA ANTES DE ENVIAR AL SERVIDOR
     async function handleSubmit() {
       if (!tokens || tokens.length === 0) {
         triggerShakeDisplay();
@@ -1147,6 +1148,13 @@
       if (DAILY_GAME && DAILY_GAME.data !== getCurrentMadridDateShort()) {
         await initUI();
         showToast("S'ha carregat el nou repte d'avui!", "warning");
+        return;
+      }
+
+      const usaCentreLocal = tokens.some(t => t.id === 'hex-center');
+      if (!usaCentreLocal) {
+        triggerShakeDisplay();
+        showToast(`Cal fer servir el dígit central (${DAILY_GAME ? DAILY_GAME.center : ''})!`, "warning");
         return;
       }
 
@@ -1170,7 +1178,7 @@
         const res = await fetch(`${API_URL}api/validar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ expressio: rawExpr, tokens: tokens })
+          body: JSON.stringify({ expressio: rawExpr })
         });
 
         if (!res.ok) {
@@ -1401,6 +1409,7 @@
       }
     }
 
+    // RECARGA AUTOMÁTICA CUANDO EL CRONÓMETRO LLEGA A CERO (MEDIANOCHE)
     function updateCountdown() {
       const now = new Date();
       const tomorrow = new Date(now);
@@ -1409,7 +1418,11 @@
 
       const diff = tomorrow - now;
       if (diff <= 0) {
-        document.getElementById('countdown-timer').innerText = "00:00:00";
+        const el = document.getElementById('countdown-timer');
+        if (el) el.innerText = "00:00:00";
+        closeModal('share-modal');
+        initUI();
+        showToast("¡Nuevo reto de Matelògic disponible!", "success");
         return;
       }
 
