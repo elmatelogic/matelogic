@@ -268,7 +268,8 @@
     </div>
 
     <div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-      <img id="header-logo" src="./img/logo.png" alt="Matelògic" class="h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
+      <img src="./img/logo.png" alt="Matelògic" class="block dark:hidden h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
+      <img src="./img/logo-fosc.png" alt="Matelògic" class="hidden dark:block h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
     </div>
   </header>
 
@@ -310,7 +311,7 @@
       <div class="flex justify-between items-center text-xs font-bold">
         <span class="text-slate-500 dark:text-slate-400">Nivell: <strong id="rank-label" class="text-brand-red">Principiant</strong></span>
                 
-        <button id="pill-share-btn" onclick="copyShareText()" class="btn-share-pill" type="button" title="Comparteix la teva partida">
+        <button id="pill-share-btn" onclick="openModal('share-modal')" class="btn-share-pill" type="button" title="Comparteix la teva partida">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true">
             <circle cx="18" cy="5" r="3"></circle>
             <circle cx="6" cy="12" r="3"></circle>
@@ -545,8 +546,11 @@
 
   <div id="yesterday-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] animate-pop">
-      <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions d'ahir</h3>
-      <div class="bg-slate-50 dark:bg-slate-900 p-2 rounded-xl flex justify-between text-xs font-mono">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions d'ahir</h3>
+        <button onclick="closeModal('yesterday-modal')" aria-label="Tancar finestra d'ahir" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl flex justify-between text-xs font-mono border border-slate-200/70 dark:border-slate-700/70">
         <span>Objectiu: <strong id="yesterday-target">--</strong></span>
         <span>Centre: <strong id="yesterday-center" class="text-brand-red">--</strong></span>
       </div>
@@ -561,18 +565,18 @@
         <img src="./favicon.png?v=4" alt="Matelògic" class="w-full h-full object-contain">
       </div>
       <h3 class="text-lg font-black text-slate-900 dark:text-white">Comparteix el teu progrés</h3>
-      <div class="bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl text-left font-mono text-xs space-y-1">
+      <div class="bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl text-left font-mono text-xs space-y-1 border border-slate-200/60 dark:border-slate-700/60">
         <p>Matelògic <span id="share-modal-num">#000</span></p>
         <p>🎯 Meta: <span id="share-modal-target">0</span></p>
         <p>🎖️ Rang: <span id="share-modal-rank">Principiant</span></p>
-        <p>✨ Solucions: <span id="share-modal-count">0</span> (<span id="share-modal-total">0</span>)</p>
+        <p>✨ Solucions: <span id="share-modal-count">0</span> (<span id="share-modal-total">0</span>+)</p>
       </div>
       <div class="bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 py-2.5 px-3 rounded-xl flex items-center justify-between">
         <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Proper repte en:</span>
         <span id="countdown-timer" class="font-mono font-bold text-sm text-brand-red">--:--:--</span>
       </div>
       
-      <button onclick="copyShareText()" id="copy-btn" class="w-full py-3 rounded-xl bg-brand-red text-white font-bold text-sm shadow-md">
+      <button onclick="copyShareText()" id="copy-btn" class="w-full py-3 rounded-xl bg-brand-red text-white font-bold text-sm shadow-md active:scale-98 transition-transform">
         Copia o Comparteix
       </button>
 
@@ -596,6 +600,19 @@
     let gameState = { solutions: [], score: 0 };
     let CURRENT_CHALLENGE_ID = "";
     let countdownInterval = null;
+    let eventsInitialized = false;
+
+    const LOCAL_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Madrid',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+
+    function getCurrentMadridDateShort() {
+      const [y, m, d] = LOCAL_DATE_FORMATTER.format(new Date()).split('-');
+      return `${d}/${m}/${y.slice(-2)}`;
+    }
 
     function saveTokensSession() {
       try {
@@ -638,12 +655,6 @@
           btns[key].className = `px-2.5 py-1 rounded-lg text-[11px] transition-all ${inactiveClass}`;
         }
       });
-
-      const isDark = document.documentElement.classList.contains('dark');
-      const logoEl = document.getElementById('header-logo');
-      if (logoEl) {
-        logoEl.src = isDark ? './img/logo-fosc.png' : './img/logo.png';
-      }
     }
 
     function setAppTheme(theme) {
@@ -680,7 +691,11 @@
         });
         DAILY_GAME = await res.json();
 
-        CURRENT_CHALLENGE_ID = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;
+        const newChallengeId = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;
+        if (CURRENT_CHALLENGE_ID && CURRENT_CHALLENGE_ID !== newChallengeId) {
+          clearTokensSession();
+        }
+        CURRENT_CHALLENGE_ID = newChallengeId;
         outerPositions = [...DAILY_GAME.outer];
 
         tokens = [];
@@ -700,13 +715,25 @@
         loadSavedProgress();
         updateScoreboard();
         updateDisplay();
-        setupDeleteEvents();
-        setupBackdropCloseEvents();
+
+        if (!eventsInitialized) {
+          setupDeleteEvents();
+          setupBackdropCloseEvents();
+          eventsInitialized = true;
+        }
       } catch (err) {
         console.error("Error initUI:", err);
         showToast("Error de connexió carregant el repte", "error");
       }
     }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && DAILY_GAME) {
+        if (DAILY_GAME.data !== getCurrentMadridDateShort()) {
+          initUI();
+        }
+      }
+    });
 
     function triggerShakeDisplay() {
       const displayEl = document.getElementById('display-container');
@@ -789,7 +816,11 @@
       const container = document.getElementById('display-tokens');
       container.innerHTML = '';
 
-      const totalChars = tokens.reduce((acc, t) => acc + t.display.length, 0) + tokens.length;
+      const oberts = tokens.filter(t => t.val === '(').length;
+      const tancats = tokens.filter(t => t.val === ')').length;
+      const pendents = Math.max(0, oberts - tancats);
+
+      const totalChars = tokens.reduce((acc, t) => acc + t.display.length, 0) + tokens.length + pendents;
       if (totalChars > 16) {
         container.className = "flex items-center min-w-full text-base sm:text-lg transition-all";
       } else if (totalChars > 11) {
@@ -818,6 +849,19 @@
           };
           container.appendChild(span);
         }
+      }
+
+      if (pendents > 0 && tokens.length > 0) {
+        const ghostSpan = document.createElement('span');
+        ghostSpan.innerText = ')'.repeat(pendents);
+        ghostSpan.title = "Toca per tancar el parèntesi";
+        ghostSpan.className = "px-1 py-0.5 text-slate-300 dark:text-slate-600 cursor-pointer hover:text-slate-400 transition-colors select-none";
+        ghostSpan.onclick = (e) => {
+          e.stopPropagation();
+          setCursorPosition(tokens.length);
+          appendChar(')');
+        };
+        container.appendChild(ghostSpan);
       }
 
       saveTokensSession();
@@ -917,7 +961,7 @@
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
       if (nextToken && nextToken.type === 'num') {
-        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString() };
+        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString(), id: `hex-${index}` };
         cursorIndex++;
         renderOuterHexagons();
         updateDisplay();
@@ -933,7 +977,7 @@
         return showToast("Cal un operador abans del número següent!", "warning");
       }
 
-      const newToken = { type: 'num', val: val.toString(), display: val.toString() };
+      const newToken = { type: 'num', val: val.toString(), display: val.toString(), id: `hex-${index}` };
       tokens.splice(cursorIndex, 0, newToken);
       cursorIndex++;
       renderOuterHexagons();
@@ -948,7 +992,7 @@
       const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
       if (nextToken && nextToken.type === 'num') {
-        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString() };
+        tokens[cursorIndex] = { type: 'num', val: val.toString(), display: val.toString(), id: 'hex-center' };
         cursorIndex++;
         renderOuterHexagons();
         updateDisplay();
@@ -964,7 +1008,7 @@
         return showToast("Cal un operador abans del número següent!", "warning");
       }
 
-      const newToken = { type: 'num', val: val.toString(), display: val.toString() };
+      const newToken = { type: 'num', val: val.toString(), display: val.toString(), id: 'hex-center' };
       tokens.splice(cursorIndex, 0, newToken);
       cursorIndex++;
       renderOuterHexagons();
@@ -1054,9 +1098,11 @@
     window.addEventListener('keydown', (e) => {
       if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
-      if (e.key === 'Backspace') {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
         e.preventDefault();
-        if (!e.repeat) {
+        if (e.repeat) {
+          clearAllTokens();
+        } else {
           handleDelete();
         }
       } else if (e.key === 'Escape') {
@@ -1096,6 +1142,24 @@
         triggerShakeDisplay();
         showToast("Escriu una operació primer", "warning");
         return;
+      }
+
+      if (DAILY_GAME && DAILY_GAME.data !== getCurrentMadridDateShort()) {
+        await initUI();
+        showToast("S'ha carregat el nou repte d'avui!", "warning");
+        return;
+      }
+
+      const oberts = tokens.filter(t => t.val === '(').length;
+      const tancats = tokens.filter(t => t.val === ')').length;
+      const ultimToken = tokens[tokens.length - 1];
+      if (oberts > tancats && ultimToken && (ultimToken.type === 'num' || ultimToken.val === ')')) {
+        const mancants = oberts - tancats;
+        for (let i = 0; i < mancants; i++) {
+          tokens.push({ type: 'op', val: ')', display: ')', id: null });
+        }
+        cursorIndex = tokens.length;
+        updateDisplay();
       }
 
       const rawExpr = tokens.map(t => t.val).join('');
@@ -1143,6 +1207,8 @@
         const digitsUsats = tokens.filter(t => t.type === 'num').length;
         const esTutiReal = !!(data.esTuti || data.tuti || digitsUsats === 7);
 
+        const rangAnterior = document.getElementById('rank-label').innerText;
+
         gameState.solutions.push({
           expression: expressioDisplay,
           raw: expressioNeta,
@@ -1152,14 +1218,22 @@
         });
         gameState.score += puntsGuanyats;
 
-        try { persistProgress(); } catch (e) { console.warn("Error guardant progrés:", e); }
-        try { updateScoreboard(); } catch (e) { console.warn("Error actualitzant marcador:", e); }
+        try { persistProgress(); } catch (e) {}
+        try { updateScoreboard(); } catch (e) {}
+
+        const nouRang = document.getElementById('rank-label').innerText;
+        const haPujatRang = rangAnterior !== nouRang;
 
         if (esTutiReal) {
           if (typeof confetti === 'function') {
             try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
           }
           showToast(`🌟 TUTI! Tots els nombres usats! +${puntsGuanyats} pts`, "success");
+        } else if (haPujatRang && (nouRang.includes("Geni") || nouRang.includes("Euler"))) {
+          if (typeof confetti === 'function') {
+            try { confetti({ particleCount: 70, spread: 60, origin: { y: 0.65 } }); } catch (e) {}
+          }
+          showToast(`🎉 Nou nivell desbloquejat: ${nouRang}! (+${puntsGuanyats} pts)`, "success");
         } else {
           showToast(`Correcte! +${puntsGuanyats} pts`, "success");
         }
@@ -1294,13 +1368,20 @@
       list.innerHTML = '';
       
       const solucions = data.solucions || [];
+      const tutisSet = new Set(data.tutis || []);
+
       if (solucions.length === 0) {
         list.innerHTML = '<p class="text-center text-slate-500 dark:text-slate-400 py-4">No hi ha solucions registrades per ahir.</p>';
       } else {
         solucions.forEach((expr, idx) => {
+          const esTuti = tutisSet.has(expr);
           const item = document.createElement('div');
-          item.className = "p-2 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 flex justify-between";
-          item.innerHTML = `<span><span class="text-slate-500 dark:text-slate-400 text-[10px] mr-1">#${idx + 1}</span> ${expr}</span> <strong>= ${data.target}</strong>`;
+          if (esTuti) {
+            item.className = "p-2 bg-amber-50/90 dark:bg-amber-950/35 rounded-lg border border-amber-300 dark:border-amber-800/70 flex justify-between items-center";
+          } else {
+            item.className = "p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center";
+          }
+          item.innerHTML = `<span><span class="text-slate-400 text-[10px] mr-1">#${idx + 1}</span> ${expr} ${esTuti ? '🌟' : ''}</span> <strong>= ${data.target}</strong>`;
           list.appendChild(item);
         });
       }
@@ -1344,7 +1425,7 @@
       document.body.classList.add('overflow-hidden');
       if (id === 'share-modal') {
         const trobades = gameState.solutions.length;
-        const total = DAILY_GAME ? DAILY_GAME.total : 0;
+        const total = DAILY_GAME ? DAILY_GAME.total : 22;
         document.getElementById('share-modal-num').innerText = `#${DAILY_GAME ? DAILY_GAME.num : '001'}`;
         document.getElementById('share-modal-target').innerText = DAILY_GAME ? DAILY_GAME.target : 0;
         document.getElementById('share-modal-count').innerText = trobades;
