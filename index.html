@@ -34,7 +34,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://www.matelogic.cat/">
-  <meta name="twitter:title" content="Matelògic - El joc matemàtic diari en català">
+  <meta name="twitter:title" content="Matelògic - El repte matemàtic diari en català">
   <meta name="twitter:description" content="Troba les operacions per arribar a la meta diària. Aconseguiràs el Tuti avui?">
   <meta name="twitter:image" content="https://www.matelogic.cat/img/og-image.png">
 
@@ -637,6 +637,30 @@
       } catch (e) {}
     }
 
+    function cleanOldProgress(currentNumStr) {
+      try {
+        const currentDayNum = parseInt(currentNumStr, 10);
+        if (isNaN(currentDayNum)) return;
+
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key) continue;
+          const match = key.match(/^matelogic_d(\d+)_t\d+$/);
+          if (match) {
+            const savedDayNum = parseInt(match[1], 10);
+            if (!isNaN(savedDayNum)) {
+              const diff = (currentDayNum - savedDayNum + 366) % 366;
+              if (diff > 7 && diff < 359) {
+                keysToRemove.push(key);
+              }
+            }
+          }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+      } catch (e) {}
+    }
+
     function updateThemeUI(selectedTheme) {
       const btns = {
         system: document.getElementById('theme-btn-system'),
@@ -696,6 +720,7 @@
           clearTokensSession();
         }
         CURRENT_CHALLENGE_ID = newChallengeId;
+        cleanOldProgress(DAILY_GAME.num);
         outerPositions = [...DAILY_GAME.outer];
 
         tokens = [];
@@ -918,15 +943,16 @@
       }
 
       if (['+', '−', '×', '÷'].includes(char)) {
-        if (!prevToken || (prevToken.type === 'op' && prevToken.val !== ')')) {
-          triggerShakeDisplay();
-          return showToast("Posa primer un número!", "warning");
-        }
-
         let rawChar = char;
         if (char === '×') rawChar = '*';
         if (char === '÷') rawChar = '/';
         if (char === '−') rawChar = '-';
+
+        if (prevToken && prevToken.type === 'op' && prevToken.val !== '(' && prevToken.val !== ')') {
+          tokens[cursorIndex - 1] = { type: 'op', val: rawChar, display: char, id: null };
+          updateDisplay();
+          return;
+        }
 
         if (nextToken && nextToken.type === 'op' && nextToken.val !== '(' && nextToken.val !== ')') {
           tokens[cursorIndex] = { type: 'op', val: rawChar, display: char, id: null };
@@ -935,10 +961,9 @@
           return;
         }
 
-        if (prevToken && prevToken.type === 'op' && prevToken.val !== ')') {
-          tokens[cursorIndex - 1] = { type: 'op', val: rawChar, display: char, id: null };
-          updateDisplay();
-          return;
+        if (!prevToken || prevToken.val === '(') {
+          triggerShakeDisplay();
+          return showToast("Posa primer un número!", "warning");
         }
       }
 
@@ -1137,7 +1162,6 @@
       }
     });
 
-    // VALIDACIÓN LOCAL PREVIA ANTES DE ENVIAR AL SERVIDOR
     async function handleSubmit() {
       if (!tokens || tokens.length === 0) {
         triggerShakeDisplay();
@@ -1151,16 +1175,15 @@
         return;
       }
 
-      const usaCentreLocal = tokens.some(t => t.id === 'hex-center');
-      if (!usaCentreLocal) {
+      const ultimToken = tokens[tokens.length - 1];
+      if (ultimToken && ultimToken.type === 'op' && ultimToken.val !== ')') {
         triggerShakeDisplay();
-        showToast(`Cal fer servir el dígit central (${DAILY_GAME ? DAILY_GAME.center : ''})!`, "warning");
+        showToast("L'operació està incompleta!", "warning");
         return;
       }
 
       const oberts = tokens.filter(t => t.val === '(').length;
       const tancats = tokens.filter(t => t.val === ')').length;
-      const ultimToken = tokens[tokens.length - 1];
       if (oberts > tancats && ultimToken && (ultimToken.type === 'num' || ultimToken.val === ')')) {
         const mancants = oberts - tancats;
         for (let i = 0; i < mancants; i++) {
@@ -1168,6 +1191,21 @@
         }
         cursorIndex = tokens.length;
         updateDisplay();
+      }
+
+      const digitsUsats = tokens.filter(t => t.type === 'num').length;
+      if (digitsUsats < 2) {
+        triggerShakeDisplay();
+        showToast("Cal combinar almenys dues xifres!", "warning");
+        return;
+      }
+
+      const centerStr = DAILY_GAME ? String(DAILY_GAME.center) : '';
+      const usaCentreLocal = tokens.some(t => t.id === 'hex-center' || (t.type === 'num' && t.val === centerStr));
+      if (!usaCentreLocal) {
+        triggerShakeDisplay();
+        showToast(`Cal fer servir el dígit central (${centerStr})!`, "warning");
+        return;
       }
 
       const rawExpr = tokens.map(t => t.val).join('');
@@ -1212,7 +1250,6 @@
         }
 
         const puntsGuanyats = Number(data.punts) || 1;
-        const digitsUsats = tokens.filter(t => t.type === 'num').length;
         const esTutiReal = !!(data.esTuti || data.tuti || digitsUsats === 7);
 
         const rangAnterior = document.getElementById('rank-label').innerText;
@@ -1409,7 +1446,6 @@
       }
     }
 
-    // RECARGA AUTOMÁTICA CUANDO EL CRONÓMETRO LLEGA A CERO (MEDIANOCHE)
     function updateCountdown() {
       const now = new Date();
       const tomorrow = new Date(now);
@@ -1422,7 +1458,7 @@
         if (el) el.innerText = "00:00:00";
         closeModal('share-modal');
         initUI();
-        showToast("¡Nuevo reto de Matelògic disponible!", "success");
+        showToast("Nou repte del Matelògic disponible!", "success");
         return;
       }
 
