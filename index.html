@@ -1112,6 +1112,9 @@
 
     function printWorksheet() {
       updatePrintableSheet();
+      try {
+        navigator.sendBeacon(`${API_URL}api/fitxa`);
+      } catch (e) {}
       window.print();
     }
 
