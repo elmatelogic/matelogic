@@ -258,7 +258,7 @@
         padding: 0 !important;
         margin: 0 !important;
       }
-      header, main, #toast-container, [id$="-modal"], .no-print {
+      header, main, #toast-container, [id$="-modal"], #duel-screen, .no-print {
         display: none !important;
       }
       #printable-sheet {
@@ -313,9 +313,17 @@
   </header>
 
   <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
-    <div class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2">
-      <span id="challenge-day-label">Carregant repte...</span>
-      <span id="challenge-date-label">-- / -- / ----</span>
+    <div class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
+      <span id="challenge-day-label" class="text-[11px] sm:text-xs">Carregant repte...</span>
+      
+      <button onclick="openDuelSetup()" aria-label="Mode 2 jugadors / Aula" title="Mode 2 jugadors / Aula" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-300 dark:border-slate-700 shadow-2xs transition-all active:scale-95 cursor-pointer">
+        <svg class="w-3.5 h-3.5 text-slate-700 dark:text-slate-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <span class="normal-case">2 jugadors/es</span>
+      </button>
+
+      <span id="challenge-date-label" class="text-[11px] sm:text-xs">-- / -- / ----</span>
     </div>
 
     <div class="w-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-2.5 shadow-sm grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-700/60 text-center transition-all">
@@ -422,6 +430,214 @@
       </button>
     </div>
   </main>
+
+  <div id="duel-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-4 animate-pop border border-slate-200 dark:border-slate-700">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-brand-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <h3 class="text-base font-black text-slate-900 dark:text-white">Duel / Mode Aula</h3>
+        </div>
+        <button onclick="closeModal('duel-setup-modal')" aria-label="Tancar" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <span class="font-bold text-slate-700 dark:text-slate-300 block mb-1.5 uppercase tracking-wider text-[10px]">Tria de rusc:</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="duel-opt-rusc-avui" onclick="setDuelRusc('avui')" class="py-2.5 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all">
+              Repte d'avui
+            </button>
+            <button id="duel-opt-rusc-atzar" onclick="setDuelRusc('atzar')" class="py-2.5 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all">
+              Rusc a l'atzar 🎲
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <span class="font-bold text-slate-700 dark:text-slate-300 block mb-1.5 uppercase tracking-wider text-[10px]">Temps per torn:</span>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button id="duel-opt-temps-30" onclick="setDuelTemps(30)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 font-mono font-bold text-xs">30s</button>
+            <button id="duel-opt-temps-45" onclick="setDuelTemps(45)" class="py-2 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-mono font-bold text-xs">45s</button>
+            <button id="duel-opt-temps-60" onclick="setDuelTemps(60)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 font-mono font-bold text-xs">60s</button>
+            <button id="duel-opt-temps-0" onclick="setDuelTemps(0)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-[10px]">Sense</button>
+          </div>
+        </div>
+
+        <div>
+          <span class="font-bold text-slate-700 dark:text-slate-300 block mb-1.5 uppercase tracking-wider text-[10px]">Durada de la partida:</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="duel-opt-rondes-3" onclick="setDuelRondes(3)" class="py-2.5 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all">
+              3 rondes
+            </button>
+            <button id="duel-opt-rondes-5" onclick="setDuelRondes(5)" class="py-2.5 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all">
+              5 rondes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex flex-col gap-2">
+        <button onclick="startDuelGame()" class="w-full py-3 rounded-xl bg-brand-red hover:bg-red-600 text-white font-black text-sm uppercase tracking-wider shadow-md transition-all active:scale-98">
+          Comença el Duel! 🚀
+        </button>
+        <span class="text-[10px] text-slate-400 text-center">Partida autònoma local: no altera les teves estadístiques personals.</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="duel-screen" class="fixed inset-0 bg-brand-bg dark:bg-slate-900 z-50 hidden flex flex-col items-center justify-between p-3 sm:p-6 overflow-y-auto">
+    <div class="w-full max-w-5xl flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5 mb-2">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">⚔️</span>
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block leading-tight">Matelògic Duel</span>
+          <span id="duel-round-label" class="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-200 font-mono">Ronda 1/3</span>
+        </div>
+      </div>
+
+      <div id="duel-timer-badge" class="px-4 py-1.5 rounded-full bg-slate-800 text-white font-mono font-black text-sm tracking-widest shadow-md">
+        ⏱ <span id="duel-timer-val">45</span>s
+      </div>
+
+      <button onclick="exitDuelConfirm()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+        ✕ Sortir
+      </button>
+    </div>
+
+    <div class="w-full max-w-5xl flex flex-col md:flex-row items-stretch justify-center gap-4 my-auto">
+      
+      <div id="duel-box-blau" class="w-full md:w-64 lg:w-72 p-4 rounded-3xl border-2 transition-all duration-300 flex flex-col justify-between shrink-0 shadow-xs">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-black uppercase tracking-wider text-sky-600 dark:text-sky-400">Equip Blau</span>
+            <span class="text-base">🟦</span>
+          </div>
+          <div id="duel-score-blau" class="text-3xl sm:text-4xl font-black font-mono text-slate-900 dark:text-white">0 pts</div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Fórmules encertades:</span>
+          <div id="duel-list-blau" class="max-h-40 overflow-y-auto space-y-1 text-xs font-mono pr-1 text-slate-600 dark:text-slate-300">
+            <span class="text-slate-400 italic text-[11px]">Cap operació encara</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 flex flex-col items-center max-w-md w-full mx-auto my-2 md:my-0">
+        <div id="duel-turn-banner" class="w-full py-1.5 px-3 rounded-xl text-center font-black text-xs uppercase tracking-wider transition-all mb-2 shadow-xs">
+          Torn: Equip Blau
+        </div>
+
+        <div class="flex flex-col items-center mb-1">
+          <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Nombre Objectiu</span>
+          <div class="w-24 h-13 bg-white dark:bg-slate-800 border-2 border-slate-800 dark:border-slate-700 rounded-2xl flex items-center justify-center shadow-xs px-2">
+            <span id="duel-target-val" class="text-3xl font-black font-mono text-slate-900 dark:text-white">--</span>
+          </div>
+        </div>
+
+        <div id="duel-display-container" class="display-scroll w-full h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap justify-center text-2xl my-1.5">
+          <div id="duel-display-tokens" class="flex items-center min-w-full justify-center"></div>
+        </div>
+
+        <div class="honeycomb-grid my-1.5 select-none scale-95 sm:scale-100">
+          <div class="hex-row">
+            <button id="duel-hex-0" onclick="handleDuelHexClick(0)" class="hex-cell hex-cell-blue w-18 h-18 sm:w-20 sm:h-20 text-white flex items-center justify-center font-mono text-2xl sm:text-3xl font-black">-</button>
+            <button id="duel-hex-1" onclick="handleDuelHexClick(1)" class="hex-cell hex-cell-blue w-18 h-18 sm:w-20 sm:h-20 text-white flex items-center justify-center font-mono text-2xl sm:text-3xl font-black">-</button>
+          </div>
+          <div class="hex-row hex-row-offset z-10">
+            <button id="duel-hex-2" onclick="handleDuelHexClick(2)" class="hex-cell hex-cell-blue w-18 h-18 sm:w-20 sm:h-20 text-white flex items-center justify-center font-mono text-2xl sm:text-3xl font-black">-</button>
+            <button id="duel-hex-center" onclick="handleDuelHexCenterClick()" class="hex-cell hex-cell-red w-18 h-18 sm:w-20 sm:h-20 text-white flex items-center justify-center font-mono text-2xl sm:text-3xl font-black">
+              <span id="duel-center-val">-</span>
+            </button>
+            <button id="duel-hex-3" onclick="handleDuelHexClick(3)" class="hex-cell hex-cell-blue w-18 h-18 sm:w-20 sm:h-20 text-white flex items-center justify-center font-mono text-2xl sm:text-3xl font-black">-</button>
+          </div>
+          <div class="hex-row">
+            <button id="duel-hex-4" onclick="handleDuelHexClick(4)" class="hex-cell hex-cell-blue w-18 h-18 sm:w-20 sm:h-20 text-white flex items-center justify-center font-mono text-2xl sm:text-3xl font-black">-</button>
+            <button id="duel-hex-5" onclick="handleDuelHexClick(5)" class="hex-cell hex-cell-blue w-18 h-18 sm:w-20 sm:h-20 text-white flex items-center justify-center font-mono text-2xl sm:text-3xl font-black">-</button>
+          </div>
+        </div>
+
+        <div class="w-full grid grid-cols-6 gap-1 max-w-sm mt-1">
+          <button onclick="appendDuelChar('+')" class="key-3d h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold text-lg rounded-xl flex items-center justify-center">+</button>
+          <button onclick="appendDuelChar('−')" class="key-3d h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold text-lg rounded-xl flex items-center justify-center">−</button>
+          <button onclick="appendDuelChar('×')" class="key-3d h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold text-lg rounded-xl flex items-center justify-center">×</button>
+          <button onclick="appendDuelChar('÷')" class="key-3d h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold text-lg rounded-xl flex items-center justify-center">÷</button>
+          <button onclick="appendDuelChar('(')" class="key-3d h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold text-base rounded-xl flex items-center justify-center">(</button>
+          <button onclick="appendDuelChar(')')" class="key-3d h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold text-base rounded-xl flex items-center justify-center">)</button>
+        </div>
+
+        <div class="w-full grid grid-cols-4 gap-1.5 max-w-sm mt-1">
+          <button onclick="handleDuelDelete()" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs rounded-xl active:scale-95">
+            Suprimeix
+          </button>
+          <button onclick="shuffleDuelHexagons()" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+          <button onclick="duelPassTurn()" class="key-3d h-11 bg-slate-200 dark:bg-slate-700 font-bold text-xs rounded-xl active:scale-95 text-slate-700 dark:text-slate-200">
+            Passa
+          </button>
+          <button onclick="submitDuelTurn()" class="key-3d h-11 bg-brand-red text-white font-bold text-xs rounded-xl shadow-md active:scale-95">
+            Valida
+          </button>
+        </div>
+      </div>
+
+      <div id="duel-box-vermell" class="w-full md:w-64 lg:w-72 p-4 rounded-3xl border-2 transition-all duration-300 flex flex-col justify-between shrink-0 shadow-xs">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-black uppercase tracking-wider text-rose-600 dark:text-rose-400">Equip Vermell</span>
+            <span class="text-base">🟥</span>
+          </div>
+          <div id="duel-score-vermell" class="text-3xl sm:text-4xl font-black font-mono text-slate-900 dark:text-white">0 pts</div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Fórmules encertades:</span>
+          <div id="duel-list-vermell" class="max-h-40 overflow-y-auto space-y-1 text-xs font-mono pr-1 text-slate-600 dark:text-slate-300">
+            <span class="text-slate-400 italic text-[11px]">Cap operació encara</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="w-full max-w-5xl text-center text-[11px] text-slate-400 py-1">
+      Regla d'or: Les fórmules trobades queden cremades i no es poden repetir pel rival.
+    </div>
+  </div>
+
+  <div id="duel-winner-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop border border-slate-200 dark:border-slate-700">
+      <div id="duel-winner-icon" class="text-5xl">🏆</div>
+      <div>
+        <h3 id="duel-winner-title" class="text-xl font-black text-slate-900 dark:text-white">Victòria de l'Equip Blau!</h3>
+        <p id="duel-winner-subtitle" class="text-xs text-slate-500 mt-1">Gran combat de càlcul mental!</p>
+      </div>
+
+      <div class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 grid grid-cols-2 divide-x divide-slate-200 dark:divide-slate-700 font-mono">
+        <div>
+          <span class="text-[10px] font-bold text-sky-600 block uppercase">Equip Blau</span>
+          <span id="duel-final-score-blau" class="text-3xl font-black text-slate-900 dark:text-white">0</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-rose-600 block uppercase">Equip Vermell</span>
+          <span id="duel-final-score-vermell" class="text-3xl font-black text-slate-900 dark:text-white">0</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 mt-1">
+        <button onclick="startDuelGame()" class="w-full py-3 rounded-xl bg-brand-red text-white font-black text-xs uppercase tracking-wider shadow-md active:scale-98">
+          Tornar a jugar 🔄
+        </button>
+        <button onclick="closeModal('duel-winner-modal'); exitDuel();" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200">
+          Sortir al joc individual
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div id="printable-sheet" class="hidden bg-white w-full max-w-[210mm] p-6 rounded-3xl border border-slate-200">
     <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2 mb-2">
@@ -987,6 +1203,24 @@
     let countdownInterval = null;
     let eventsInitialized = false;
 
+    let duelConfig = { rusc: 'avui', temps: 45, rondes: 3 };
+    let duelState = {
+      active: false,
+      game: null,
+      outer: [],
+      turn: 0,
+      totalTurns: 6,
+      currentRound: 1,
+      timerSec: 45,
+      timerInterval: null,
+      blau: { score: 0, solutions: [] },
+      vermell: { score: 0, solutions: [] },
+      usedCanonics: new Set(),
+      tokens: [],
+      cursorIndex: 0,
+      usedNumbers: new Set()
+    };
+
     const LOCAL_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Europe/Madrid',
       year: 'numeric',
@@ -1535,6 +1769,35 @@
     }
 
     window.addEventListener('keydown', (e) => {
+      if (duelState.active) {
+        if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+          e.preventDefault();
+          handleDuelDelete();
+        } else if (e.key === 'Escape') {
+          exitDuelConfirm();
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          shuffleDuelHexagons();
+        } else if (e.key === 'Enter') {
+          submitDuelTurn();
+        } else if (['+', '-', '*', '/'].includes(e.key)) {
+          const mapOp = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+          appendDuelChar(mapOp[e.key]);
+        } else if (e.key === '(' || e.key === ')') {
+          appendDuelChar(e.key);
+        } else if (!isNaN(e.key) && e.key !== ' ') {
+          const val = parseInt(e.key, 10);
+          if (duelState.game && val === duelState.game.center && !duelState.usedNumbers.has(val)) {
+            handleDuelHexCenterClick();
+          } else {
+            const idx = duelState.outer.findIndex(v => v === val && !duelState.usedNumbers.has(v));
+            if (idx !== -1) handleDuelHexClick(idx);
+          }
+        }
+        return;
+      }
+
       if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
       if (e.key === 'Backspace' || e.key === 'Delete') {
@@ -1909,6 +2172,541 @@
         countdownInterval = null;
       }
       document.getElementById(id).classList.add('hidden');
+    }
+
+    function openDuelSetup() {
+      openModal('duel-setup-modal');
+    }
+
+    function setDuelRusc(tipus) {
+      duelConfig.rusc = tipus;
+      const btnAvui = document.getElementById('duel-opt-rusc-avui');
+      const btnAtzar = document.getElementById('duel-opt-rusc-atzar');
+      if (tipus === 'avui') {
+        btnAvui.className = "py-2.5 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all";
+        btnAtzar.className = "py-2.5 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all";
+      } else {
+        btnAtzar.className = "py-2.5 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all";
+        btnAvui.className = "py-2.5 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all";
+      }
+    }
+
+    function setDuelTemps(segons) {
+      duelConfig.temps = segons;
+      [30, 45, 60, 0].forEach(val => {
+        const btn = document.getElementById(`duel-opt-temps-${val}`);
+        if (!btn) return;
+        if (val === segons) {
+          btn.className = "py-2 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-mono font-bold text-xs";
+        } else {
+          btn.className = "py-2 rounded-xl border border-slate-200 dark:border-slate-700 font-mono font-bold text-xs";
+        }
+      });
+    }
+
+    function setDuelRondes(rondes) {
+      duelConfig.rondes = rondes;
+      [3, 5].forEach(val => {
+        const btn = document.getElementById(`duel-opt-rondes-${val}`);
+        if (!btn) return;
+        if (val === rondes) {
+          btn.className = "py-2.5 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all";
+        } else {
+          btn.className = "py-2.5 px-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all";
+        }
+      });
+    }
+
+    function generarRuscAleatoriLocal() {
+      const TARGETS_DUEL = [
+        24, 27, 28, 31, 33, 35, 36, 37, 38, 40,
+        42, 45, 48, 49, 50, 52, 54, 56, 58, 60,
+        62, 63, 64, 65, 68, 70, 72, 75, 76, 80
+      ];
+      const target = TARGETS_DUEL[Math.floor(Math.random() * TARGETS_DUEL.length)];
+      const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      for (let i = digits.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [digits[i], digits[j]] = [digits[j], digits[i]];
+      }
+      return {
+        target: target,
+        center: digits[0],
+        outer: digits.slice(1, 7)
+      };
+    }
+
+    function startDuelGame() {
+      closeModal('duel-setup-modal');
+      closeModal('duel-winner-modal');
+
+      let gameData;
+      if (duelConfig.rusc === 'avui' && DAILY_GAME) {
+        gameData = {
+          target: DAILY_GAME.target,
+          center: DAILY_GAME.center,
+          outer: [...DAILY_GAME.outer]
+        };
+      } else {
+        gameData = generarRuscAleatoriLocal();
+      }
+
+      duelState = {
+        active: true,
+        game: gameData,
+        outer: [...gameData.outer],
+        turn: 0,
+        totalTurns: duelConfig.rondes * 2,
+        currentRound: 1,
+        timerSec: duelConfig.temps,
+        timerInterval: null,
+        blau: { score: 0, solutions: [] },
+        vermell: { score: 0, solutions: [] },
+        usedCanonics: new Set(),
+        tokens: [],
+        cursorIndex: 0,
+        usedNumbers: new Set()
+      };
+
+      document.getElementById('duel-target-val').textContent = duelState.game.target;
+      document.getElementById('duel-center-val').textContent = duelState.game.center;
+      document.getElementById('duel-list-blau').innerHTML = '<span class="text-slate-400 italic text-[11px]">Cap operació encara</span>';
+      document.getElementById('duel-list-vermell').innerHTML = '<span class="text-slate-400 italic text-[11px]">Cap operació encara</span>';
+
+      document.getElementById('duel-screen').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+
+      renderDuelHexagons();
+      updateDuelScoreboard();
+      startDuelTurn();
+    }
+
+    function startDuelTurn() {
+      if (duelState.timerInterval) clearInterval(duelState.timerInterval);
+
+      duelState.tokens = [];
+      duelState.cursorIndex = 0;
+      duelState.usedNumbers.clear();
+      updateDuelDisplay();
+      renderDuelHexagons();
+
+      duelState.currentRound = Math.floor(duelState.turn / 2) + 1;
+      const isBlau = (duelState.turn % 2 === 0);
+
+      document.getElementById('duel-round-label').textContent = `Ronda ${duelState.currentRound}/${duelConfig.rondes}`;
+
+      const banner = document.getElementById('duel-turn-banner');
+      const boxBlau = document.getElementById('duel-box-blau');
+      const boxVermell = document.getElementById('duel-box-vermell');
+
+      if (isBlau) {
+        banner.textContent = "Torn: Equip Blau 🟦";
+        banner.className = "w-full py-1.5 px-3 rounded-xl text-center font-black text-xs uppercase tracking-wider bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700 shadow-xs";
+        
+        boxBlau.className = "w-full md:w-64 lg:w-72 p-4 rounded-3xl border-2 border-sky-500 bg-sky-50/80 dark:bg-sky-950/60 ring-4 ring-sky-400 shadow-[0_0_30px_rgba(56,189,248,0.45)] transition-all duration-300 flex flex-col justify-between shrink-0";
+        boxVermell.className = "w-full md:w-64 lg:w-72 p-4 rounded-3xl border-2 border-transparent bg-white dark:bg-slate-800 opacity-60 transition-all duration-300 flex flex-col justify-between shrink-0";
+      } else {
+        banner.textContent = "Torn: Equip Vermell 🟥";
+        banner.className = "w-full py-1.5 px-3 rounded-xl text-center font-black text-xs uppercase tracking-wider bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-700 shadow-xs";
+        
+        boxVermell.className = "w-full md:w-64 lg:w-72 p-4 rounded-3xl border-2 border-rose-500 bg-rose-50/80 dark:bg-rose-950/60 ring-4 ring-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.45)] transition-all duration-300 flex flex-col justify-between shrink-0";
+        boxBlau.className = "w-full md:w-64 lg:w-72 p-4 rounded-3xl border-2 border-transparent bg-white dark:bg-slate-800 opacity-60 transition-all duration-300 flex flex-col justify-between shrink-0";
+      }
+
+      const timerBadge = document.getElementById('duel-timer-badge');
+      const timerVal = document.getElementById('duel-timer-val');
+
+      if (duelConfig.temps === 0) {
+        timerBadge.classList.add('hidden');
+      } else {
+        timerBadge.classList.remove('hidden');
+        duelState.timerSec = duelConfig.temps;
+        timerVal.textContent = duelState.timerSec;
+
+        duelState.timerInterval = setInterval(() => {
+          duelState.timerSec--;
+          timerVal.textContent = duelState.timerSec;
+          if (duelState.timerSec <= 0) {
+            clearInterval(duelState.timerInterval);
+            showToast("Temps esgotat!", "warning");
+            advanceDuelTurn();
+          }
+        }, 1000);
+      }
+    }
+
+    function advanceDuelTurn() {
+      duelState.turn++;
+      if (duelState.turn >= duelState.totalTurns) {
+        finishDuelGame();
+      } else {
+        startDuelTurn();
+      }
+    }
+
+    function duelPassTurn() {
+      if (!duelState.active) return;
+      showToast("Torn passat", "warning");
+      advanceDuelTurn();
+    }
+
+    function finishDuelGame() {
+      if (duelState.timerInterval) clearInterval(duelState.timerInterval);
+      duelState.active = false;
+
+      const blau = duelState.blau.score;
+      const vermell = duelState.vermell.score;
+
+      document.getElementById('duel-final-score-blau').textContent = blau;
+      document.getElementById('duel-final-score-vermell').textContent = vermell;
+
+      const title = document.getElementById('duel-winner-title');
+      const icon = document.getElementById('duel-winner-icon');
+      const subtitle = document.getElementById('duel-winner-subtitle');
+
+      if (blau > vermell) {
+        title.textContent = "Victòria de l'Equip Blau! 🟦";
+        title.className = "text-xl font-black text-sky-600";
+        icon.textContent = "🏆";
+        subtitle.textContent = `Ha guanyat per ${blau} a ${vermell} punts.`;
+      } else if (vermell > blau) {
+        title.textContent = "Victòria de l'Equip Vermell! 🟥";
+        title.className = "text-xl font-black text-rose-600";
+        icon.textContent = "🏆";
+        subtitle.textContent = `Ha guanyat per ${vermell} a ${blau} punts.`;
+      } else {
+        title.textContent = "Empat matemàtic! 🤝";
+        title.className = "text-xl font-black text-amber-500";
+        icon.textContent = "⚖️";
+        subtitle.textContent = `Tots dos equips han sumat ${blau} punts.`;
+      }
+
+      if (typeof confetti === 'function') {
+        try { confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 } }); } catch (e) {}
+      }
+
+      openModal('duel-winner-modal');
+    }
+
+    function exitDuelConfirm() {
+      if (confirm("Vols sortir del duel actual?")) {
+        exitDuel();
+      }
+    }
+
+    function exitDuel() {
+      if (duelState.timerInterval) clearInterval(duelState.timerInterval);
+      duelState.active = false;
+      document.getElementById('duel-screen').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function updateDuelScoreboard() {
+      document.getElementById('duel-score-blau').textContent = `${duelState.blau.score} pts`;
+      document.getElementById('duel-score-vermell').textContent = `${duelState.vermell.score} pts`;
+
+      const listB = document.getElementById('duel-list-blau');
+      const listV = document.getElementById('duel-list-vermell');
+
+      if (duelState.blau.solutions.length > 0) {
+        listB.innerHTML = duelState.blau.solutions.slice().reverse().map(s => `<div>${s}</div>`).join('');
+      }
+      if (duelState.vermell.solutions.length > 0) {
+        listV.innerHTML = duelState.vermell.solutions.slice().reverse().map(s => `<div>${s}</div>`).join('');
+      }
+    }
+
+    function renderDuelHexagons() {
+      duelState.outer.forEach((val, idx) => {
+        const btn = document.getElementById(`duel-hex-${idx}`);
+        if (btn) {
+          btn.textContent = val;
+          if (duelState.usedNumbers.has(val)) {
+            btn.classList.add('used');
+          } else {
+            btn.classList.remove('used');
+          }
+        }
+      });
+      const cBtn = document.getElementById('duel-hex-center');
+      if (cBtn && duelState.game) {
+        if (duelState.usedNumbers.has(duelState.game.center)) {
+          cBtn.classList.add('used');
+        } else {
+          cBtn.classList.remove('used');
+        }
+      }
+    }
+
+    function shuffleDuelHexagons() {
+      for (let i = duelState.outer.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [duelState.outer[i], duelState.outer[j]] = [duelState.outer[j], duelState.outer[i]];
+      }
+      renderDuelHexagons();
+    }
+
+    function updateDuelDisplay() {
+      const container = document.getElementById('duel-display-tokens');
+      container.innerHTML = '';
+
+      const oberts = duelState.tokens.filter(t => t.val === '(').length;
+      const tancats = duelState.tokens.filter(t => t.val === ')').length;
+      const pendents = Math.max(0, oberts - tancats);
+
+      const cursorSpan = document.createElement('span');
+      cursorSpan.className = "w-2 h-6 bg-brand-red rounded-xs cursor-blink mx-0.5 inline-block shrink-0";
+
+      for (let i = 0; i <= duelState.tokens.length; i++) {
+        if (i === duelState.cursorIndex) {
+          container.appendChild(cursorSpan);
+        }
+        if (i < duelState.tokens.length) {
+          const t = duelState.tokens[i];
+          const span = document.createElement('span');
+          span.innerText = t.display;
+          span.className = "px-1";
+          container.appendChild(span);
+        }
+      }
+
+      if (pendents > 0 && duelState.tokens.length > 0) {
+        const ghostSpan = document.createElement('span');
+        ghostSpan.innerText = ')'.repeat(pendents);
+        ghostSpan.className = "px-1 text-slate-300 dark:text-slate-600 select-none";
+        container.appendChild(ghostSpan);
+      }
+    }
+
+    function appendDuelChar(char) {
+      if (!duelState.active) return;
+      const prev = duelState.cursorIndex > 0 ? duelState.tokens[duelState.cursorIndex - 1] : null;
+
+      if (char === '(' && prev && (prev.type === 'num' || prev.val === ')')) {
+        return showToast("Cal un operador abans del parèntesi!", "warning");
+      }
+      if (char === ')') {
+        const oberts = duelState.tokens.filter(t => t.val === '(').length;
+        const tancats = duelState.tokens.filter(t => t.val === ')').length;
+        if (oberts <= tancats) return showToast("No hi ha parèntesi per tancar!", "warning");
+      }
+
+      let raw = char;
+      if (char === '×') raw = '*';
+      if (char === '÷') raw = '/';
+      if (char === '−') raw = '-';
+
+      duelState.tokens.splice(duelState.cursorIndex, 0, { type: 'op', val: raw, display: char });
+      duelState.cursorIndex++;
+      updateDuelDisplay();
+    }
+
+    function handleDuelHexClick(idx) {
+      if (!duelState.active) return;
+      const val = duelState.outer[idx];
+      if (duelState.usedNumbers.has(val)) return;
+
+      const prev = duelState.cursorIndex > 0 ? duelState.tokens[duelState.cursorIndex - 1] : null;
+      if (prev && (prev.type === 'num' || prev.val === ')')) {
+        return showToast("Cal un operador!", "warning");
+      }
+
+      duelState.tokens.splice(duelState.cursorIndex, 0, { type: 'num', val: String(val), display: String(val) });
+      duelState.cursorIndex++;
+      duelState.usedNumbers.add(val);
+      renderDuelHexagons();
+      updateDuelDisplay();
+    }
+
+    function handleDuelHexCenterClick() {
+      if (!duelState.active) return;
+      const val = duelState.game.center;
+      if (duelState.usedNumbers.has(val)) return;
+
+      const prev = duelState.cursorIndex > 0 ? duelState.tokens[duelState.cursorIndex - 1] : null;
+      if (prev && (prev.type === 'num' || prev.val === ')')) {
+        return showToast("Cal un operador!", "warning");
+      }
+
+      duelState.tokens.splice(duelState.cursorIndex, 0, { type: 'num', val: String(val), display: String(val) });
+      duelState.cursorIndex++;
+      duelState.usedNumbers.add(val);
+      renderDuelHexagons();
+      updateDuelDisplay();
+    }
+
+    function handleDuelDelete() {
+      if (!duelState.active || duelState.cursorIndex === 0) return;
+      const eliminated = duelState.tokens.splice(duelState.cursorIndex - 1, 1)[0];
+      duelState.cursorIndex--;
+
+      if (eliminated && eliminated.type === 'num') {
+        duelState.usedNumbers.delete(parseInt(eliminated.val, 10));
+      }
+
+      renderDuelHexagons();
+      updateDuelDisplay();
+    }
+
+    function calcularExpressioLocal(expr) {
+      let clean = expr.split('×').join('*').split('÷').join('/').split('−').join('-').split(' ').join('');
+      if (!clean) throw new Error("Expressió buida");
+
+      for (let idx = 0; idx < clean.length - 1; idx++) {
+        const act = clean.charAt(idx);
+        const seg = clean.charAt(idx + 1);
+        const esNumAct = (act >= '0' && act <= '9');
+        const esNumSeg = (seg >= '0' && seg <= '9');
+        const esOpAct = (act === '+' || act === '-' || act === '*' || act === '/');
+        const esOpSeg = (seg === '+' || seg === '-' || seg === '*' || seg === '/');
+
+        if (esNumAct && seg === '(') throw new Error("Cal especificar el signe de la multiplicació (×)!");
+        if (act === ')' && esNumSeg) throw new Error("Cal especificar el signe de la multiplicació (×)!");
+        if (act === ')' && seg === '(') throw new Error("Cal un operador entre parèntesis!");
+        if (act === '(' && seg === ')') throw new Error("No es permeten parèntesis buits!");
+        if (esOpAct && esOpSeg) throw new Error("No es poden posar dos operadors seguits!");
+      }
+
+      const tokens = [];
+      let i = 0;
+      while (i < clean.length) {
+        const c = clean.charAt(i);
+        if (c >= '0' && c <= '9') {
+          let num = '';
+          while (i < clean.length && clean.charAt(i) >= '0' && clean.charAt(i) <= '9') {
+            num += clean.charAt(i);
+            i++;
+          }
+          tokens.push({ type: 'num', val: parseInt(num, 10) });
+          continue;
+        }
+        tokens.push({ type: 'op', val: c });
+        i++;
+      }
+
+      const outputQueue = [];
+      const opStack = [];
+      const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
+
+      for (let k = 0; k < tokens.length; k++) {
+        const t = tokens[k];
+        if (t.type === 'num') {
+          outputQueue.push(t.val);
+        } else if (t.val === '(') {
+          opStack.push(t.val);
+        } else if (t.val === ')') {
+          while (opStack.length > 0 && opStack[opStack.length - 1] !== '(') {
+            outputQueue.push(opStack.pop());
+          }
+          if (opStack.length === 0) throw new Error("Parèntesis desquadrats");
+          opStack.pop();
+        } else {
+          while (
+            opStack.length > 0 &&
+            opStack[opStack.length - 1] !== '(' &&
+            precedence[opStack[opStack.length - 1]] >= precedence[t.val]
+          ) {
+            outputQueue.push(opStack.pop());
+          }
+          opStack.push(t.val);
+        }
+      }
+
+      while (opStack.length > 0) {
+        const op = opStack.pop();
+        if (op === '(' || op === ')') throw new Error("Parèntesis desquadrats");
+        outputQueue.push(op);
+      }
+
+      const evalStack = [];
+      for (let m = 0; m < outputQueue.length; m++) {
+        const item = outputQueue[m];
+        if (typeof item === 'number') {
+          evalStack.push({ val: item, str: String(item) });
+        } else {
+          if (evalStack.length < 2) throw new Error("Sintaxi matemàtica incompleta");
+          const b = evalStack.pop();
+          const a = evalStack.pop();
+          let res = 0;
+          if (item === '+') res = a.val + b.val;
+          else if (item === '-') res = a.val - b.val;
+          else if (item === '*') res = a.val * b.val;
+          else if (item === '/') {
+            if (b.val === 0) throw new Error("Divisió per zero");
+            if (a.val % b.val !== 0) throw new Error("Les divisions han de ser exactes!");
+            res = Math.round(a.val / b.val);
+          }
+          evalStack.push({ val: res, str: `(${a.str}${item}${b.str})` });
+        }
+      }
+
+      if (evalStack.length !== 1) throw new Error("Operació no vàlida");
+      return evalStack[0].val;
+    }
+
+    function submitDuelTurn() {
+      if (!duelState.active) return;
+      if (duelState.tokens.length === 0) return showToast("Escriu una operació primer", "warning");
+
+      const oberts = duelState.tokens.filter(t => t.val === '(').length;
+      const tancats = duelState.tokens.filter(t => t.val === ')').length;
+      if (oberts > tancats) {
+        const mancants = oberts - tancats;
+        for (let i = 0; i < mancants; i++) {
+          duelState.tokens.push({ type: 'op', val: ')', display: ')' });
+        }
+        duelState.cursorIndex = duelState.tokens.length;
+        updateDuelDisplay();
+      }
+
+      const numTokens = duelState.tokens.filter(t => t.type === 'num');
+      if (numTokens.length < 2) return showToast("Cal combinar almenys 2 xifres!", "warning");
+
+      const centerStr = String(duelState.game.center);
+      const usaCentre = numTokens.some(t => t.val === centerStr);
+      if (!usaCentre) return showToast(`Cal usar el centre (${centerStr})!`, "warning");
+
+      const rawExpr = duelState.tokens.map(t => t.val).join('');
+      const displayExpr = duelState.tokens.map(t => t.display).join(' ');
+
+      try {
+        const res = calcularExpressioLocal(rawExpr);
+        if (Math.abs(res - duelState.game.target) > 0.0001) {
+          return showToast(`És ${res}, no pas ${duelState.game.target}`, "error");
+        }
+
+        const canonicalKey = rawExpr.replace(/\s+/g, '');
+        if (duelState.usedCanonics.has(canonicalKey)) {
+          return showToast("Aquesta operació ja ha estat trobada en aquest duel!", "warning");
+        }
+
+        const digitsUsats = numTokens.length;
+        const esTuti = (digitsUsats === 7);
+        const punts = 5 + (digitsUsats * 3) + (esTuti ? 20 : 0);
+
+        duelState.usedCanonics.add(canonicalKey);
+
+        const isBlau = (duelState.turn % 2 === 0);
+        const equip = isBlau ? duelState.blau : duelState.vermell;
+        equip.score += punts;
+        equip.solutions.push(`${displayExpr} (+${punts}) ${esTuti ? '🌟' : ''}`);
+
+        updateDuelScoreboard();
+
+        if (esTuti) {
+          if (typeof confetti === 'function') {
+            try { confetti({ particleCount: 90, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
+          }
+          showToast(`🌟 TUTI DE L'EQUIP! +${punts} pts`, "success");
+        } else {
+          showToast(`Correcte! +${punts} pts`, "success");
+        }
+
+        advanceDuelTurn();
+
+      } catch (err) {
+        showToast(err.message || "Operació no vàlida matemàticament", "error");
+      }
     }
 
     async function copyShareText() {
