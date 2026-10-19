@@ -1112,14 +1112,14 @@
           </summary>
           <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-1.5 leading-relaxed text-[11px]">
             <p>
-              Per motius didàctics i per afavorir l'exploració del càlcul, el joc té en compte la <strong>propietat commutativa</strong> de la suma i la multiplicació (l'ordre dels factors o sumands no altera el resultat final).
+              Per motius didàctics i per afavorir l'exploració del càlcul, el joc individual té en compte la <strong>propietat commutativa</strong> de la suma i la multiplicació (l'ordre dels factors o sumands no altera el resultat final).
             </p>
             <div class="bg-white dark:bg-slate-800/80 p-2 rounded-xl border border-slate-200/70 dark:border-slate-700/70 space-y-1 font-mono">
               <div><span class="text-brand-red font-bold">Suma:</span> <code>9 + 4 = 4 + 9</code></div>
               <div><span class="text-brand-red font-bold">Producte:</span> <code>8 × 7 = 7 × 8</code></div>
             </div>
             <p class="text-slate-500 dark:text-slate-400">
-              Això permet a l'alumnat i als jugadors/es investigar diferents combinacions per estructurar un mateix raonament numèric.
+              En el <strong>Mode 2 jugadors/es</strong> no es permet repetir una operació mitjançant la propietat commutativa per evitar que un equip copiï l'anterior.
             </p>
           </div>
         </details>
@@ -1263,6 +1263,7 @@
     let duelConfig = { rusc: 'avui', temps: 45, rondes: 3 };
     let duelTimerId = null;
     let duelTurnDeadline = 0;
+    let pausedRemainingMs = null;
     let duelState = {
       active: false,
       game: null,
@@ -1404,6 +1405,7 @@
     }
 
     function printWorksheet() {
+      stopDuelTimer();
       updatePrintableSheet();
       try {
         navigator.sendBeacon(`${API_URL}api/fitxa`);
@@ -1461,7 +1463,7 @@
     }
 
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && DAILY_GAME) {
+      if (document.visibilityState === 'visible' && DAILY_GAME && !duelState.active) {
         if (DAILY_GAME.data !== getCurrentMadridDateShort()) {
           initUI();
         }
@@ -2288,6 +2290,9 @@
         countdownInterval = null;
       }
       document.getElementById(id).classList.add('hidden');
+      if (id === 'duel-setup-modal' && duelState.active && pausedRemainingMs !== null) {
+        resumeDuelTimer();
+      }
     }
 
     function stopDuelTimer() {
@@ -2301,7 +2306,48 @@
       }
     }
 
+    function runDuelInterval() {
+      const timerVal = document.getElementById('duel-timer-val');
+      duelTimerId = setInterval(() => {
+        if (!duelState.active) {
+          stopDuelTimer();
+          return;
+        }
+
+        const restantMs = duelTurnDeadline - Date.now();
+        const segonsRestants = Math.max(0, Math.ceil(restantMs / 1000));
+
+        if (segonsRestants !== duelState.timerSec) {
+          duelState.timerSec = segonsRestants;
+          if (timerVal) {
+            timerVal.textContent = `${segonsRestants}s`;
+            if (segonsRestants <= 10) {
+              timerVal.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+            }
+          }
+        }
+
+        if (restantMs <= 0) {
+          stopDuelTimer();
+          const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
+          showToast(esUltimTorn ? "Temps esgotat! Fi del duel!" : "Temps esgotat! Canvi de torn", "warning");
+          advanceDuelTurn();
+        }
+      }, 200);
+    }
+
+    function resumeDuelTimer() {
+      if (!duelState.active || duelConfig.temps === 0 || pausedRemainingMs === null) return;
+      stopDuelTimer();
+      duelTurnDeadline = Date.now() + pausedRemainingMs;
+      pausedRemainingMs = null;
+      runDuelInterval();
+    }
+
     function openDuelSetup() {
+      if (duelState.active && duelConfig.temps > 0 && duelTimerId !== null) {
+        pausedRemainingMs = Math.max(500, duelTurnDeadline - Date.now());
+      }
       stopDuelTimer();
       openModal('duel-setup-modal');
     }
@@ -2368,9 +2414,7 @@
 
     function startDuelGame() {
       stopDuelTimer();
-
-      closeModal('duel-setup-modal');
-      closeModal('duel-winner-modal');
+      pausedRemainingMs = null;
 
       let gameData;
       let ruscTitle = "Rusc a l'atzar";
@@ -2402,6 +2446,9 @@
         usedNumbers: new Set()
       };
 
+      document.getElementById('duel-setup-modal').classList.add('hidden');
+      document.getElementById('duel-winner-modal').classList.add('hidden');
+
       document.getElementById('duel-rusc-label').textContent = ruscTitle;
       document.getElementById('duel-target-val').textContent = duelState.game.target;
       document.getElementById('duel-center-val').textContent = duelState.game.center;
@@ -2425,6 +2472,7 @@
 
     function startDuelTurn() {
       stopDuelTimer();
+      pausedRemainingMs = null;
 
       duelState.tokens = [];
       duelState.cursorIndex = 0;
@@ -2471,35 +2519,13 @@
         duelState.timerSec = duelConfig.temps;
         timerVal.textContent = `${duelState.timerSec}s`;
         timerVal.className = "text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono";
-
-        duelTimerId = setInterval(() => {
-          if (!duelState.active) {
-            stopDuelTimer();
-            return;
-          }
-
-          const restantMs = duelTurnDeadline - Date.now();
-          const segonsRestants = Math.max(0, Math.ceil(restantMs / 1000));
-
-          if (segonsRestants !== duelState.timerSec) {
-            duelState.timerSec = segonsRestants;
-            timerVal.textContent = `${segonsRestants}s`;
-            if (segonsRestants <= 10) {
-              timerVal.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
-            }
-          }
-
-          if (restantMs <= 0) {
-            stopDuelTimer();
-            showToast("Temps esgotat! Canvi de torn", "warning");
-            advanceDuelTurn();
-          }
-        }, 200);
+        runDuelInterval();
       }
     }
 
     function advanceDuelTurn() {
       stopDuelTimer();
+      pausedRemainingMs = null;
       duelState.turn++;
       if (duelState.turn >= duelState.totalTurns) {
         finishDuelGame();
@@ -2510,12 +2536,14 @@
 
     function duelPassTurn() {
       if (!duelState.active) return;
-      showToast("Torn passat", "warning");
+      const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
+      showToast(esUltimTorn ? "Fi del duel!" : "Torn passat", "warning");
       advanceDuelTurn();
     }
 
     function finishDuelGame() {
       stopDuelTimer();
+      pausedRemainingMs = null;
       duelState.active = false;
 
       const blau = duelState.blau.score;
@@ -2560,6 +2588,7 @@
 
     function exitDuel() {
       stopDuelTimer();
+      pausedRemainingMs = null;
       duelState.active = false;
       document.getElementById('duel-screen').classList.add('hidden');
       document.body.classList.remove('overflow-hidden');
