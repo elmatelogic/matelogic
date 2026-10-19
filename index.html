@@ -1261,6 +1261,8 @@
     let eventsInitialized = false;
 
     let duelConfig = { rusc: 'avui', temps: 45, rondes: 3 };
+    let duelTimerId = null;
+    let duelTurnDeadline = 0;
     let duelState = {
       active: false,
       game: null,
@@ -2288,7 +2290,19 @@
       document.getElementById(id).classList.add('hidden');
     }
 
+    function stopDuelTimer() {
+      if (duelTimerId !== null) {
+        clearInterval(duelTimerId);
+        duelTimerId = null;
+      }
+      if (duelState && duelState.timerInterval) {
+        clearInterval(duelState.timerInterval);
+        duelState.timerInterval = null;
+      }
+    }
+
     function openDuelSetup() {
+      stopDuelTimer();
       openModal('duel-setup-modal');
     }
 
@@ -2353,6 +2367,8 @@
     }
 
     function startDuelGame() {
+      stopDuelTimer();
+
       closeModal('duel-setup-modal');
       closeModal('duel-winner-modal');
 
@@ -2408,7 +2424,7 @@
     }
 
     function startDuelTurn() {
-      if (duelState.timerInterval) clearInterval(duelState.timerInterval);
+      stopDuelTimer();
 
       duelState.tokens = [];
       duelState.cursorIndex = 0;
@@ -2451,26 +2467,39 @@
         timerVal.textContent = "∞";
         timerVal.className = "text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono";
       } else {
+        duelTurnDeadline = Date.now() + (duelConfig.temps * 1000);
         duelState.timerSec = duelConfig.temps;
         timerVal.textContent = `${duelState.timerSec}s`;
         timerVal.className = "text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono";
 
-        duelState.timerInterval = setInterval(() => {
-          duelState.timerSec--;
-          timerVal.textContent = `${duelState.timerSec}s`;
-          if (duelState.timerSec <= 10) {
-            timerVal.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+        duelTimerId = setInterval(() => {
+          if (!duelState.active) {
+            stopDuelTimer();
+            return;
           }
-          if (duelState.timerSec <= 0) {
-            clearInterval(duelState.timerInterval);
+
+          const restantMs = duelTurnDeadline - Date.now();
+          const segonsRestants = Math.max(0, Math.ceil(restantMs / 1000));
+
+          if (segonsRestants !== duelState.timerSec) {
+            duelState.timerSec = segonsRestants;
+            timerVal.textContent = `${segonsRestants}s`;
+            if (segonsRestants <= 10) {
+              timerVal.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
+            }
+          }
+
+          if (restantMs <= 0) {
+            stopDuelTimer();
             showToast("Temps esgotat! Canvi de torn", "warning");
             advanceDuelTurn();
           }
-        }, 1000);
+        }, 200);
       }
     }
 
     function advanceDuelTurn() {
+      stopDuelTimer();
       duelState.turn++;
       if (duelState.turn >= duelState.totalTurns) {
         finishDuelGame();
@@ -2486,7 +2515,7 @@
     }
 
     function finishDuelGame() {
-      if (duelState.timerInterval) clearInterval(duelState.timerInterval);
+      stopDuelTimer();
       duelState.active = false;
 
       const blau = duelState.blau.score;
@@ -2512,7 +2541,7 @@
         subtitle.textContent = `Tots dos equips han empatat a ${blau} punts.`;
       }
 
-      if (typeof confetti === 'function') {
+      if ((blau > 0 || vermell > 0) && typeof confetti === 'function') {
         try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
       }
 
@@ -2530,7 +2559,7 @@
     }
 
     function exitDuel() {
-      if (duelState.timerInterval) clearInterval(duelState.timerInterval);
+      stopDuelTimer();
       duelState.active = false;
       document.getElementById('duel-screen').classList.add('hidden');
       document.body.classList.remove('overflow-hidden');
