@@ -491,10 +491,10 @@
       </div>
 
       <div class="flex flex-col gap-2 pt-1">
-        <button onclick="startDuelGame()" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md transition-all">
+        <button onclick="restartDuelGame(event)" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md transition-all">
           Comença el Duel
         </button>
-        <span class="text-[10px] text-slate-400 text-center">Les fórmules no es poden repetir.</span>
+        <span class="text-[10px] text-slate-400 text-center">Joc per equips sense propietat commutativa</span>
       </div>
     </div>
   </div>
@@ -628,7 +628,7 @@
         </div>
 
         <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-1">
-          Les fórmules no es poden repetir.
+          Joc per equips sense propietat commutativa.
         </p>
       </div>
 
@@ -683,13 +683,13 @@
       </div>
 
       <div class="flex flex-col gap-2 mt-1">
-        <button onclick="startDuelGame()" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md">
+        <button type="button" onclick="restartDuelGame(event)" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md">
           Torna a jugar
         </button>
-        <button onclick="closeModal('duel-winner-modal'); openDuelSetup();" class="w-full py-2.5 rounded-full bg-slate-100 dark:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200">
+        <button type="button" onclick="changeDuelConfigFromWinner(event)" class="w-full py-2.5 rounded-full bg-slate-100 dark:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200">
           Canvia la configuració
         </button>
-        <button onclick="closeModal('duel-winner-modal'); exitDuel();" class="text-xs text-slate-400 hover:underline mt-1">
+        <button type="button" onclick="exitDuelFromWinner(event)" class="text-xs text-slate-400 hover:underline mt-1">
           Tornar al joc individual
         </button>
       </div>
@@ -1870,6 +1870,7 @@
 
     function setupBackdropCloseEvents() {
       document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+        if (modal.id === 'duel-winner-modal') return;
         modal.addEventListener('click', (e) => {
           if (e.target === modal) closeModal(modal.id);
         });
@@ -1881,7 +1882,9 @@
 
       const modalObert = document.querySelector('[id$="-modal"]:not(.hidden)');
       if (modalObert) {
-        if (e.key === 'Escape') closeModal(modalObert.id);
+        if (e.key === 'Escape' && modalObert.id !== 'duel-winner-modal') {
+          closeModal(modalObert.id);
+        }
         return;
       }
 
@@ -2352,6 +2355,32 @@
       openModal('duel-setup-modal');
     }
 
+    function restartDuelGame(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      startDuelGame();
+    }
+
+    function changeDuelConfigFromWinner(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      document.getElementById('duel-winner-modal').classList.add('hidden');
+      openDuelSetup();
+    }
+
+    function exitDuelFromWinner(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      document.getElementById('duel-winner-modal').classList.add('hidden');
+      exitDuel();
+    }
+
     function setDuelRusc(tipus) {
       duelConfig.rusc = tipus;
       const btnAvui = document.getElementById('duel-opt-rusc-avui');
@@ -2545,6 +2574,19 @@
       stopDuelTimer();
       pausedRemainingMs = null;
       duelState.active = false;
+
+      // Netegem el visor i els hexàgons abans de mostrar el podi perquè no quedin restes de l'última jugada
+      duelState.tokens = [];
+      duelState.cursorIndex = 0;
+      duelState.usedNumbers.clear();
+      updateDuelDisplay();
+      renderDuelHexagons();
+
+      const timerVal = document.getElementById('duel-timer-val');
+      if (timerVal) {
+        timerVal.textContent = duelConfig.temps === 0 ? "∞" : "0s";
+        timerVal.className = "text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono";
+      }
 
       const blau = duelState.blau.score;
       const vermell = duelState.vermell.score;
