@@ -322,17 +322,17 @@
   </header>
 
   <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
-    <div class="grid grid-cols-3 items-center w-full text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
-      <span id="challenge-day-label" class="justify-self-start truncate">Carregant repte...</span>
+    <div class="relative flex items-center justify-between w-full min-h-[26px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
+      <span id="challenge-day-label" class="truncate pr-2">Carregant repte...</span>
       
-      <button onclick="openDuelSetup()" aria-label="Mode 2 jugadors / Aula" title="Mode 2 jugadors / Aula" class="justify-self-center inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-bold text-[11px] border border-slate-200/90 dark:border-slate-700 shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap">
+      <button onclick="openDuelSetup()" aria-label="Mode 2 jugadors" title="Mode 2 jugadors" class="absolute left-1/2 -translate-x-1/2 inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-bold text-[11px] border border-slate-200/90 dark:border-slate-700 shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap z-10">
         <svg class="w-3.5 h-3.5 text-brand-red shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <span class="normal-case tracking-normal">2 jugadors/es</span>
       </button>
 
-      <span id="challenge-date-label" class="justify-self-end whitespace-nowrap">-- / -- / ----</span>
+      <span id="challenge-date-label" class="whitespace-nowrap pl-2">-- / -- / ----</span>
     </div>
 
     <div class="w-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-2.5 shadow-sm grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-700/60 text-center transition-all">
@@ -449,7 +449,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
           </div>
-          <h3 class="text-lg font-black text-slate-900 dark:text-white">2 jugadors/es · Aula</h3>
+          <h3 class="text-lg font-black text-slate-900 dark:text-white">Mode 2 jugadors/es</h3>
         </div>
         <button onclick="closeModal('duel-setup-modal')" aria-label="Tancar" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
@@ -540,7 +540,7 @@
             <span id="duel-count-blau" class="font-mono text-slate-500 dark:text-slate-400">0</span>
           </div>
           <div id="duel-list-blau" class="max-h-24 sm:max-h-36 lg:max-h-64 overflow-y-auto pr-1 flex flex-col gap-1.5 font-mono text-[11px]">
-            <p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació encara.</p>
+            <p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació resolta</p>
           </div>
         </div>
       </div>
@@ -653,7 +653,7 @@
             <span id="duel-count-vermell" class="font-mono text-slate-500 dark:text-slate-400">0</span>
           </div>
           <div id="duel-list-vermell" class="max-h-24 sm:max-h-36 lg:max-h-64 overflow-y-auto pr-1 flex flex-col gap-1.5 font-mono text-[11px]">
-            <p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació encara.</p>
+            <p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació resolta</p>
           </div>
         </div>
       </div>
@@ -2575,7 +2575,7 @@
       const listV = document.getElementById('duel-list-vermell');
 
       if (duelState.blau.solutions.length === 0) {
-        listB.innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació encara.</p>';
+        listB.innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació resolta</p>';
       } else {
         listB.innerHTML = duelState.blau.solutions.slice().reverse().map(sol => `
           <div class="p-1.5 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center gap-1">
@@ -2586,7 +2586,7 @@
       }
 
       if (duelState.vermell.solutions.length === 0) {
-        listV.innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació encara.</p>';
+        listV.innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-[11px] font-sans py-1">Cap operació resolta</p>';
       } else {
         listV.innerHTML = duelState.vermell.solutions.slice().reverse().map(sol => `
           <div class="p-1.5 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center gap-1">
