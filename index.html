@@ -322,17 +322,17 @@
   </header>
 
   <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
-    <div class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2">
-      <span id="challenge-day-label">Carregant repte...</span>
+    <div class="grid grid-cols-3 items-center w-full text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
+      <span id="challenge-day-label" class="justify-self-start truncate">Carregant repte...</span>
       
-      <button onclick="openDuelSetup()" aria-label="Mode 2 jugadors / Aula" title="Mode 2 jugadors / Aula" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-bold text-[11px] border border-slate-200/90 dark:border-slate-700 shadow-xs transition-all active:scale-95 cursor-pointer">
+      <button onclick="openDuelSetup()" aria-label="Mode 2 jugadors / Aula" title="Mode 2 jugadors / Aula" class="justify-self-center inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-bold text-[11px] border border-slate-200/90 dark:border-slate-700 shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap">
         <svg class="w-3.5 h-3.5 text-brand-red shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <span class="normal-case tracking-normal">2 jugadors/es</span>
       </button>
 
-      <span id="challenge-date-label">-- / -- / ----</span>
+      <span id="challenge-date-label" class="justify-self-end whitespace-nowrap">-- / -- / ----</span>
     </div>
 
     <div class="w-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-2.5 shadow-sm grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-700/60 text-center transition-all">
@@ -494,7 +494,7 @@
         <button onclick="startDuelGame()" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md transition-all">
           Comença el Duel
         </button>
-        <span class="text-[10px] text-slate-400 text-center">Les fórmules encertades queden cremades i no es poden repetir.</span>
+        <span class="text-[10px] text-slate-400 text-center">Les fórmules no es poden repetir.</span>
       </div>
     </div>
   </div>
@@ -521,14 +521,14 @@
 
       <div id="duel-box-blau" class="col-span-1 lg:col-span-3 order-1 lg:order-1 bg-white dark:bg-slate-800 border-2 border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
         <div>
-          <div class="flex items-center justify-between gap-1 mb-1">
-            <div class="flex items-center gap-1.5">
+          <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-1 mb-1.5 text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start gap-1.5">
               <span class="w-2.5 h-2.5 rounded-full bg-brand-blue shrink-0"></span>
               <span class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">Equip Blau</span>
             </div>
-            <span id="duel-badge-turn-blau" class="hidden text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/80 text-brand-blueDark dark:text-brand-blue">Torn actiu</span>
+            <span id="duel-badge-turn-blau" class="hidden text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/80 text-brand-blueDark dark:text-brand-blue text-center inline-flex items-center justify-center whitespace-nowrap mx-auto sm:mx-0">Torn actiu</span>
           </div>
-          <div class="flex items-baseline gap-1">
+          <div class="flex items-baseline justify-center sm:justify-start gap-1">
             <span id="duel-score-blau" class="text-2xl sm:text-3xl lg:text-4xl font-black font-mono text-slate-900 dark:text-white">0</span>
             <span class="text-[10px] font-bold uppercase text-slate-400">punts</span>
           </div>
@@ -626,18 +626,22 @@
             Introdueix
           </button>
         </div>
+
+        <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-1">
+          Les fórmules no es poden repetir.
+        </p>
       </div>
 
       <div id="duel-box-vermell" class="col-span-1 lg:col-span-3 order-2 lg:order-3 bg-white dark:bg-slate-800 border-2 border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
         <div>
-          <div class="flex items-center justify-between gap-1 mb-1">
-            <div class="flex items-center gap-1.5">
+          <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-1 mb-1.5 text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start gap-1.5">
               <span class="w-2.5 h-2.5 rounded-full bg-brand-red shrink-0"></span>
               <span class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">Equip Vermell</span>
             </div>
-            <span id="duel-badge-turn-vermell" class="hidden text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/80 text-brand-red">Torn actiu</span>
+            <span id="duel-badge-turn-vermell" class="hidden text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/80 text-brand-red text-center inline-flex items-center justify-center whitespace-nowrap mx-auto sm:mx-0">Torn actiu</span>
           </div>
-          <div class="flex items-baseline gap-1">
+          <div class="flex items-baseline justify-center sm:justify-start gap-1">
             <span id="duel-score-vermell" class="text-2xl sm:text-3xl lg:text-4xl font-black font-mono text-slate-900 dark:text-white">0</span>
             <span class="text-[10px] font-bold uppercase text-slate-400">punts</span>
           </div>
@@ -3071,7 +3075,7 @@
         const clauComm = generarClauCommutativaLocal(rawExpr);
         if (duelState.usedCanonics.has(canonic) || duelState.usedCanonics.has(clauComm)) {
           triggerShakeDuelDisplay();
-          return showToast("Aquesta operació ja ha estat cremada en aquest duel!", "warning");
+          return showToast("Les fórmules no es poden repetir!", "warning");
         }
 
         const digitsUsats = numTokens.length;
