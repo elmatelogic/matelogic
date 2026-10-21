@@ -1319,6 +1319,9 @@
     let duelConn = null;
     let duelRoomCode = "";
     let duelRole = null;
+    let duelWakeLock = null;
+    let duelPingInterval = null;
+    let duelDisconnectTimeout = null;
 
     let duelState = {
       active: false,
@@ -1350,6 +1353,87 @@
       const [y, m, d] = LOCAL_DATE_FORMATTER.format(new Date()).split('-');
       return `${d}/${m}/${y.slice(-2)}`;
     }
+
+    async function requestDuelWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          if (duelWakeLock) return;
+          duelWakeLock = await navigator.wakeLock.request('screen');
+          duelWakeLock.addEventListener('release', () => {
+            duelWakeLock = null;
+          });
+        } catch (e) {}
+      }
+    }
+
+    function releaseDuelWakeLock() {
+      if (duelWakeLock) {
+        try {
+          duelWakeLock.release();
+          duelWakeLock = null;
+        } catch (e) {}
+      }
+    }
+
+    function startDuelHeartbeat() {
+      stopDuelHeartbeat();
+      duelPingInterval = setInterval(() => {
+        if (duelConn && duelConn.open) {
+          try { duelConn.send({ type: 'PING' }); } catch (e) {}
+        }
+      }, 5000);
+    }
+
+    function stopDuelHeartbeat() {
+      if (duelPingInterval) {
+        clearInterval(duelPingInterval);
+        duelPingInterval = null;
+      }
+    }
+
+    function clearDisconnectGraceTimer() {
+      if (duelDisconnectTimeout) {
+        clearTimeout(duelDisconnectTimeout);
+        duelDisconnectTimeout = null;
+      }
+    }
+
+    function reconnectGuestToHost() {
+      if (!duelRoomCode || duelRole !== 'guest') return;
+      if (duelPeer && !duelPeer.destroyed && !duelPeer.disconnected) {
+        try {
+          duelConn = duelPeer.connect(`matelogic-room-${duelRoomCode}`, { reliable: true });
+          setupDuelConnectionHandlers();
+          return;
+        } catch (e) {}
+      }
+      try { if (duelPeer) duelPeer.destroy(); } catch (e) {}
+      duelPeer = new Peer();
+      duelPeer.on('open', () => {
+        duelConn = duelPeer.connect(`matelogic-room-${duelRoomCode}`, { reliable: true });
+        setupDuelConnectionHandlers();
+      });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (duelState.active || duelRoomCode) {
+          requestDuelWakeLock();
+        }
+        if (duelRoomCode && duelRole) {
+          if (duelPeer && duelPeer.disconnected && !duelPeer.destroyed) {
+            try { duelPeer.reconnect(); } catch (e) {}
+          }
+          if (duelRole === 'guest' && (!duelConn || !duelConn.open)) {
+            reconnectGuestToHost();
+          }
+        } else if (DAILY_GAME && !duelState.active) {
+          if (DAILY_GAME.data !== getCurrentMadridDateShort()) {
+            initUI();
+          }
+        }
+      }
+    });
 
     function saveTokensSession() {
       try {
@@ -1539,14 +1623,6 @@
         }
       } catch (e) {}
     }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && DAILY_GAME && !duelState.active) {
-        if (DAILY_GAME.data !== getCurrentMadridDateShort()) {
-          initUI();
-        }
-      }
-    });
 
     function triggerShakeDisplay() {
       const displayEl = document.getElementById('display-container');
@@ -2466,6 +2542,9 @@
     }
 
     function cleanupDuelPeer() {
+      stopDuelHeartbeat();
+      clearDisconnectGraceTimer();
+      releaseDuelWakeLock();
       try {
         if (duelConn) {
           duelConn.close();
@@ -2487,6 +2566,7 @@
         return showToast("No s'ha pogut carregar el sistema de sales", "error");
       }
       cleanupDuelPeer();
+      requestDuelWakeLock();
 
       duelRoomCode = generateSecureRoomCode();
       duelRole = 'host';
@@ -2515,7 +2595,7 @@
       });
 
       duelPeer.on('connection', (conn) => {
-        if (duelConn && duelConn.open) {
+        if (duelConn && duelConn.open && !duelDisconnectTimeout) {
           conn.on('open', () => {
             conn.send({ type: 'ROOM_FULL' });
             setTimeout(() => conn.close(), 300);
@@ -2526,10 +2606,18 @@
         setupDuelConnectionHandlers();
       });
 
+      duelPeer.on('disconnected', () => {
+        if (duelPeer && !duelPeer.destroyed) {
+          try { duelPeer.reconnect(); } catch (e) {}
+        }
+      });
+
       duelPeer.on('error', (err) => {
         console.error("PeerHost error:", err);
-        showToast("Error de connexió amb la sala", "error");
-        cancelRemoteLobby();
+        if (!duelState.active) {
+          showToast("Error de connexió amb la sala", "error");
+          cancelRemoteLobby();
+        }
       });
     }
 
@@ -2549,6 +2637,8 @@
       }
 
       cleanupDuelPeer();
+      requestDuelWakeLock();
+
       duelRoomCode = cleanCode;
       duelRole = 'guest';
 
@@ -2572,8 +2662,10 @@
           joinBtn.disabled = false;
           joinBtn.textContent = "Entra";
         }
-        showToast("No s'ha trobat cap sala activa amb aquest codi", "error");
-        cleanupDuelPeer();
+        if (!duelState.active) {
+          showToast("No s'ha trobat cap sala activa amb aquest codi", "error");
+          cleanupDuelPeer();
+        }
       });
     }
 
@@ -2585,6 +2677,9 @@
       });
 
       duelConn.on('open', () => {
+        clearDisconnectGraceTimer();
+        startDuelHeartbeat();
+
         const joinBtn = document.getElementById('duel-join-btn');
         if (joinBtn) {
           joinBtn.disabled = false;
@@ -2592,17 +2687,31 @@
         }
 
         if (duelRole === 'guest') {
-          showToast("Connectat a la sala! Sincronitzant partida...", "success");
-          duelConn.send({ type: 'GUEST_READY' });
+          if (!duelState.active) {
+            showToast("Connectat a la sala! Sincronitzant partida...", "success");
+          }
+          duelConn.send({ type: 'GUEST_READY', isReconnect: duelState.active });
         }
       });
 
       duelConn.on('close', () => {
+        stopDuelHeartbeat();
         if (duelState.active && duelState.isRemote) {
-          showToast("L'altre jugador/a s'ha desconnectat de la sala", "warning");
-          exitDuel();
-        } else {
-          cleanupDuelPeer();
+          showToast("Connexió en pausa. Esperant que torni el rival (20s)...", "warning");
+          if (duelRole === 'guest') {
+            setTimeout(() => {
+              if (duelState.active && (!duelConn || !duelConn.open)) {
+                reconnectGuestToHost();
+              }
+            }, 1500);
+          }
+          clearDisconnectGraceTimer();
+          duelDisconnectTimeout = setTimeout(() => {
+            if (duelState.active && (!duelConn || !duelConn.open)) {
+              showToast("L'altre jugador/a s'ha desconnectat de la sala", "error");
+              exitDuel(false);
+            }
+          }, 20000);
         }
       });
     }
@@ -2618,6 +2727,11 @@
     function handleRemoteDuelMessage(data) {
       if (!data || !data.type) return;
 
+      if (data.type === 'PING') {
+        clearDisconnectGraceTimer();
+        return;
+      }
+
       if (data.type === 'ROOM_FULL') {
         showToast("Aquesta sala ja està plena (2/2)!", "error");
         cleanupDuelPeer();
@@ -2625,14 +2739,61 @@
       }
 
       if (data.type === 'GUEST_READY') {
-        if (duelRole === 'host' && !duelState.active) {
-          showToast("Jugador/a connectat! Iniciant duel...", "success");
-          startDuelGame();
+        clearDisconnectGraceTimer();
+        if (duelRole === 'host') {
+          if (!duelState.active) {
+            showToast("Jugador/a connectat! Iniciant duel...", "success");
+            startDuelGame();
+          } else {
+            showToast("El rival s'ha reconnectat!", "success");
+            const remainingSec = duelConfig.temps > 0 ? Math.max(1, Math.ceil((duelTurnDeadline - Date.now()) / 1000)) : 0;
+            sendDuelRemoteMessage({
+              type: 'FULL_SYNC',
+              config: duelConfig,
+              gameData: duelState.game,
+              ruscTitle: duelState.ruscTitle,
+              turn: duelState.turn,
+              blau: duelState.blau,
+              vermell: duelState.vermell,
+              usedCanonics: Array.from(duelState.usedCanonics),
+              tokens: duelState.tokens,
+              cursorIndex: duelState.cursorIndex,
+              outer: duelState.outer,
+              remainingSec: remainingSec
+            });
+          }
         }
         return;
       }
 
+      if (data.type === 'FULL_SYNC') {
+        clearDisconnectGraceTimer();
+        duelConfig.temps = data.config.temps;
+        duelConfig.rondes = data.config.rondes;
+        duelConfig.rusc = data.config.rusc;
+        if (!duelState.active) {
+          startDuelGame(data.gameData, data.ruscTitle);
+        }
+        duelState.turn = data.turn;
+        duelState.blau = data.blau;
+        duelState.vermell = data.vermell;
+        duelState.usedCanonics = new Set(data.usedCanonics || []);
+        updateDuelScoreboard();
+        startDuelTurn();
+        duelState.tokens = data.tokens || [];
+        duelState.cursorIndex = data.cursorIndex || 0;
+        duelState.outer = data.outer || [...duelState.game.outer];
+        renderDuelHexagons();
+        updateDuelDisplay();
+        if (duelConfig.temps > 0 && data.remainingSec > 0) {
+          duelTurnDeadline = Date.now() + (data.remainingSec * 1000);
+        }
+        showToast("Connexió restablerta!", "success");
+        return;
+      }
+
       if (data.type === 'INIT_MATCH') {
+        clearDisconnectGraceTimer();
         duelConfig.temps = data.config.temps;
         duelConfig.rondes = data.config.rondes;
         duelConfig.rusc = data.config.rusc;
@@ -2687,6 +2848,12 @@
         const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
         showToast(esUltimTorn ? "Temps esgotat! Fi del duel!" : "Temps esgotat! Canvi de torn", "warning");
         advanceDuelTurn();
+        return;
+      }
+
+      if (data.type === 'EXIT_MATCH') {
+        showToast("El rival ha sortit de la sala", "warning");
+        exitDuel(false);
         return;
       }
 
@@ -2862,6 +3029,7 @@
       }
       document.getElementById('duel-winner-modal').classList.add('hidden');
       if (duelState.isRemote) {
+        sendDuelRemoteMessage({ type: 'EXIT_MATCH' });
         cleanupDuelPeer();
         duelState.isRemote = false;
       }
@@ -2940,6 +3108,7 @@
     function startDuelGame(forcedGameData = null, forcedTitle = null) {
       stopDuelTimer();
       pausedRemainingMs = null;
+      requestDuelWakeLock();
 
       const isRemoteMatch = !!(duelConn && duelConn.open);
       let gameData;
@@ -3168,7 +3337,10 @@
       }
     }
 
-    function exitDuel() {
+    function exitDuel(notifyRemote = true) {
+      if (notifyRemote && duelState.isRemote) {
+        sendDuelRemoteMessage({ type: 'EXIT_MATCH' });
+      }
       stopDuelTimer();
       pausedRemainingMs = null;
       cleanupDuelPeer();
