@@ -633,7 +633,7 @@
           </button>
         </div>
 
-        <div id="duel- interactive-pad" class="w-full flex flex-col items-center transition-opacity duration-200">
+        <div id="duel-interactive-pad" class="w-full flex flex-col items-center transition-opacity duration-200">
           <div class="honeycomb-grid my-1.5 select-none">
             <div class="hex-row">
               <button id="duel-hex-0" onclick="handleDuelHexClick(0)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
@@ -1318,7 +1318,7 @@
     let duelPeer = null;
     let duelConn = null;
     let duelRoomCode = "";
-    let duelRole = null; // 'host' (Equip Blau) | 'guest' (Equip Vermell) | null
+    let duelRole = null;
 
     let duelState = {
       active: false,
@@ -2580,6 +2580,10 @@
     function setupDuelConnectionHandlers() {
       if (!duelConn) return;
 
+      duelConn.on('data', (data) => {
+        handleRemoteDuelMessage(data);
+      });
+
       duelConn.on('open', () => {
         const joinBtn = document.getElementById('duel-join-btn');
         if (joinBtn) {
@@ -2587,16 +2591,10 @@
           joinBtn.textContent = "Entra";
         }
 
-        if (duelRole === 'host') {
-          showToast("Jugador/a connectat! Iniciant duel...", "success");
-          startDuelGame();
-        } else {
-          showToast("Connectat a la sala! Esperant l'amfitrió...", "success");
+        if (duelRole === 'guest') {
+          showToast("Connectat a la sala! Sincronitzant partida...", "success");
+          duelConn.send({ type: 'GUEST_READY' });
         }
-      });
-
-      duelConn.on('data', (data) => {
-        handleRemoteDuelMessage(data);
       });
 
       duelConn.on('close', () => {
@@ -2610,7 +2608,7 @@
     }
 
     function sendDuelRemoteMessage(payload) {
-      if (duelState.isRemote && duelConn && duelConn.open) {
+      if (duelConn && duelConn.open) {
         try {
           duelConn.send(payload);
         } catch (e) {}
@@ -2623,6 +2621,14 @@
       if (data.type === 'ROOM_FULL') {
         showToast("Aquesta sala ja està plena (2/2)!", "error");
         cleanupDuelPeer();
+        return;
+      }
+
+      if (data.type === 'GUEST_READY') {
+        if (duelRole === 'host' && !duelState.active) {
+          showToast("Jugador/a connectat! Iniciant duel...", "success");
+          startDuelGame();
+        }
         return;
       }
 
@@ -2736,7 +2742,7 @@
     }
 
     function updateDuelInteractiveLockUI() {
-      const pad = document.getElementById('duel- interactive-pad');
+      const pad = document.getElementById('duel-interactive-pad');
       const leftBtn = document.getElementById('duel-cursor-left-btn');
       const rightBtn = document.getElementById('duel-cursor-right-btn');
       const hint = document.getElementById('duel-bottom-hint');
@@ -2953,15 +2959,6 @@
         gameData = generarRuscAleatoriLocal();
       }
 
-      if (isRemoteMatch && duelRole === 'host') {
-        sendDuelRemoteMessage({
-          type: 'INIT_MATCH',
-          config: duelConfig,
-          gameData: gameData,
-          ruscTitle: ruscTitle
-        });
-      }
-
       duelState = {
         active: true,
         isRemote: isRemoteMatch,
@@ -2980,6 +2977,15 @@
         cursorIndex: 0,
         usedNumbers: new Set()
       };
+
+      if (isRemoteMatch && duelRole === 'host') {
+        sendDuelRemoteMessage({
+          type: 'INIT_MATCH',
+          config: duelConfig,
+          gameData: gameData,
+          ruscTitle: ruscTitle
+        });
+      }
 
       document.getElementById('duel-setup-modal').classList.add('hidden');
       document.getElementById('duel-winner-modal').classList.add('hidden');
