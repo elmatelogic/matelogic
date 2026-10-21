@@ -56,7 +56,6 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "bb0b0097461a42fdbd85c4b1dd787d6e"}'></script>
@@ -442,7 +441,7 @@
   </main>
 
   <div id="duel-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3.5 max-h-[92vh] overflow-y-auto animate-pop border border-slate-200/80 dark:border-slate-700/80">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-4 animate-pop border border-slate-200/80 dark:border-slate-700/80">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
         <div class="flex items-center gap-2">
           <div class="w-7 h-7 rounded-full bg-red-50 dark:bg-red-950/50 flex items-center justify-center text-brand-red">
@@ -455,58 +454,14 @@
         <button onclick="closeModal('duel-setup-modal')" aria-label="Tancar" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
 
-      <div id="duel-mode-tabs" class="bg-slate-100 dark:bg-slate-900/60 p-1 rounded-2xl grid grid-cols-2 gap-1 text-xs font-bold border border-slate-200/80 dark:border-slate-700/70">
-        <button id="duel-tab-local" type="button" onclick="setDuelMode('local')" class="py-2 px-2 rounded-xl bg-brand-red text-white font-bold shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-          <span>📱</span>
-          <span class="truncate">Compartint dispositiu</span>
-        </button>
-        <button id="duel-tab-remote" type="button" onclick="setDuelMode('remote')" class="py-2 px-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-          <span>🌐</span>
-          <span class="truncate">Dispositius diferents</span>
-        </button>
-      </div>
-
-      <div id="duel-remote-join-box" class="hidden bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 text-xs">
-        <span class="font-bold text-slate-700 dark:text-slate-300 block mb-2 uppercase tracking-wider text-[10px]">🔑 Tens el codi d'una sala?</span>
-        <div class="flex gap-1.5">
-          <input id="duel-join-input" type="text" maxlength="9" placeholder="XXXX-XXXX" oninput="formatRoomCodeInput(this)" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono font-bold text-sm uppercase tracking-widest text-center text-slate-900 dark:text-white focus:outline-none focus:border-brand-red">
-          <button id="duel-join-btn" type="button" onclick="joinRemoteRoom()" class="px-4 py-2 rounded-xl bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white font-bold text-xs shrink-0 transition-all active:scale-95 cursor-pointer">
-            Entra
-          </button>
-        </div>
-      </div>
-
-      <div id="duel-remote-lobby-box" class="hidden bg-slate-50 dark:bg-slate-900/60 rounded-2xl border-2 border-dashed border-brand-red/50 p-4 text-center flex-col items-center gap-3">
-        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Codi de la sala (8 caràcters)</span>
-        <div id="duel-room-code-display" class="text-2xl sm:text-3xl font-black font-mono tracking-widest text-brand-red bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs select-all">
-          ---- - ----
-        </div>
-        <div class="w-full flex flex-col gap-2">
-          <button type="button" onclick="shareRemoteRoomLink()" class="key-3d w-full py-2.5 px-3 rounded-xl bg-brand-red text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-            <span>Comparteix l'enllaç directe</span>
-          </button>
-          <button type="button" onclick="copyRemoteRoomCode()" class="w-full py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-            Copia només el codi
-          </button>
-        </div>
-        <div class="flex items-center justify-center gap-2 text-[11px] font-semibold text-amber-600 dark:text-amber-400 pt-1">
-          <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-          <span id="duel-lobby-status-text">Esperant l'altre jugador/a (1/2)...</span>
-        </div>
-        <button type="button" onclick="cancelRemoteLobby()" class="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline cursor-pointer">
-          Cancel·la la sala
-        </button>
-      </div>
-
-      <div id="duel-config-options-box" class="space-y-3 text-xs">
+      <div class="space-y-3 text-xs">
         <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3">
           <span class="font-bold text-slate-700 dark:text-slate-300 block mb-2 uppercase tracking-wider text-[10px]">🎯 Tria del rusc</span>
           <div class="grid grid-cols-2 gap-2">
-            <button id="duel-opt-rusc-avui" type="button" onclick="setDuelRusc('avui')" class="py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all cursor-pointer">
+            <button id="duel-opt-rusc-avui" onclick="setDuelRusc('avui')" class="py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all">
               Repte d'avui
             </button>
-            <button id="duel-opt-rusc-atzar" type="button" onclick="setDuelRusc('atzar')" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all cursor-pointer">
+            <button id="duel-opt-rusc-atzar" onclick="setDuelRusc('atzar')" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all">
               Rusc a l'atzar
             </button>
           </div>
@@ -515,28 +470,28 @@
         <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3">
           <span class="font-bold text-slate-700 dark:text-slate-300 block mb-2 uppercase tracking-wider text-[10px]">⏱️ Temps per torn</span>
           <div class="grid grid-cols-4 gap-1.5">
-            <button id="duel-opt-temps-30" type="button" onclick="setDuelTemps(30)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-bold text-xs transition-all cursor-pointer">30s</button>
-            <button id="duel-opt-temps-45" type="button" onclick="setDuelTemps(45)" class="py-2 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-mono font-bold text-xs transition-all cursor-pointer">45s</button>
-            <button id="duel-opt-temps-60" type="button" onclick="setDuelTemps(60)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-bold text-xs transition-all cursor-pointer">60s</button>
-            <button id="duel-opt-temps-0" type="button" onclick="setDuelTemps(0)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[11px] transition-all cursor-pointer">Sense</button>
+            <button id="duel-opt-temps-30" onclick="setDuelTemps(30)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-bold text-xs transition-all">30s</button>
+            <button id="duel-opt-temps-45" onclick="setDuelTemps(45)" class="py-2 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-mono font-bold text-xs transition-all">45s</button>
+            <button id="duel-opt-temps-60" onclick="setDuelTemps(60)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-bold text-xs transition-all">60s</button>
+            <button id="duel-opt-temps-0" onclick="setDuelTemps(0)" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[11px] transition-all">Sense</button>
           </div>
         </div>
 
         <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3">
           <span class="font-bold text-slate-700 dark:text-slate-300 block mb-2 uppercase tracking-wider text-[10px]">🏁 Durada del duel</span>
           <div class="grid grid-cols-2 gap-2">
-            <button id="duel-opt-rondes-3" type="button" onclick="setDuelRondes(3)" class="py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all cursor-pointer">
+            <button id="duel-opt-rondes-3" onclick="setDuelRondes(3)" class="py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all">
               3 rondes
             </button>
-            <button id="duel-opt-rondes-5" type="button" onclick="setDuelRondes(5)" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all cursor-pointer">
+            <button id="duel-opt-rondes-5" onclick="setDuelRondes(5)" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all">
               5 rondes
             </button>
           </div>
         </div>
       </div>
 
-      <div id="duel-setup-footer" class="flex flex-col gap-2 pt-1">
-        <button id="duel-primary-action-btn" type="button" onclick="handleDuelPrimaryAction(event)" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md transition-all cursor-pointer">
+      <div class="flex flex-col gap-2 pt-1">
+        <button onclick="restartDuelGame(event)" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md transition-all">
           Comença el Duel
         </button>
         <span class="text-[10px] text-slate-400 text-center">Joc per equips sense propietat commutativa</span>
@@ -551,12 +506,9 @@
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
           <span>Surt del duel</span>
         </button>
-        <button id="duel-header-settings-btn" onclick="openDuelSetup()" aria-label="Configuració del duel" title="Canvia opcions del duel" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <button onclick="openDuelSetup()" aria-label="Configuració del duel" title="Canvia opcions del duel" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
         </button>
-        <span id="duel-remote-room-pill" class="hidden px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-[10px]">
-          Sala: ----
-        </span>
       </div>
 
       <div class="flex items-center select-none py-0.5">
@@ -572,7 +524,7 @@
           <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-1 mb-1.5 text-center sm:text-left">
             <div class="flex items-center justify-center sm:justify-start gap-1.5">
               <span class="w-2.5 h-2.5 rounded-full bg-brand-blue shrink-0"></span>
-              <span id="duel-name-blau" class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">Equip Blau</span>
+              <span class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">Equip Blau</span>
             </div>
             <span id="duel-badge-turn-blau" class="hidden text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/80 text-brand-blueDark dark:text-brand-blue text-center inline-flex items-center justify-center whitespace-nowrap mx-auto sm:mx-0">Torn actiu</span>
           </div>
@@ -620,7 +572,7 @@
         </div>
 
         <div class="w-full relative mt-0.5 flex items-center gap-1">
-          <button id="duel-cursor-left-btn" onclick="moveDuelCursor(-1)" aria-label="Moure cursor a l'esquerra" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
+          <button onclick="moveDuelCursor(-1)" aria-label="Moure cursor a l'esquerra" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
             ‹
           </button>
 
@@ -628,56 +580,54 @@
             <div id="duel-display-tokens" class="flex items-center min-w-full justify-center transition-all"></div>
           </div>
 
-          <button id="duel-cursor-right-btn" onclick="moveDuelCursor(1)" aria-label="Moure cursor a la dreta" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
+          <button onclick="moveDuelCursor(1)" aria-label="Moure cursor a la dreta" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
             ›
           </button>
         </div>
 
-        <div id="duel-interactive-pad" class="w-full flex flex-col items-center transition-opacity duration-200">
-          <div class="honeycomb-grid my-1.5 select-none">
-            <div class="hex-row">
-              <button id="duel-hex-0" onclick="handleDuelHexClick(0)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-              <button id="duel-hex-1" onclick="handleDuelHexClick(1)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-            </div>
-            <div class="hex-row hex-row-offset z-10">
-              <button id="duel-hex-2" onclick="handleDuelHexClick(2)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-              <button id="duel-hex-center" onclick="handleDuelHexCenterClick()" class="hex-cell hex-cell-red w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">
-                <span id="duel-center-val">-</span>
-              </button>
-              <button id="duel-hex-3" onclick="handleDuelHexClick(3)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-            </div>
-            <div class="hex-row">
-              <button id="duel-hex-4" onclick="handleDuelHexClick(4)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-              <button id="duel-hex-5" onclick="handleDuelHexClick(5)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-            </div>
+        <div class="honeycomb-grid my-1.5 select-none">
+          <div class="hex-row">
+            <button id="duel-hex-0" onclick="handleDuelHexClick(0)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-1" onclick="handleDuelHexClick(1)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
           </div>
-
-          <div class="w-full grid grid-cols-6 gap-1.5 max-w-sm mt-0.5">
-            <button onclick="appendDuelChar('+')" aria-label="Sumar" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">+</button>
-            <button onclick="appendDuelChar('−')" aria-label="Restar" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">−</button>
-            <button onclick="appendDuelChar('×')" aria-label="Multiplicar" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">×</button>
-            <button onclick="appendDuelChar('÷')" aria-label="Dividir" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">÷</button>
-            <button onclick="appendDuelChar('(')" aria-label="Obrir parèntesi" class="key-3d h-11 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-mono font-bold text-lg rounded-xl flex items-center justify-center">(</button>
-            <button onclick="appendDuelChar(')')" aria-label="Tancar parèntesi" class="key-3d h-11 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-mono font-bold text-lg rounded-xl flex items-center justify-center">)</button>
+          <div class="hex-row hex-row-offset z-10">
+            <button id="duel-hex-2" onclick="handleDuelHexClick(2)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-center" onclick="handleDuelHexCenterClick()" class="hex-cell hex-cell-red w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">
+              <span id="duel-center-val">-</span>
+            </button>
+            <button id="duel-hex-3" onclick="handleDuelHexClick(3)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
           </div>
-
-          <div class="w-full grid grid-cols-4 gap-2 max-w-sm mt-2">
-            <button id="duel-delete-btn" aria-label="Suprimeix" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs sm:text-sm rounded-full active:scale-95 transition-all">
-              Suprimeix
-            </button>
-            <button onclick="shuffleDuelHexagons()" aria-label="Barrejar les xifres" title="Barreja les xifres (Espai)" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center">
-              <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-            </button>
-            <button onclick="duelPassTurn()" aria-label="Passar el torn" class="key-3d h-12 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs sm:text-sm rounded-full active:scale-95 transition-all">
-              Passa
-            </button>
-            <button onclick="submitDuelTurn()" aria-label="Introdueix l'operació" class="key-3d h-12 bg-brand-red text-white font-bold text-xs sm:text-sm rounded-full shadow-md">
-              Introdueix
-            </button>
+          <div class="hex-row">
+            <button id="duel-hex-4" onclick="handleDuelHexClick(4)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-5" onclick="handleDuelHexClick(5)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
           </div>
         </div>
 
-        <p id="duel-bottom-hint" class="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-1">
+        <div class="w-full grid grid-cols-6 gap-1.5 max-w-sm mt-0.5">
+          <button onclick="appendDuelChar('+')" aria-label="Sumar" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">+</button>
+          <button onclick="appendDuelChar('−')" aria-label="Restar" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">−</button>
+          <button onclick="appendDuelChar('×')" aria-label="Multiplicar" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">×</button>
+          <button onclick="appendDuelChar('÷')" aria-label="Dividir" class="key-3d h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-mono font-bold text-xl rounded-xl flex items-center justify-center">÷</button>
+          <button onclick="appendDuelChar('(')" aria-label="Obrir parèntesi" class="key-3d h-11 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-mono font-bold text-lg rounded-xl flex items-center justify-center">(</button>
+          <button onclick="appendDuelChar(')')" aria-label="Tancar parèntesi" class="key-3d h-11 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-mono font-bold text-lg rounded-xl flex items-center justify-center">)</button>
+        </div>
+
+        <div class="w-full grid grid-cols-4 gap-2 max-w-sm mt-1">
+          <button id="duel-delete-btn" aria-label="Suprimeix" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs sm:text-sm rounded-full active:scale-95 transition-all">
+            Suprimeix
+          </button>
+          <button onclick="shuffleDuelHexagons()" aria-label="Barrejar les xifres" title="Barreja les xifres (Espai)" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+          <button onclick="duelPassTurn()" aria-label="Passar el torn" class="key-3d h-12 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs sm:text-sm rounded-full active:scale-95 transition-all">
+            Passa
+          </button>
+          <button onclick="submitDuelTurn()" aria-label="Introdueix l'operació" class="key-3d h-12 bg-brand-red text-white font-bold text-xs sm:text-sm rounded-full shadow-md">
+            Introdueix
+          </button>
+        </div>
+
+        <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-1">
           Joc per equips sense propietat commutativa.
         </p>
       </div>
@@ -687,7 +637,7 @@
           <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-1 mb-1.5 text-center sm:text-left">
             <div class="flex items-center justify-center sm:justify-start gap-1.5">
               <span class="w-2.5 h-2.5 rounded-full bg-brand-red shrink-0"></span>
-              <span id="duel-name-vermell" class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">Equip Vermell</span>
+              <span class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">Equip Vermell</span>
             </div>
             <span id="duel-badge-turn-vermell" class="hidden text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/80 text-brand-red text-center inline-flex items-center justify-center whitespace-nowrap mx-auto sm:mx-0">Torn actiu</span>
           </div>
@@ -733,10 +683,10 @@
       </div>
 
       <div class="flex flex-col gap-2 mt-1">
-        <button id="duel-winner-replay-btn" type="button" onclick="restartDuelGame(event)" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md">
+        <button type="button" onclick="restartDuelGame(event)" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md">
           Torna a jugar
         </button>
-        <button id="duel-winner-config-btn" type="button" onclick="changeDuelConfigFromWinner(event)" class="w-full py-2.5 rounded-full bg-slate-100 dark:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200">
+        <button type="button" onclick="changeDuelConfigFromWinner(event)" class="w-full py-2.5 rounded-full bg-slate-100 dark:bg-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200">
           Canvia la configuració
         </button>
         <button type="button" onclick="exitDuelFromWinner(event)" class="text-xs text-slate-400 hover:underline mt-1">
@@ -1310,24 +1260,13 @@
     let countdownInterval = null;
     let eventsInitialized = false;
 
-    let duelConfig = { mode: 'local', rusc: 'avui', temps: 45, rondes: 3 };
+    let duelConfig = { rusc: 'avui', temps: 45, rondes: 3 };
     let duelTimerId = null;
     let duelTurnDeadline = 0;
     let pausedRemainingMs = null;
-
-    let duelPeer = null;
-    let duelConn = null;
-    let duelRoomCode = "";
-    let duelRole = null;
-    let duelWakeLock = null;
-    let duelPingInterval = null;
-    let duelDisconnectTimeout = null;
-
     let duelState = {
       active: false,
-      isRemote: false,
       game: null,
-      ruscTitle: "Mode 2 jugadors/es",
       outer: [],
       turn: 0,
       totalTurns: 6,
@@ -1353,87 +1292,6 @@
       const [y, m, d] = LOCAL_DATE_FORMATTER.format(new Date()).split('-');
       return `${d}/${m}/${y.slice(-2)}`;
     }
-
-    async function requestDuelWakeLock() {
-      if ('wakeLock' in navigator) {
-        try {
-          if (duelWakeLock) return;
-          duelWakeLock = await navigator.wakeLock.request('screen');
-          duelWakeLock.addEventListener('release', () => {
-            duelWakeLock = null;
-          });
-        } catch (e) {}
-      }
-    }
-
-    function releaseDuelWakeLock() {
-      if (duelWakeLock) {
-        try {
-          duelWakeLock.release();
-          duelWakeLock = null;
-        } catch (e) {}
-      }
-    }
-
-    function startDuelHeartbeat() {
-      stopDuelHeartbeat();
-      duelPingInterval = setInterval(() => {
-        if (duelConn && duelConn.open) {
-          try { duelConn.send({ type: 'PING' }); } catch (e) {}
-        }
-      }, 5000);
-    }
-
-    function stopDuelHeartbeat() {
-      if (duelPingInterval) {
-        clearInterval(duelPingInterval);
-        duelPingInterval = null;
-      }
-    }
-
-    function clearDisconnectGraceTimer() {
-      if (duelDisconnectTimeout) {
-        clearTimeout(duelDisconnectTimeout);
-        duelDisconnectTimeout = null;
-      }
-    }
-
-    function reconnectGuestToHost() {
-      if (!duelRoomCode || duelRole !== 'guest') return;
-      if (duelPeer && !duelPeer.destroyed && !duelPeer.disconnected) {
-        try {
-          duelConn = duelPeer.connect(`matelogic-room-${duelRoomCode}`, { reliable: true });
-          setupDuelConnectionHandlers();
-          return;
-        } catch (e) {}
-      }
-      try { if (duelPeer) duelPeer.destroy(); } catch (e) {}
-      duelPeer = new Peer();
-      duelPeer.on('open', () => {
-        duelConn = duelPeer.connect(`matelogic-room-${duelRoomCode}`, { reliable: true });
-        setupDuelConnectionHandlers();
-      });
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        if (duelState.active || duelRoomCode) {
-          requestDuelWakeLock();
-        }
-        if (duelRoomCode && duelRole) {
-          if (duelPeer && duelPeer.disconnected && !duelPeer.destroyed) {
-            try { duelPeer.reconnect(); } catch (e) {}
-          }
-          if (duelRole === 'guest' && (!duelConn || !duelConn.open)) {
-            reconnectGuestToHost();
-          }
-        } else if (DAILY_GAME && !duelState.active) {
-          if (DAILY_GAME.data !== getCurrentMadridDateShort()) {
-            initUI();
-          }
-        }
-      }
-    });
 
     function saveTokensSession() {
       try {
@@ -1597,7 +1455,6 @@
           setupDuelDeleteEvents();
           setupBackdropCloseEvents();
           eventsInitialized = true;
-          checkRoomUrlParam();
         }
       } catch (err) {
         console.error("Error initUI:", err);
@@ -1605,24 +1462,13 @@
       }
     }
 
-    function checkRoomUrlParam() {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const rawSala = params.get('sala');
-        if (!rawSala) return;
-        const cleanCode = rawSala.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 8);
-        if (cleanCode.length === 8) {
-          window.history.replaceState({}, document.title, window.location.pathname);
-          openDuelSetup();
-          setDuelMode('remote');
-          const input = document.getElementById('duel-join-input');
-          if (input) {
-            input.value = `${cleanCode.slice(0, 4)}-${cleanCode.slice(4, 8)}`;
-            setTimeout(() => joinRemoteRoom(), 250);
-          }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && DAILY_GAME && !duelState.active) {
+        if (DAILY_GAME.data !== getCurrentMadridDateShort()) {
+          initUI();
         }
-      } catch (e) {}
-    }
+      }
+    });
 
     function triggerShakeDisplay() {
       const displayEl = document.getElementById('display-container');
@@ -2043,7 +1889,6 @@
       }
 
       if (duelState.active) {
-        if (!canInteractDuel()) return;
         if (e.key === 'Backspace' || e.key === 'Delete') {
           e.preventDefault();
           if (e.repeat) {
@@ -2447,9 +2292,6 @@
         clearInterval(countdownInterval);
         countdownInterval = null;
       }
-      if (id === 'duel-setup-modal' && !duelState.active && duelPeer) {
-        cleanupDuelPeer();
-      }
       document.getElementById(id).classList.add('hidden');
       if (id === 'duel-setup-modal' && duelState.active && pausedRemainingMs !== null) {
         resumeDuelTimer();
@@ -2464,485 +2306,6 @@
       if (duelState && duelState.timerInterval) {
         clearInterval(duelState.timerInterval);
         duelState.timerInterval = null;
-      }
-    }
-
-    function generateSecureRoomCode() {
-      const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-      const arr = new Uint8Array(8);
-      if (window.crypto && window.crypto.getRandomValues) {
-        window.crypto.getRandomValues(arr);
-      } else {
-        for (let i = 0; i < 8; i++) arr[i] = Math.floor(Math.random() * 256);
-      }
-      let out = '';
-      for (let i = 0; i < 8; i++) {
-        out += chars[arr[i] % chars.length];
-      }
-      return out;
-    }
-
-    function formatRoomCodeDisplay(code) {
-      const clean = (code || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 8);
-      if (clean.length <= 4) return clean;
-      return `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
-    }
-
-    function formatRoomCodeInput(inputEl) {
-      const clean = inputEl.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 8);
-      if (clean.length > 4) {
-        inputEl.value = `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
-      } else {
-        inputEl.value = clean;
-      }
-    }
-
-    function setDuelMode(mode) {
-      duelConfig.mode = mode;
-      const tabLocal = document.getElementById('duel-tab-local');
-      const tabRemote = document.getElementById('duel-tab-remote');
-      const joinBox = document.getElementById('duel-remote-join-box');
-      const lobbyBox = document.getElementById('duel-remote-lobby-box');
-      const configBox = document.getElementById('duel-config-options-box');
-      const footerBox = document.getElementById('duel-setup-footer');
-      const primaryBtn = document.getElementById('duel-primary-action-btn');
-
-      const activeTabCls = "py-2 px-2 rounded-xl bg-brand-red text-white font-bold shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer";
-      const inactiveTabCls = "py-2 px-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer";
-
-      lobbyBox.classList.add('hidden');
-      lobbyBox.classList.remove('flex');
-      configBox.classList.remove('hidden');
-      footerBox.classList.remove('hidden');
-
-      if (mode === 'local') {
-        cleanupDuelPeer();
-        tabLocal.className = activeTabCls;
-        tabRemote.className = inactiveTabCls;
-        joinBox.classList.add('hidden');
-        primaryBtn.textContent = "Comença el Duel";
-      } else {
-        tabRemote.className = activeTabCls;
-        tabLocal.className = inactiveTabCls;
-        joinBox.classList.remove('hidden');
-        primaryBtn.textContent = "Crea la sala per compartir-ho";
-      }
-    }
-
-    function handleDuelPrimaryAction(e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-      if (duelConfig.mode === 'remote') {
-        createRemoteRoom();
-      } else {
-        startDuelGame();
-      }
-    }
-
-    function cleanupDuelPeer() {
-      stopDuelHeartbeat();
-      clearDisconnectGraceTimer();
-      releaseDuelWakeLock();
-      try {
-        if (duelConn) {
-          duelConn.close();
-          duelConn = null;
-        }
-      } catch (e) {}
-      try {
-        if (duelPeer) {
-          duelPeer.destroy();
-          duelPeer = null;
-        }
-      } catch (e) {}
-      duelRoomCode = "";
-      duelRole = null;
-    }
-
-    function createRemoteRoom() {
-      if (typeof Peer === 'undefined') {
-        return showToast("No s'ha pogut carregar el sistema de sales", "error");
-      }
-      cleanupDuelPeer();
-      requestDuelWakeLock();
-
-      duelRoomCode = generateSecureRoomCode();
-      duelRole = 'host';
-
-      const joinBox = document.getElementById('duel-remote-join-box');
-      const lobbyBox = document.getElementById('duel-remote-lobby-box');
-      const configBox = document.getElementById('duel-config-options-box');
-      const footerBox = document.getElementById('duel-setup-footer');
-      const codeDisplay = document.getElementById('duel-room-code-display');
-      const statusText = document.getElementById('duel-lobby-status-text');
-
-      joinBox.classList.add('hidden');
-      configBox.classList.add('hidden');
-      footerBox.classList.add('hidden');
-      lobbyBox.classList.remove('hidden');
-      lobbyBox.classList.add('flex');
-
-      codeDisplay.textContent = formatRoomCodeDisplay(duelRoomCode);
-      statusText.textContent = "Obrint sala segura...";
-
-      const peerId = `matelogic-room-${duelRoomCode}`;
-      duelPeer = new Peer(peerId);
-
-      duelPeer.on('open', () => {
-        statusText.textContent = "Esperant l'altre jugador/a (1/2)...";
-      });
-
-      duelPeer.on('connection', (conn) => {
-        if (duelConn && duelConn.open && !duelDisconnectTimeout) {
-          conn.on('open', () => {
-            conn.send({ type: 'ROOM_FULL' });
-            setTimeout(() => conn.close(), 300);
-          });
-          return;
-        }
-        duelConn = conn;
-        setupDuelConnectionHandlers();
-      });
-
-      duelPeer.on('disconnected', () => {
-        if (duelPeer && !duelPeer.destroyed) {
-          try { duelPeer.reconnect(); } catch (e) {}
-        }
-      });
-
-      duelPeer.on('error', (err) => {
-        console.error("PeerHost error:", err);
-        if (!duelState.active) {
-          showToast("Error de connexió amb la sala", "error");
-          cancelRemoteLobby();
-        }
-      });
-    }
-
-    function cancelRemoteLobby() {
-      cleanupDuelPeer();
-      setDuelMode('remote');
-    }
-
-    function joinRemoteRoom() {
-      if (typeof Peer === 'undefined') {
-        return showToast("No s'ha pogut carregar el sistema de sales", "error");
-      }
-      const input = document.getElementById('duel-join-input');
-      const cleanCode = (input ? input.value : '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-      if (cleanCode.length !== 8) {
-        return showToast("El codi ha de tenir 8 caràcters!", "warning");
-      }
-
-      cleanupDuelPeer();
-      requestDuelWakeLock();
-
-      duelRoomCode = cleanCode;
-      duelRole = 'guest';
-
-      const joinBtn = document.getElementById('duel-join-btn');
-      if (joinBtn) {
-        joinBtn.disabled = true;
-        joinBtn.textContent = "...";
-      }
-
-      duelPeer = new Peer();
-
-      duelPeer.on('open', () => {
-        const hostPeerId = `matelogic-room-${duelRoomCode}`;
-        duelConn = duelPeer.connect(hostPeerId, { reliable: true });
-        setupDuelConnectionHandlers();
-      });
-
-      duelPeer.on('error', (err) => {
-        console.error("PeerGuest error:", err);
-        if (joinBtn) {
-          joinBtn.disabled = false;
-          joinBtn.textContent = "Entra";
-        }
-        if (!duelState.active) {
-          showToast("No s'ha trobat cap sala activa amb aquest codi", "error");
-          cleanupDuelPeer();
-        }
-      });
-    }
-
-    function setupDuelConnectionHandlers() {
-      if (!duelConn) return;
-
-      duelConn.on('data', (data) => {
-        handleRemoteDuelMessage(data);
-      });
-
-      duelConn.on('open', () => {
-        clearDisconnectGraceTimer();
-        startDuelHeartbeat();
-
-        const joinBtn = document.getElementById('duel-join-btn');
-        if (joinBtn) {
-          joinBtn.disabled = false;
-          joinBtn.textContent = "Entra";
-        }
-
-        if (duelRole === 'guest') {
-          if (!duelState.active) {
-            showToast("Connectat a la sala! Sincronitzant partida...", "success");
-          }
-          duelConn.send({ type: 'GUEST_READY', isReconnect: duelState.active });
-        }
-      });
-
-      duelConn.on('close', () => {
-        stopDuelHeartbeat();
-        if (duelState.active && duelState.isRemote) {
-          showToast("Connexió en pausa. Esperant que torni el rival (20s)...", "warning");
-          if (duelRole === 'guest') {
-            setTimeout(() => {
-              if (duelState.active && (!duelConn || !duelConn.open)) {
-                reconnectGuestToHost();
-              }
-            }, 1500);
-          }
-          clearDisconnectGraceTimer();
-          duelDisconnectTimeout = setTimeout(() => {
-            if (duelState.active && (!duelConn || !duelConn.open)) {
-              showToast("L'altre jugador/a s'ha desconnectat de la sala", "error");
-              exitDuel(false);
-            }
-          }, 20000);
-        }
-      });
-    }
-
-    function sendDuelRemoteMessage(payload) {
-      if (duelConn && duelConn.open) {
-        try {
-          duelConn.send(payload);
-        } catch (e) {}
-      }
-    }
-
-    function handleRemoteDuelMessage(data) {
-      if (!data || !data.type) return;
-
-      if (data.type === 'PING') {
-        clearDisconnectGraceTimer();
-        return;
-      }
-
-      if (data.type === 'ROOM_FULL') {
-        showToast("Aquesta sala ja està plena (2/2)!", "error");
-        cleanupDuelPeer();
-        return;
-      }
-
-      if (data.type === 'GUEST_READY') {
-        clearDisconnectGraceTimer();
-        if (duelRole === 'host') {
-          if (!duelState.active) {
-            showToast("Jugador/a connectat! Iniciant duel...", "success");
-            startDuelGame();
-          } else {
-            showToast("El rival s'ha reconnectat!", "success");
-            const remainingSec = duelConfig.temps > 0 ? Math.max(1, Math.ceil((duelTurnDeadline - Date.now()) / 1000)) : 0;
-            sendDuelRemoteMessage({
-              type: 'FULL_SYNC',
-              config: duelConfig,
-              gameData: duelState.game,
-              ruscTitle: duelState.ruscTitle,
-              turn: duelState.turn,
-              blau: duelState.blau,
-              vermell: duelState.vermell,
-              usedCanonics: Array.from(duelState.usedCanonics),
-              tokens: duelState.tokens,
-              cursorIndex: duelState.cursorIndex,
-              outer: duelState.outer,
-              remainingSec: remainingSec
-            });
-          }
-        }
-        return;
-      }
-
-      if (data.type === 'FULL_SYNC') {
-        clearDisconnectGraceTimer();
-        duelConfig.temps = data.config.temps;
-        duelConfig.rondes = data.config.rondes;
-        duelConfig.rusc = data.config.rusc;
-        if (!duelState.active) {
-          startDuelGame(data.gameData, data.ruscTitle);
-        }
-        duelState.turn = data.turn;
-        duelState.blau = data.blau;
-        duelState.vermell = data.vermell;
-        duelState.usedCanonics = new Set(data.usedCanonics || []);
-        updateDuelScoreboard();
-        startDuelTurn();
-        duelState.tokens = data.tokens || [];
-        duelState.cursorIndex = data.cursorIndex || 0;
-        duelState.outer = data.outer || [...duelState.game.outer];
-        renderDuelHexagons();
-        updateDuelDisplay();
-        if (duelConfig.temps > 0 && data.remainingSec > 0) {
-          duelTurnDeadline = Date.now() + (data.remainingSec * 1000);
-        }
-        showToast("Connexió restablerta!", "success");
-        return;
-      }
-
-      if (data.type === 'INIT_MATCH') {
-        clearDisconnectGraceTimer();
-        duelConfig.temps = data.config.temps;
-        duelConfig.rondes = data.config.rondes;
-        duelConfig.rusc = data.config.rusc;
-        startDuelGame(data.gameData, data.ruscTitle);
-        return;
-      }
-
-      if (data.type === 'SYNC_TOKENS') {
-        if (!duelState.active) return;
-        duelState.tokens = data.tokens || [];
-        duelState.cursorIndex = typeof data.cursorIndex === 'number' ? data.cursorIndex : duelState.tokens.length;
-        if (Array.isArray(data.outer)) {
-          duelState.outer = [...data.outer];
-        }
-        renderDuelHexagons();
-        updateDuelDisplay();
-        return;
-      }
-
-      if (data.type === 'TURN_SUBMITTED') {
-        if (!duelState.active) return;
-        const equip = data.isBlau ? duelState.blau : duelState.vermell;
-        equip.score = data.newScore;
-        equip.solutions.push(data.solutionObj);
-        duelState.usedCanonics.add(data.canonic);
-        duelState.usedCanonics.add(data.clauComm);
-        updateDuelScoreboard();
-
-        if (data.solutionObj.esTuti) {
-          if (typeof confetti === 'function') {
-            try { confetti({ particleCount: 90, spread: 60, origin: { y: 0.6 } }); } catch (e) {}
-          }
-          showToast(`🌟 TUTI! +${data.solutionObj.points} pts`, "success");
-        } else {
-          showToast(`Operació validada! +${data.solutionObj.points} pts`, "success");
-        }
-        advanceDuelTurn();
-        return;
-      }
-
-      if (data.type === 'PASS_TURN') {
-        if (!duelState.active) return;
-        const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
-        showToast(esUltimTorn ? "Fi del duel!" : "El rival ha passat el torn", "warning");
-        advanceDuelTurn();
-        return;
-      }
-
-      if (data.type === 'TIMEOUT_TURN') {
-        if (!duelState.active) return;
-        stopDuelTimer();
-        const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
-        showToast(esUltimTorn ? "Temps esgotat! Fi del duel!" : "Temps esgotat! Canvi de torn", "warning");
-        advanceDuelTurn();
-        return;
-      }
-
-      if (data.type === 'EXIT_MATCH') {
-        showToast("El rival ha sortit de la sala", "warning");
-        exitDuel(false);
-        return;
-      }
-
-      if (data.type === 'REQUEST_REMATCH') {
-        if (duelRole === 'host') {
-          startDuelGame();
-        }
-      }
-    }
-
-    async function shareRemoteRoomLink() {
-      if (!duelRoomCode) return;
-      const formatted = formatRoomCodeDisplay(duelRoomCode);
-      const url = `${window.location.origin}${window.location.pathname}?sala=${duelRoomCode}`;
-      const text = `⚔️ Entra a la meva sala del Matelògic per jugar un duel!\n🔑 Codi de sala: ${formatted}\n👉 ${url}`;
-
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Duel Matelògic',
-            text: text
-          });
-          return;
-        } catch (e) {}
-      }
-
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast("Enllaç directe copiat al porta-retalls!", "success");
-      } catch (e) {
-        showToast("No s'ha pogut copiar l'enllaç", "error");
-      }
-    }
-
-    async function copyRemoteRoomCode() {
-      if (!duelRoomCode) return;
-      const formatted = formatRoomCodeDisplay(duelRoomCode);
-      try {
-        await navigator.clipboard.writeText(formatted);
-        showToast(`Codi ${formatted} copiat!`, "success");
-      } catch (e) {
-        showToast("No s'ha pogut copiar el codi", "error");
-      }
-    }
-
-    function canInteractDuel() {
-      if (!duelState.active) return false;
-      if (!duelState.isRemote) return true;
-      const isBlauTurn = (duelState.turn % 2 === 0);
-      if (duelRole === 'host' && isBlauTurn) return true;
-      if (duelRole === 'guest' && !isBlauTurn) return true;
-      return false;
-    }
-
-    function updateDuelInteractiveLockUI() {
-      const pad = document.getElementById('duel-interactive-pad');
-      const leftBtn = document.getElementById('duel-cursor-left-btn');
-      const rightBtn = document.getElementById('duel-cursor-right-btn');
-      const hint = document.getElementById('duel-bottom-hint');
-
-      const allowed = canInteractDuel();
-      if (pad) {
-        if (allowed) {
-          pad.classList.remove('opacity-45', 'pointer-events-none');
-        } else {
-          pad.classList.add('opacity-45', 'pointer-events-none');
-        }
-      }
-      if (leftBtn && rightBtn) {
-        leftBtn.disabled = !allowed;
-        rightBtn.disabled = !allowed;
-      }
-      if (hint) {
-        if (duelState.isRemote && !allowed) {
-          hint.textContent = "⏳ Esperant la jugada de l'altre dispositiu...";
-        } else {
-          hint.textContent = "Joc per equips sense propietat commutativa.";
-        }
-      }
-    }
-
-    function syncRemoteTokensIfNeeded() {
-      if (duelState.isRemote && canInteractDuel()) {
-        sendDuelRemoteMessage({
-          type: 'SYNC_TOKENS',
-          tokens: duelState.tokens,
-          cursorIndex: duelState.cursorIndex,
-          outer: duelState.outer
-        });
       }
     }
 
@@ -2969,18 +2332,9 @@
 
         if (restantMs <= 0) {
           stopDuelTimer();
-          if (duelState.isRemote) {
-            if (duelRole === 'host') {
-              sendDuelRemoteMessage({ type: 'TIMEOUT_TURN' });
-              const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
-              showToast(esUltimTorn ? "Temps esgotat! Fi del duel!" : "Temps esgotat! Canvi de torn", "warning");
-              advanceDuelTurn();
-            }
-          } else {
-            const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
-            showToast(esUltimTorn ? "Temps esgotat! Fi del duel!" : "Temps esgotat! Canvi de torn", "warning");
-            advanceDuelTurn();
-          }
+          const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
+          showToast(esUltimTorn ? "Temps esgotat! Fi del duel!" : "Temps esgotat! Canvi de torn", "warning");
+          advanceDuelTurn();
         }
       }, 200);
     }
@@ -2994,14 +2348,10 @@
     }
 
     function openDuelSetup() {
-      if (duelState.active && duelState.isRemote) {
-        return showToast("No es pot canviar la configuració durant una partida en remot", "warning");
-      }
       if (duelState.active && duelConfig.temps > 0 && duelTimerId !== null) {
         pausedRemainingMs = Math.max(500, duelTurnDeadline - Date.now());
       }
       stopDuelTimer();
-      setDuelMode(duelConfig.mode);
       openModal('duel-setup-modal');
     }
 
@@ -3009,15 +2359,6 @@
       if (e) {
         e.preventDefault();
         e.stopPropagation();
-      }
-      if (duelState.isRemote) {
-        if (duelRole === 'host') {
-          startDuelGame();
-        } else {
-          sendDuelRemoteMessage({ type: 'REQUEST_REMATCH' });
-          showToast("Sol·licitant nova partida a l'amfitrió...", "success");
-        }
-        return;
       }
       startDuelGame();
     }
@@ -3028,11 +2369,6 @@
         e.stopPropagation();
       }
       document.getElementById('duel-winner-modal').classList.add('hidden');
-      if (duelState.isRemote) {
-        sendDuelRemoteMessage({ type: 'EXIT_MATCH' });
-        cleanupDuelPeer();
-        duelState.isRemote = false;
-      }
       openDuelSetup();
     }
 
@@ -3049,8 +2385,8 @@
       duelConfig.rusc = tipus;
       const btnAvui = document.getElementById('duel-opt-rusc-avui');
       const btnAtzar = document.getElementById('duel-opt-rusc-atzar');
-      const activeCls = "py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all cursor-pointer";
-      const inactiveCls = "py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all cursor-pointer";
+      const activeCls = "py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all";
+      const inactiveCls = "py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all";
       if (tipus === 'avui') {
         btnAvui.className = activeCls;
         btnAtzar.className = inactiveCls;
@@ -3067,17 +2403,17 @@
         if (!btn) return;
         const isSense = val === 0;
         if (val === segons) {
-          btn.className = `py-2 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red ${isSense ? 'font-bold text-[11px]' : 'font-mono font-bold text-xs'} transition-all cursor-pointer`;
+          btn.className = `py-2 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red ${isSense ? 'font-bold text-[11px]' : 'font-mono font-bold text-xs'} transition-all`;
         } else {
-          btn.className = `py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 ${isSense ? 'font-bold text-[11px]' : 'font-mono font-bold text-xs'} transition-all cursor-pointer`;
+          btn.className = `py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 ${isSense ? 'font-bold text-[11px]' : 'font-mono font-bold text-xs'} transition-all`;
         }
       });
     }
 
     function setDuelRondes(rondes) {
       duelConfig.rondes = rondes;
-      const activeCls = "py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all cursor-pointer";
-      const inactiveCls = "py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all cursor-pointer";
+      const activeCls = "py-2 px-3 rounded-xl border-2 border-brand-red bg-red-50 dark:bg-red-950/40 text-brand-red font-bold text-xs transition-all";
+      const inactiveCls = "py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs transition-all";
       [3, 5].forEach(val => {
         const btn = document.getElementById(`duel-opt-rondes-${val}`);
         if (!btn) return;
@@ -3105,19 +2441,13 @@
       };
     }
 
-    function startDuelGame(forcedGameData = null, forcedTitle = null) {
+    function startDuelGame() {
       stopDuelTimer();
       pausedRemainingMs = null;
-      requestDuelWakeLock();
 
-      const isRemoteMatch = !!(duelConn && duelConn.open);
       let gameData;
       let ruscTitle = "Rusc a l'atzar";
-
-      if (forcedGameData) {
-        gameData = forcedGameData;
-        ruscTitle = forcedTitle || "Mode 2 jugadors/es";
-      } else if (duelConfig.rusc === 'avui' && DAILY_GAME) {
+      if (duelConfig.rusc === 'avui' && DAILY_GAME) {
         gameData = {
           target: DAILY_GAME.target,
           center: DAILY_GAME.center,
@@ -3130,9 +2460,7 @@
 
       duelState = {
         active: true,
-        isRemote: isRemoteMatch,
         game: gameData,
-        ruscTitle: ruscTitle,
         outer: [...gameData.outer],
         turn: 0,
         totalTurns: duelConfig.rondes * 2,
@@ -3147,15 +2475,6 @@
         usedNumbers: new Set()
       };
 
-      if (isRemoteMatch && duelRole === 'host') {
-        sendDuelRemoteMessage({
-          type: 'INIT_MATCH',
-          config: duelConfig,
-          gameData: gameData,
-          ruscTitle: ruscTitle
-        });
-      }
-
       document.getElementById('duel-setup-modal').classList.add('hidden');
       document.getElementById('duel-winner-modal').classList.add('hidden');
 
@@ -3163,26 +2482,6 @@
       document.getElementById('duel-target-val').textContent = duelState.game.target;
       document.getElementById('duel-center-val').textContent = duelState.game.center;
       document.getElementById('duel-round-total').textContent = duelConfig.rondes;
-
-      const nameBlau = document.getElementById('duel-name-blau');
-      const nameVermell = document.getElementById('duel-name-vermell');
-      const roomPill = document.getElementById('duel-remote-room-pill');
-      const settingsBtn = document.getElementById('duel-header-settings-btn');
-
-      if (isRemoteMatch) {
-        nameBlau.textContent = duelRole === 'host' ? "Equip Blau (Tu)" : "Equip Blau";
-        nameVermell.textContent = duelRole === 'guest' ? "Equip Vermell (Tu)" : "Equip Vermell";
-        if (roomPill) {
-          roomPill.textContent = `Sala: ${formatRoomCodeDisplay(duelRoomCode)}`;
-          roomPill.classList.remove('hidden');
-        }
-        if (settingsBtn) settingsBtn.classList.add('hidden');
-      } else {
-        nameBlau.textContent = "Equip Blau";
-        nameVermell.textContent = "Equip Vermell";
-        if (roomPill) roomPill.classList.add('hidden');
-        if (settingsBtn) settingsBtn.classList.remove('hidden');
-      }
 
       document.getElementById('duel-screen').classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
@@ -3239,8 +2538,6 @@
         badgeBlau.classList.add('hidden');
       }
 
-      updateDuelInteractiveLockUI();
-
       const timerVal = document.getElementById('duel-timer-val');
 
       if (duelConfig.temps === 0) {
@@ -3267,12 +2564,9 @@
     }
 
     function duelPassTurn() {
-      if (!canInteractDuel()) return;
+      if (!duelState.active) return;
       const esUltimTorn = (duelState.turn + 1 >= duelState.totalTurns);
       showToast(esUltimTorn ? "Fi del duel!" : "Torn passat", "warning");
-      if (duelState.isRemote) {
-        sendDuelRemoteMessage({ type: 'PASS_TURN' });
-      }
       advanceDuelTurn();
     }
 
@@ -3281,6 +2575,7 @@
       pausedRemainingMs = null;
       duelState.active = false;
 
+      // Netegem el visor i els hexàgons abans de mostrar el podi perquè no quedin restes de l'última jugada
       duelState.tokens = [];
       duelState.cursorIndex = 0;
       duelState.usedNumbers.clear();
@@ -3324,11 +2619,7 @@
     }
 
     function exitDuelConfirm() {
-      if (!duelState.active && !duelState.isRemote) {
-        exitDuel();
-        return;
-      }
-      if (!duelState.isRemote && duelState.blau.score === 0 && duelState.vermell.score === 0 && duelState.turn === 0) {
+      if (!duelState.active || (duelState.blau.score === 0 && duelState.vermell.score === 0 && duelState.turn === 0)) {
         exitDuel();
         return;
       }
@@ -3337,15 +2628,10 @@
       }
     }
 
-    function exitDuel(notifyRemote = true) {
-      if (notifyRemote && duelState.isRemote) {
-        sendDuelRemoteMessage({ type: 'EXIT_MATCH' });
-      }
+    function exitDuel() {
       stopDuelTimer();
       pausedRemainingMs = null;
-      cleanupDuelPeer();
       duelState.active = false;
-      duelState.isRemote = false;
       document.getElementById('duel-screen').classList.add('hidden');
       document.body.classList.remove('overflow-hidden');
     }
@@ -3406,13 +2692,11 @@
     }
 
     function shuffleDuelHexagons() {
-      if (!canInteractDuel()) return;
       for (let i = duelState.outer.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [duelState.outer[i], duelState.outer[j]] = [duelState.outer[j], duelState.outer[i]];
       }
       renderDuelHexagons();
-      syncRemoteTokensIfNeeded();
     }
 
     function updateDuelDisplay() {
@@ -3447,7 +2731,6 @@
           span.className = "px-1 py-0.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors";
           span.onclick = (e) => {
             e.stopPropagation();
-            if (!canInteractDuel()) return;
             setDuelCursorPosition(i + 1);
           };
           container.appendChild(span);
@@ -3461,7 +2744,6 @@
         ghostSpan.className = "px-1 py-0.5 text-slate-300 dark:text-slate-600 cursor-pointer hover:text-slate-400 transition-colors select-none";
         ghostSpan.onclick = (e) => {
           e.stopPropagation();
-          if (!canInteractDuel()) return;
           setDuelCursorPosition(duelState.tokens.length);
           appendDuelChar(')');
         };
@@ -3477,10 +2759,8 @@
     }
 
     function setDuelCursorPosition(newPos) {
-      if (!canInteractDuel()) return;
       duelState.cursorIndex = Math.max(0, Math.min(newPos, duelState.tokens.length));
       updateDuelDisplay();
-      syncRemoteTokensIfNeeded();
     }
 
     function moveDuelCursor(delta) {
@@ -3488,7 +2768,6 @@
     }
 
     function handleDuelDisplayClick(e) {
-      if (!canInteractDuel()) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       if (clickX < rect.width / 3) {
@@ -3499,7 +2778,7 @@
     }
 
     function appendDuelChar(char) {
-      if (!canInteractDuel()) return;
+      if (!duelState.active) return;
       const prevToken = duelState.cursorIndex > 0 ? duelState.tokens[duelState.cursorIndex - 1] : null;
       const nextToken = duelState.cursorIndex < duelState.tokens.length ? duelState.tokens[duelState.cursorIndex] : null;
 
@@ -3532,7 +2811,6 @@
         if (prevToken && prevToken.type === 'op' && prevToken.val !== '(' && prevToken.val !== ')') {
           duelState.tokens[duelState.cursorIndex - 1] = { type: 'op', val: rawChar, display: char, id: null };
           updateDuelDisplay();
-          syncRemoteTokensIfNeeded();
           return;
         }
 
@@ -3540,7 +2818,6 @@
           duelState.tokens[duelState.cursorIndex] = { type: 'op', val: rawChar, display: char, id: null };
           duelState.cursorIndex++;
           updateDuelDisplay();
-          syncRemoteTokensIfNeeded();
           return;
         }
 
@@ -3558,11 +2835,10 @@
       duelState.tokens.splice(duelState.cursorIndex, 0, { type: 'op', val: raw, display: char, id: null });
       duelState.cursorIndex++;
       updateDuelDisplay();
-      syncRemoteTokensIfNeeded();
     }
 
     function handleDuelHexClick(index) {
-      if (!canInteractDuel()) return;
+      if (!duelState.active) return;
       const val = duelState.outer[index];
       if (duelState.usedNumbers.has(val)) return;
 
@@ -3574,7 +2850,6 @@
         duelState.cursorIndex++;
         renderDuelHexagons();
         updateDuelDisplay();
-        syncRemoteTokensIfNeeded();
         return;
       }
 
@@ -3591,11 +2866,10 @@
       duelState.cursorIndex++;
       renderDuelHexagons();
       updateDuelDisplay();
-      syncRemoteTokensIfNeeded();
     }
 
     function handleDuelHexCenterClick() {
-      if (!canInteractDuel()) return;
+      if (!duelState.active) return;
       const val = duelState.game.center;
       if (duelState.usedNumbers.has(val)) return;
 
@@ -3607,7 +2881,6 @@
         duelState.cursorIndex++;
         renderDuelHexagons();
         updateDuelDisplay();
-        syncRemoteTokensIfNeeded();
         return;
       }
 
@@ -3624,11 +2897,10 @@
       duelState.cursorIndex++;
       renderDuelHexagons();
       updateDuelDisplay();
-      syncRemoteTokensIfNeeded();
     }
 
     function handleDuelDelete() {
-      if (!canInteractDuel() || duelState.cursorIndex === 0) return;
+      if (!duelState.active || duelState.cursorIndex === 0) return;
 
       const prevToken = duelState.tokens[duelState.cursorIndex - 1];
       const tokenAbans = duelState.cursorIndex > 1 ? duelState.tokens[duelState.cursorIndex - 2] : null;
@@ -3642,7 +2914,6 @@
           duelState.cursorIndex--;
           renderDuelHexagons();
           updateDuelDisplay();
-          syncRemoteTokensIfNeeded();
           return;
         }
       }
@@ -3651,16 +2922,14 @@
       duelState.cursorIndex--;
       renderDuelHexagons();
       updateDuelDisplay();
-      syncRemoteTokensIfNeeded();
     }
 
     function clearAllDuelTokens() {
-      if (!canInteractDuel() || duelState.tokens.length === 0) return;
+      if (!duelState.active || duelState.tokens.length === 0) return;
       duelState.tokens = [];
       duelState.cursorIndex = 0;
       renderDuelHexagons();
       updateDuelDisplay();
-      syncRemoteTokensIfNeeded();
       showToast("Operació buidada", "warning");
     }
 
@@ -3857,7 +3126,7 @@
     }
 
     function submitDuelTurn() {
-      if (!canInteractDuel()) return;
+      if (!duelState.active) return;
       if (!duelState.tokens || duelState.tokens.length === 0) {
         triggerShakeDuelDisplay();
         return showToast("Escriu una operació primer", "warning");
@@ -3918,26 +3187,14 @@
 
         const isBlau = (duelState.turn % 2 === 0);
         const equip = isBlau ? duelState.blau : duelState.vermell;
-        const solutionObj = {
+        equip.score += punts;
+        equip.solutions.push({
           expression: displayExpr,
           points: punts,
           esTuti: esTuti
-        };
-        equip.score += punts;
-        equip.solutions.push(solutionObj);
+        });
 
         updateDuelScoreboard();
-
-        if (duelState.isRemote) {
-          sendDuelRemoteMessage({
-            type: 'TURN_SUBMITTED',
-            isBlau: isBlau,
-            newScore: equip.score,
-            solutionObj: solutionObj,
-            canonic: canonic,
-            clauComm: clauComm
-          });
-        }
 
         if (esTuti) {
           if (typeof confetti === 'function') {
