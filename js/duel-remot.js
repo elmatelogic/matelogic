@@ -5,7 +5,8 @@ let remoteState = {
   role: null,
   salaId: "",
   pollingInterval: null,
-  lastVersion: 0
+  lastVersion: 0,
+  syncInputTimeout: null
 };
 
 if (typeof duelConfig !== 'undefined' && !duelConfig.mode) {
@@ -83,7 +84,7 @@ function formatRoomCodeInput(inputEl) {
 }
 
 async function createRemoteRoom() {
-  stopDuelTimer();
+  if (typeof stopDuelTimer === 'function') stopDuelTimer();
   stopRemotePolling();
 
   const salaId = generateSecureRoomCode();
@@ -91,12 +92,15 @@ async function createRemoteRoom() {
   remoteState.role = 'host';
   remoteState.lastVersion = 0;
   remoteState.active = false;
-  duelState.active = false;
-  duelState.isRemote = true;
+  
+  if (typeof duelState !== 'undefined') {
+    duelState.active = false;
+    duelState.isRemote = true;
+  }
 
   let gameData;
   let ruscTitle = "Rusc a l'atzar";
-  if (duelConfig.rusc === 'avui' && DAILY_GAME) {
+  if (duelConfig.rusc === 'avui' && typeof DAILY_GAME !== 'undefined' && DAILY_GAME) {
     gameData = {
       target: DAILY_GAME.target,
       center: DAILY_GAME.center,
@@ -104,7 +108,7 @@ async function createRemoteRoom() {
     };
     ruscTitle = `Repte Núm. ${DAILY_GAME.num}`;
   } else {
-    gameData = generarRuscAleatoriLocal();
+    gameData = typeof generarRuscAleatoriLocal === 'function' ? generarRuscAleatoriLocal() : null;
   }
 
   const joinBox = document.getElementById('duel-remote-join-box');
@@ -143,8 +147,7 @@ async function createRemoteRoom() {
     if (statusText) statusText.textContent = "Esperant l'altre jugador/a (1/2)...";
     startRemotePolling();
   } catch (err) {
-    console.error(err);
-    showToast("Error creant la sala al servidor", "error");
+    if (typeof showToast === 'function') showToast("Error creant la sala al servidor", "error");
     cancelRemoteLobby();
   }
 }
@@ -153,7 +156,8 @@ async function joinRemoteRoom() {
   const input = document.getElementById('duel-join-input');
   const cleanCode = (input ? input.value : '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   if (cleanCode.length !== 8) {
-    return showToast("El codi ha de tenir 8 caràcters!", "warning");
+    if (typeof showToast === 'function') return showToast("El codi ha de tenir 8 caràcters!", "warning");
+    return;
   }
 
   const joinBtn = document.getElementById('duel-join-btn');
@@ -175,18 +179,18 @@ async function joinRemoteRoom() {
         joinBtn.disabled = false;
         joinBtn.textContent = "Entra";
       }
-      return showToast(data.msg || "Error unint-se a la sala", "error");
+      if (typeof showToast === 'function') return showToast(data.msg || "Error unint-se a la sala", "error");
+      return;
     }
 
     remoteState.salaId = cleanCode;
     remoteState.role = 'guest';
 
-    showToast("Connectat a la sala!", "success");
+    if (typeof showToast === 'function') showToast("Connectat a la sala!", "success");
     syncRemoteGame(data.sala);
     startRemotePolling();
   } catch (err) {
-    console.error(err);
-    showToast("No s'ha pogut connectar amb el servidor", "error");
+    if (typeof showToast === 'function') showToast("No s'ha pogut connectar amb el servidor", "error");
     if (joinBtn) {
       joinBtn.disabled = false;
       joinBtn.textContent = "Entra";
@@ -205,7 +209,7 @@ function startRemotePolling() {
       const data = await res.json();
 
       if (!data.ok) {
-        showToast(data.msg || "La sala s'ha tancat", "warning");
+        if (typeof showToast === 'function') showToast(data.msg || "La sala s'ha tancat", "warning");
         exitRemoteDuel();
         return;
       }
@@ -216,8 +220,8 @@ function startRemotePolling() {
         return;
       }
 
-      if (!remoteState.active && (sala.status === 'PLAYING' || sala.status === 'FINISHED')) {
-        showToast("Jugador/a connectat! Iniciant duel...", "success");
+      if (remoteState.role === 'host' && !remoteState.active && (sala.status === 'PLAYING' || sala.status === 'FINISHED')) {
+        if (typeof showToast === 'function') showToast("Jugador/a connectat! Iniciant duel...", "success");
         syncRemoteGame(sala);
         return;
       }
@@ -237,14 +241,16 @@ function stopRemotePolling() {
 }
 
 function syncRemoteGame(sala) {
-  if (sala.status === 'WAITING') return;
+  if (sala.status === 'WAITING' || typeof duelState === 'undefined') return;
 
   const previousTurn = duelState.turn;
   remoteState.lastVersion = sala.version;
   remoteState.active = (sala.status === 'PLAYING');
 
-  duelConfig.temps = sala.config.temps;
-  duelConfig.rondes = sala.config.rondes;
+  if (typeof duelConfig !== 'undefined') {
+    duelConfig.temps = sala.config.temps;
+    duelConfig.rondes = sala.config.rondes;
+  }
 
   duelState.active = (sala.status === 'PLAYING');
   duelState.isRemote = true;
@@ -258,14 +264,22 @@ function syncRemoteGame(sala) {
   duelState.vermell = sala.vermell;
   duelState.usedCanonics = new Set(sala.usedCanonics || []);
 
-  closeModal('duel-setup-modal');
-  closeModal('duel-winner-modal');
+  if (typeof closeModal === 'function') {
+    closeModal('duel-setup-modal');
+    closeModal('duel-winner-modal');
+  }
 
-  document.getElementById('duel-rusc-label').textContent = sala.ruscTitle;
-  document.getElementById('duel-target-val').textContent = sala.gameData.target;
-  document.getElementById('duel-center-val').textContent = sala.gameData.center;
-  document.getElementById('duel-round-total').textContent = sala.config.rondes;
-  document.getElementById('duel-round-current').textContent = sala.currentRound;
+  const ruscLabel = document.getElementById('duel-rusc-label');
+  const targetVal = document.getElementById('duel-target-val');
+  const centerVal = document.getElementById('duel-center-val');
+  const roundTotal = document.getElementById('duel-round-total');
+  const roundCurrent = document.getElementById('duel-round-current');
+
+  if (ruscLabel) ruscLabel.textContent = sala.ruscTitle;
+  if (targetVal) targetVal.textContent = sala.gameData.target;
+  if (centerVal) centerVal.textContent = sala.gameData.center;
+  if (roundTotal) roundTotal.textContent = sala.config.rondes;
+  if (roundCurrent) roundCurrent.textContent = sala.currentRound;
 
   const nameBlau = document.getElementById('duel-name-blau');
   const nameVermell = document.getElementById('duel-name-vermell');
@@ -281,34 +295,47 @@ function syncRemoteGame(sala) {
   const settingsBtn = document.getElementById('duel-header-settings-btn');
   if (settingsBtn) settingsBtn.classList.add('hidden');
 
-  document.getElementById('duel-screen').classList.remove('hidden');
-  document.body.classList.add('overflow-hidden');
+  const duelScreen = document.getElementById('duel-screen');
+  if (duelScreen) {
+    duelScreen.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  }
 
-  updateDuelScoreboard();
+  if (typeof updateDuelScoreboard === 'function') updateDuelScoreboard();
 
   if (previousTurn !== sala.turn || !remoteState.active) {
     duelState.tokens = [];
     duelState.cursorIndex = 0;
-    updateDuelDisplay();
+    if (typeof updateDuelDisplay === 'function') updateDuelDisplay();
   }
 
-  renderDuelHexagons();
+  if (!canInteractRemote()) {
+    duelState.tokens = sala.currentTokens || [];
+    duelState.cursorIndex = sala.cursorIndex || 0;
+    if (typeof updateDuelDisplay === 'function') updateDuelDisplay();
+  }
+
+  if (typeof renderDuelHexagons === 'function') renderDuelHexagons();
   updateDuelTurnUI();
   updateRemoteLockUI();
 
   if (sala.config.temps > 0 && sala.timerDeadline > 0) {
-    duelTurnDeadline = sala.timerDeadline;
+    if (typeof duelTurnDeadline !== 'undefined') {
+      duelTurnDeadline = sala.timerDeadline;
+    }
     startRemoteClock();
   } else {
-    document.getElementById('duel-timer-val').textContent = "∞";
+    const timerVal = document.getElementById('duel-timer-val');
+    if (timerVal) timerVal.textContent = "∞";
   }
 
-  if (sala.status === 'FINISHED') {
+  if (sala.status === 'FINISHED' && typeof finishDuelGame === 'function') {
     finishDuelGame();
   }
 }
 
 function updateDuelTurnUI() {
+  if (typeof duelState === 'undefined') return;
   const isBlau = (duelState.turn % 2 === 0);
   const turnIndicator = document.getElementById('duel-turn-indicator');
   const boxBlau = document.getElementById('duel-box-blau');
@@ -319,24 +346,28 @@ function updateDuelTurnUI() {
   const baseCardCls = "col-span-1 lg:col-span-3 bg-white dark:bg-slate-800 border-2 border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-sm transition-all duration-300 flex flex-col justify-between";
 
   if (isBlau) {
-    turnIndicator.textContent = "Torn: Equip Blau";
-    turnIndicator.className = "font-extrabold text-brand-blueDark dark:text-brand-blue";
-    boxBlau.className = `${baseCardCls} order-1 lg:order-1 duel-halo-blau`;
-    boxVermell.className = `${baseCardCls} order-2 lg:order-3 opacity-60`;
-    badgeBlau.classList.remove('hidden');
-    badgeVermell.classList.add('hidden');
+    if (turnIndicator) {
+      turnIndicator.textContent = "Torn: Equip Blau";
+      turnIndicator.className = "font-extrabold text-brand-blueDark dark:text-brand-blue";
+    }
+    if (boxBlau) boxBlau.className = `${baseCardCls} order-1 lg:order-1 duel-halo-blau`;
+    if (boxVermell) boxVermell.className = `${baseCardCls} order-2 lg:order-3 opacity-60`;
+    if (badgeBlau) badgeBlau.classList.remove('hidden');
+    if (badgeVermell) badgeVermell.classList.add('hidden');
   } else {
-    turnIndicator.textContent = "Torn: Equip Vermell";
-    turnIndicator.className = "font-extrabold text-brand-red";
-    boxVermell.className = `${baseCardCls} order-2 lg:order-3 duel-halo-vermell`;
-    boxBlau.className = `${baseCardCls} order-1 lg:order-1 opacity-60`;
-    badgeVermell.classList.remove('hidden');
-    badgeBlau.classList.add('hidden');
+    if (turnIndicator) {
+      turnIndicator.textContent = "Torn: Equip Vermell";
+      turnIndicator.className = "font-extrabold text-brand-red";
+    }
+    if (boxVermell) boxVermell.className = `${baseCardCls} order-2 lg:order-3 duel-halo-vermell`;
+    if (boxBlau) boxBlau.className = `${baseCardCls} order-1 lg:order-1 opacity-60`;
+    if (badgeVermell) badgeVermell.classList.remove('hidden');
+    if (badgeBlau) badgeBlau.classList.add('hidden');
   }
 }
 
 function canInteractRemote() {
-  if (!duelState.active) return false;
+  if (typeof duelState === 'undefined' || !duelState.active) return false;
   if (!duelState.isRemote) return true;
   const isBlauTurn = (duelState.turn % 2 === 0);
   return (remoteState.role === 'host' && isBlauTurn) || (remoteState.role === 'guest' && !isBlauTurn);
@@ -366,32 +397,34 @@ function updateRemoteLockUI() {
 }
 
 function startRemoteClock() {
-  stopDuelTimer();
+  if (typeof stopDuelTimer === 'function') stopDuelTimer();
   const timerVal = document.getElementById('duel-timer-val');
 
-  duelTimerId = setInterval(() => {
-    if (!duelState.active) {
-      stopDuelTimer();
-      return;
-    }
-
-    const restantMs = duelTurnDeadline - Date.now();
-    const segonsRestants = Math.max(0, Math.ceil(restantMs / 1000));
-
-    if (timerVal) {
-      timerVal.textContent = `${segonsRestants}s`;
-      timerVal.className = segonsRestants <= 10 
-        ? "text-2xl sm:text-3xl font-black text-brand-red font-mono"
-        : "text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono";
-    }
-
-    if (restantMs <= 0) {
-      stopDuelTimer();
-      if (canInteractRemote()) {
-        sendRemoteAction('TIMEOUT');
+  if (typeof duelTimerId !== 'undefined') {
+    duelTimerId = setInterval(() => {
+      if (typeof duelState !== 'undefined' && !duelState.active) {
+        if (typeof stopDuelTimer === 'function') stopDuelTimer();
+        return;
       }
-    }
-  }, 200);
+
+      const restantMs = (typeof duelTurnDeadline !== 'undefined' ? duelTurnDeadline : 0) - Date.now();
+      const segonsRestants = Math.max(0, Math.ceil(restantMs / 1000));
+
+      if (timerVal) {
+        timerVal.textContent = `${segonsRestants}s`;
+        timerVal.className = segonsRestants <= 10 
+          ? "text-2xl sm:text-3xl font-black text-brand-red font-mono"
+          : "text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono";
+      }
+
+      if (restantMs <= 0) {
+        if (typeof stopDuelTimer === 'function') stopDuelTimer();
+        if (canInteractRemote()) {
+          sendRemoteAction('TIMEOUT');
+        }
+      }
+    }, 200);
+  }
 }
 
 async function sendRemoteAction(accio, extraData = {}) {
@@ -409,9 +442,18 @@ async function sendRemoteAction(accio, extraData = {}) {
     if (data.ok && data.sala) {
       syncRemoteGame(data.sala);
     }
-  } catch (e) {
-    console.error("Error enviant acció al servidor:", e);
-  }
+  } catch (e) {}
+}
+
+function syncRemoteInputLive() {
+  if (typeof duelState === 'undefined' || !duelState.isRemote || !canInteractRemote()) return;
+  clearTimeout(remoteState.syncInputTimeout);
+  remoteState.syncInputTimeout = setTimeout(() => {
+    sendRemoteAction('SYNC_INPUT', {
+      tokens: duelState.tokens,
+      cursorIndex: duelState.cursorIndex
+    });
+  }, 75);
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -432,7 +474,6 @@ function cancelRemoteLobby() {
   remoteState.salaId = "";
   remoteState.role = null;
   remoteState.active = false;
-  duelState.isRemote = false;
   setDuelMode('remote');
 }
 
@@ -441,8 +482,10 @@ function exitRemoteDuel() {
   remoteState.salaId = "";
   remoteState.role = null;
   remoteState.active = false;
-  duelState.isRemote = false;
-  exitDuel();
+  if (typeof duelState !== 'undefined') {
+    duelState.isRemote = false;
+  }
+  if (typeof exitDuel === 'function') exitDuel();
 }
 
 async function shareRemoteRoomLink() {
@@ -460,9 +503,9 @@ async function shareRemoteRoomLink() {
 
   try {
     await navigator.clipboard.writeText(url);
-    showToast("Enllaç directe copiat al porta-retalls!", "success");
+    if (typeof showToast === 'function') showToast("Enllaç directe copiat al porta-retalls!", "success");
   } catch (e) {
-    showToast("No s'ha pogut copiar l'enllaç", "error");
+    if (typeof showToast === 'function') showToast("No s'ha pogut copiar l'enllaç", "error");
   }
 }
 
@@ -471,8 +514,8 @@ async function copyRemoteRoomCode() {
   const formatted = formatRoomCodeDisplay(remoteState.salaId);
   try {
     await navigator.clipboard.writeText(formatted);
-    showToast(`Codi ${formatted} copiat!`, "success");
+    if (typeof showToast === 'function') showToast(`Codi ${formatted} copiat!`, "success");
   } catch (e) {
-    showToast("No s'ha pogut copiar el codi", "error");
+    if (typeof showToast === 'function') showToast("No s'ha pogut copiar el codi", "error");
   }
 }
