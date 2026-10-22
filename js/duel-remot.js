@@ -89,7 +89,7 @@ async function createRemoteRoom() {
   const salaId = generateSecureRoomCode();
   remoteState.salaId = salaId;
   remoteState.role = 'host';
-  remoteState.lastVersion = 1;
+  remoteState.lastVersion = 0;
   remoteState.active = false;
   duelState.active = false;
   duelState.isRemote = true;
@@ -216,14 +216,13 @@ function startRemotePolling() {
         return;
       }
 
-      if (sala.status === 'PLAYING') {
-        if (!remoteState.active) {
-          showToast("Jugador/a connectat! Iniciant duel...", "success");
-          syncRemoteGame(sala);
-        } else if (sala.version !== remoteState.lastVersion) {
-          syncRemoteGame(sala);
-        }
-      } else if (sala.status === 'FINISHED') {
+      if (!remoteState.active && (sala.status === 'PLAYING' || sala.status === 'FINISHED')) {
+        showToast("Jugador/a connectat! Iniciant duel...", "success");
+        syncRemoteGame(sala);
+        return;
+      }
+
+      if (sala.version !== remoteState.lastVersion) {
         syncRemoteGame(sala);
       }
     } catch (e) {}
