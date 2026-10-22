@@ -2,11 +2,10 @@ const REMOTE_API_URL = "https://matelogicremot.elmatelogic.workers.dev/";
 
 let remoteState = {
   active: false,
-  role: null, // 'host' (Equip Blau) | 'guest' (Equip Vermell)
+  role: null,
   salaId: "",
   pollingInterval: null,
-  lastVersion: 0,
-  syncInputTimeout: null
+  lastVersion: 0
 };
 
 if (typeof duelConfig !== 'undefined' && !duelConfig.mode) {
@@ -87,6 +86,7 @@ async function createRemoteRoom() {
   const salaId = generateSecureRoomCode();
   remoteState.salaId = salaId;
   remoteState.role = 'host';
+  remoteState.lastVersion = 0;
 
   let gameData;
   let ruscTitle = "Rusc a l'atzar";
@@ -193,7 +193,9 @@ function startRemotePolling() {
   remoteState.pollingInterval = setInterval(async () => {
     if (!remoteState.salaId) return;
     try {
-      const res = await fetch(`${REMOTE_API_URL}api/sala/estat?id=${remoteState.salaId}`);
+      const res = await fetch(`${REMOTE_API_URL}api/sala/estat?id=${remoteState.salaId}&t=${Date.now()}`, {
+        cache: 'no-store'
+      });
       const data = await res.json();
 
       if (!data.ok) {
@@ -214,7 +216,7 @@ function startRemotePolling() {
         syncRemoteGame(sala);
       }
     } catch (e) {}
-  }, 1200);
+  }, 1000);
 }
 
 function stopRemotePolling() {
@@ -225,6 +227,7 @@ function stopRemotePolling() {
 }
 
 function syncRemoteGame(sala) {
+  const previousTurn = duelState.turn;
   remoteState.lastVersion = sala.version;
   remoteState.active = (sala.status === 'PLAYING');
 
@@ -271,10 +274,9 @@ function syncRemoteGame(sala) {
 
   updateDuelScoreboard();
 
-  const isMyTurn = canInteractRemote();
-  if (!isMyTurn) {
-    duelState.tokens = sala.currentTokens || [];
-    duelState.cursorIndex = sala.cursorIndex || 0;
+  if (previousTurn !== sala.turn || !remoteState.active) {
+    duelState.tokens = [];
+    duelState.cursorIndex = 0;
     updateDuelDisplay();
   }
 
@@ -382,7 +384,7 @@ function startRemoteClock() {
 
 async function sendRemoteAction(accio, extraData = {}) {
   try {
-    await fetch(`${REMOTE_API_URL}api/sala/accio`, {
+    const res = await fetch(`${REMOTE_API_URL}api/sala/accio`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -391,25 +393,18 @@ async function sendRemoteAction(accio, extraData = {}) {
         ...extraData
       })
     });
+    const data = await res.json();
+    if (data.ok && data.sala) {
+      syncRemoteGame(data.sala);
+    }
   } catch (e) {
     console.error("Error enviant acció al servidor:", e);
   }
 }
 
-function syncRemoteInputLive() {
-  if (!duelState.isRemote || !canInteractRemote()) return;
-  clearTimeout(remoteState.syncInputTimeout);
-  remoteState.syncInputTimeout = setTimeout(() => {
-    sendRemoteAction('SYNC_INPUT', {
-      tokens: duelState.tokens,
-      cursorIndex: duelState.cursorIndex
-    });
-  }, 75);
-}
-
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && remoteState.salaId) {
-    fetch(`${REMOTE_API_URL}api/sala/estat?id=${remoteState.salaId}`)
+    fetch(`${REMOTE_API_URL}api/sala/estat?id=${remoteState.salaId}&t=${Date.now()}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         if (data.ok) syncRemoteGame(data.sala);
