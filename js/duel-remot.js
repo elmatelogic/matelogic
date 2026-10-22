@@ -86,7 +86,8 @@ async function createRemoteRoom() {
   const salaId = generateSecureRoomCode();
   remoteState.salaId = salaId;
   remoteState.role = 'host';
-  remoteState.lastVersion = 0;
+  remoteState.lastVersion = 1;
+  remoteState.active = false;
 
   let gameData;
   let ruscTitle = "Rusc a l'atzar";
@@ -206,7 +207,11 @@ function startRemotePolling() {
 
       const sala = data.sala;
 
-      if (remoteState.role === 'host' && !remoteState.active && sala.status === 'PLAYING') {
+      if (sala.status === 'WAITING') {
+        return;
+      }
+
+      if (remoteState.role === 'host' && !remoteState.active && (sala.status === 'PLAYING' || sala.status === 'FINISHED')) {
         showToast("Jugador/a connectat! Iniciant duel...", "success");
         syncRemoteGame(sala);
         return;
@@ -227,6 +232,8 @@ function stopRemotePolling() {
 }
 
 function syncRemoteGame(sala) {
+  if (sala.status === 'WAITING') return;
+
   const previousTurn = duelState.turn;
   remoteState.lastVersion = sala.version;
   remoteState.active = (sala.status === 'PLAYING');
@@ -403,11 +410,13 @@ async function sendRemoteAction(accio, extraData = {}) {
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && remoteState.salaId) {
+  if (document.visibilityState === 'visible' && remoteState.salaId && remoteState.active) {
     fetch(`${REMOTE_API_URL}api/sala/estat?id=${remoteState.salaId}&t=${Date.now()}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
-        if (data.ok) syncRemoteGame(data.sala);
+        if (data.ok && data.sala && data.sala.status !== 'WAITING') {
+          syncRemoteGame(data.sala);
+        }
       })
       .catch(() => {});
   }
