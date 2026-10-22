@@ -83,11 +83,16 @@ function formatRoomCodeInput(inputEl) {
 }
 
 async function createRemoteRoom() {
+  stopDuelTimer();
+  stopRemotePolling();
+
   const salaId = generateSecureRoomCode();
   remoteState.salaId = salaId;
   remoteState.role = 'host';
   remoteState.lastVersion = 1;
   remoteState.active = false;
+  duelState.active = false;
+  duelState.isRemote = true;
 
   let gameData;
   let ruscTitle = "Rusc a l'atzar";
@@ -211,13 +216,14 @@ function startRemotePolling() {
         return;
       }
 
-      if (remoteState.role === 'host' && !remoteState.active && (sala.status === 'PLAYING' || sala.status === 'FINISHED')) {
-        showToast("Jugador/a connectat! Iniciant duel...", "success");
-        syncRemoteGame(sala);
-        return;
-      }
-
-      if (sala.version !== remoteState.lastVersion) {
+      if (sala.status === 'PLAYING') {
+        if (!remoteState.active) {
+          showToast("Jugador/a connectat! Iniciant duel...", "success");
+          syncRemoteGame(sala);
+        } else if (sala.version !== remoteState.lastVersion) {
+          syncRemoteGame(sala);
+        }
+      } else if (sala.status === 'FINISHED') {
         syncRemoteGame(sala);
       }
     } catch (e) {}
@@ -427,6 +433,7 @@ function cancelRemoteLobby() {
   remoteState.salaId = "";
   remoteState.role = null;
   remoteState.active = false;
+  duelState.isRemote = false;
   setDuelMode('remote');
 }
 
