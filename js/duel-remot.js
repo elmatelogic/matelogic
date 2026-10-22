@@ -9,6 +9,56 @@ let remoteState = {
   syncInputTimeout: null
 };
 
+if (typeof duelConfig !== 'undefined' && !duelConfig.mode) {
+  duelConfig.mode = 'local';
+}
+
+function setDuelMode(mode) {
+  duelConfig.mode = mode;
+  const tabLocal = document.getElementById('duel-tab-local');
+  const tabRemote = document.getElementById('duel-tab-remote');
+  const joinBox = document.getElementById('duel-remote-join-box');
+  const lobbyBox = document.getElementById('duel-remote-lobby-box');
+  const configBox = document.getElementById('duel-config-options-box');
+  const footerBox = document.getElementById('duel-setup-footer');
+  const primaryBtn = document.getElementById('duel-primary-action-btn');
+
+  const activeTabCls = "py-2 px-2 rounded-xl bg-brand-red text-white font-bold shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+  const inactiveTabCls = "py-2 px-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+
+  if (lobbyBox) {
+    lobbyBox.classList.add('hidden');
+    lobbyBox.classList.remove('flex');
+  }
+  if (configBox) configBox.classList.remove('hidden');
+  if (footerBox) footerBox.classList.remove('hidden');
+
+  if (mode === 'local') {
+    cancelRemoteLobby();
+    if (tabLocal) tabLocal.className = activeTabCls;
+    if (tabRemote) tabRemote.className = inactiveTabCls;
+    if (joinBox) joinBox.classList.add('hidden');
+    if (primaryBtn) primaryBtn.textContent = "Comença el Duel";
+  } else {
+    if (tabRemote) tabRemote.className = activeTabCls;
+    if (tabLocal) tabLocal.className = inactiveTabCls;
+    if (joinBox) joinBox.classList.remove('hidden');
+    if (primaryBtn) primaryBtn.textContent = "Crea la sala per compartir-ho";
+  }
+}
+
+function handleDuelPrimaryAction(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  if (duelConfig.mode === 'remote') {
+    createRemoteRoom();
+  } else {
+    startDuelGame();
+  }
+}
+
 function generateSecureRoomCode() {
   const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
   const arr = new Uint8Array(8);
@@ -33,7 +83,6 @@ function formatRoomCodeInput(inputEl) {
   inputEl.value = clean.length > 4 ? `${clean.slice(0, 4)}-${clean.slice(4, 8)}` : clean;
 }
 
-// 1. CREACIÓ DE SALA
 async function createRemoteRoom() {
   const salaId = generateSecureRoomCode();
   remoteState.salaId = salaId;
@@ -164,8 +213,7 @@ function startRemotePolling() {
       if (sala.version !== remoteState.lastVersion) {
         syncRemoteGame(sala);
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }, 1200);
 }
 
@@ -374,6 +422,7 @@ function cancelRemoteLobby() {
   stopRemotePolling();
   remoteState.salaId = "";
   remoteState.role = null;
+  remoteState.active = false;
   setDuelMode('remote');
 }
 
