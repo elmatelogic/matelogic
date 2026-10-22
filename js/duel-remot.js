@@ -451,9 +451,10 @@ function syncRemoteInputLive() {
   remoteState.syncInputTimeout = setTimeout(() => {
     sendRemoteAction('SYNC_INPUT', {
       tokens: duelState.tokens,
-      cursorIndex: duelState.cursorIndex
+      cursorIndex: duelState.cursorIndex,
+      turn: duelState.turn
     });
-  }, 75);
+  }, 250);
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -474,6 +475,9 @@ function cancelRemoteLobby() {
   remoteState.salaId = "";
   remoteState.role = null;
   remoteState.active = false;
+  if (typeof duelState !== 'undefined') {
+    duelState.isRemote = false;
+  }
   setDuelMode('remote');
 }
 
