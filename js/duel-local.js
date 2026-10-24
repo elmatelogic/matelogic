@@ -1,4 +1,4 @@
-let duelConfig = { rusc: 'avui', temps: 45, rondes: 3 };
+let duelConfig = { rusc: 'avui', temps: 45, rondes: 3, mode: 'local' };
 let duelTimerId = null;
 let duelTurnDeadline = 0;
 
@@ -16,7 +16,8 @@ let duelState = {
   usedCanonics: new Set(),
   tokens: [],
   cursorIndex: 0,
-  usedNumbers: new Set()
+  usedNumbers: new Set(),
+  isRemote: false
 };
 
 window.duelState = duelState;
@@ -104,13 +105,12 @@ function generarRuscAleatoriLocal() {
 
 function startDuelGame() {
   stopDuelTimer();
-
   closeModal('duel-setup-modal');
   closeModal('duel-winner-modal');
 
   let gameData;
   let ruscTitle = "Rusc a l'atzar";
-  if (duelConfig.rusc === 'avui' && DAILY_GAME) {
+  if (duelConfig.rusc === 'avui' && typeof DAILY_GAME !== 'undefined' && DAILY_GAME) {
     gameData = {
       target: DAILY_GAME.target,
       center: DAILY_GAME.center,
@@ -135,7 +135,8 @@ function startDuelGame() {
     usedCanonics: new Set(),
     tokens: [],
     cursorIndex: 0,
-    usedNumbers: new Set()
+    usedNumbers: new Set(),
+    isRemote: false
   };
   window.duelState = duelState;
 
@@ -247,6 +248,12 @@ function advanceDuelTurn() {
 
 function duelPassTurn() {
   if (!duelState.active) return;
+  if (duelState.isRemote) {
+    if (typeof canInteractRemote === 'function' && !canInteractRemote()) return;
+    showToast("Torn passat", "warning");
+    if (typeof sendSocketAction === 'function') sendSocketAction('PASS');
+    return;
+  }
   showToast("Torn passat", "warning");
   advanceDuelTurn();
 }
@@ -432,6 +439,10 @@ function updateDuelDisplay() {
       cEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
   }, 10);
+
+  if (typeof syncRemoteInputLive === 'function') {
+    syncRemoteInputLive();
+  }
 }
 
 function setDuelCursorPosition(newPos) {
@@ -879,6 +890,11 @@ function calcularExpressioLocal(expr) {
 
 function submitDuelTurn() {
   if (!duelState.active) return;
+
+  if (duelState.isRemote && (typeof canInteractRemote === 'function' && !canInteractRemote())) {
+    return showToast("És el torn de l'altre jugador/a", "warning");
+  }
+
   if (!duelState.tokens || duelState.tokens.length === 0) {
     triggerShakeDuelDisplay();
     return showToast("Escriu una operació primer", "warning");
@@ -934,19 +950,11 @@ function submitDuelTurn() {
     const esTuti = (digitsUsats === 7);
     const punts = 5 + (digitsUsats * 3) + (esTuti ? 20 : 0);
 
-    duelState.usedCanonics.add(canonic);
-    duelState.usedCanonics.add(clauComm);
-
-    const isBlau = (duelState.turn % 2 === 0);
-    const equip = isBlau ? duelState.blau : duelState.vermell;
-    equip.score += punts;
-    equip.solutions.push({
+    const solutionObj = {
       expression: displayExpr,
       points: punts,
       esTuti: esTuti
-    });
-
-    updateDuelScoreboard();
+    };
 
     if (esTuti) {
       if (typeof confetti === 'function') {
@@ -957,6 +965,26 @@ function submitDuelTurn() {
       showToast(`Correcte! +${punts} pts`, "success");
     }
 
+    if (duelState.isRemote) {
+      if (typeof sendSocketAction === 'function') {
+        sendSocketAction('SUBMIT', {
+          points: punts,
+          solutionObj: solutionObj,
+          canonic: canonic,
+          clauComm: clauComm
+        });
+      }
+      return;
+    }
+
+    const isBlau = (duelState.turn % 2 === 0);
+    const equip = isBlau ? duelState.blau : duelState.vermell;
+    duelState.usedCanonics.add(canonic);
+    duelState.usedCanonics.add(clauComm);
+    equip.score += punts;
+    equip.solutions.push(solutionObj);
+
+    updateDuelScoreboard();
     advanceDuelTurn();
 
   } catch (err) {
