@@ -1,7 +1,7 @@
 const SUPABASE_URL = "https://wxmqaaxiexvnwbtgvyas.supabase.co";
 const SUPABASE_KEY = "sb_publishable_4-mTzuGMadeDwQX21vP4Pw_nY3K6zMv";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let duelChannel = null;
 let remoteSession = {
@@ -17,14 +17,14 @@ localStorage.setItem('matelogic_player_uuid', remoteSession.playerId);
 
 async function initSupabaseChannel(salaId, role) {
   if (duelChannel) {
-    await supabase.removeChannel(duelChannel);
+    await supabaseClient.removeChannel(duelChannel);
   }
   
   remoteSession.salaId = salaId;
   remoteSession.role = role;
   remoteSession.isHost = (role === 'host');
   
-  duelChannel = supabase.channel(`room-${salaId}`, {
+  duelChannel = supabaseClient.channel(`room-${salaId}`, {
     config: { broadcast: { ack: false, self: false } }
   });
 
@@ -208,7 +208,7 @@ function updateRemoteLockUI() {
 
 function closeWebSocket() {
   if (duelChannel) {
-    supabase.removeChannel(duelChannel);
+    supabaseClient.removeChannel(duelChannel);
     duelChannel = null;
   }
   remoteSession.active = false;
