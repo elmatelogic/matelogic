@@ -395,6 +395,7 @@
     </div>
   </main>
 
+  <!-- MODAL CONFIGURACIÓ DUEL -->
   <div id="duel-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-4 animate-pop border border-slate-200/80 dark:border-slate-700/80">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
@@ -409,16 +410,7 @@
         <button onclick="closeModal('duel-setup-modal')" aria-label="Tancar" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
 
-      <div class="flex bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80">
-        <button id="tab-duel-local" onclick="switchDuelTab('local')" class="flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-xs font-bold text-slate-800 dark:text-white transition-all">
-          Local (1 Pantalla)
-        </button>
-        <button id="tab-duel-remot" onclick="switchDuelTab('remot')" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all">
-          Remot (En línia)
-        </button>
-      </div>
-
-      <div id="duel-content-local" class="space-y-3 text-xs block">
+      <div class="space-y-3 text-xs">
         <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3">
           <span class="font-bold text-slate-700 dark:text-slate-300 block mb-2 uppercase tracking-wider text-[10px]">🎯 Tria del rusc</span>
           <div class="grid grid-cols-2 gap-2">
@@ -452,56 +444,18 @@
             </button>
           </div>
         </div>
-
-        <div class="flex flex-col gap-2 pt-1">
-          <button onclick="startDuelGame()" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md transition-all">
-            Comença el Duel
-          </button>
-          <span class="text-[10px] text-slate-400 text-center">Les fórmules no es poden repetir.</span>
-        </div>
       </div>
 
-      <div id="duel-content-remot" class="hidden space-y-4 text-xs">
-        <div id="duel-remote-join-box" class="space-y-4">
-          <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-4 text-center">
-            <span class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Convida un amic/ga</span>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3">Crea una sala amb la configuració actual i passa-li el codi.</p>
-            <button onclick="createRemoteDuelRoom()" class="w-full py-2.5 rounded-xl bg-slate-800 dark:bg-slate-700 text-white font-bold transition-transform active:scale-95">
-              Crear Sala Nova
-            </button>
-          </div>
-
-          <div class="relative flex items-center justify-center py-2">
-            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200 dark:border-slate-700"></div></div>
-            <div class="relative bg-white dark:bg-slate-800 px-3 text-[10px] font-bold text-slate-400 uppercase">O bé</div>
-          </div>
-
-          <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-4">
-            <span class="font-bold text-slate-700 dark:text-slate-300 block mb-2 text-center">Unir-se a una sala</span>
-            <div class="flex gap-2">
-              <input type="text" id="duel-join-input" placeholder="Codi de la sala" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-bold text-center tracking-widest focus:border-brand-blue outline-none uppercase" maxlength="8">
-              <button onclick="joinRemoteDuelRoom()" class="px-4 rounded-xl bg-brand-blue text-white font-bold shrink-0 transition-transform active:scale-95">
-                Entra
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div id="duel-remote-lobby-box" class="hidden bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-brand-blue/30 p-6 flex flex-col items-center justify-center text-center gap-3">
-          <span class="text-3xl animate-pulse">⏳</span>
-          <div>
-            <p class="font-bold text-slate-700 dark:text-slate-300 text-sm">Sala Creada!</p>
-            <p class="text-[11px] text-slate-500">Passa-li aquest codi al teu rival:</p>
-          </div>
-          <div class="bg-white dark:bg-slate-800 border-2 border-brand-blue text-brand-blue px-6 py-2 rounded-xl text-3xl font-mono font-black tracking-widest cursor-pointer select-all shadow-sm" id="duel-room-code-display">
-            ----
-          </div>
-          <p class="text-[10px] text-slate-400 mt-2">La partida començarà automàticament quan el rival introdueixi el codi.</p>
-        </div>
+      <div class="flex flex-col gap-2 pt-1">
+        <button onclick="startDuelGame()" class="key-3d w-full py-3 rounded-full bg-brand-red text-white font-bold text-sm shadow-md transition-all">
+          Comença el Duel
+        </button>
+        <span class="text-[10px] text-slate-400 text-center">Les fórmules no es poden repetir.</span>
       </div>
     </div>
   </div>
 
+  <!-- PANTALLA COMPLETA DEL DUEL -->
   <div id="duel-screen" class="fixed inset-0 bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 z-40 hidden flex flex-col justify-start items-center overflow-y-auto pb-8">
     <div class="w-full max-w-6xl border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-3 sm:px-5 py-2 flex items-center justify-between shadow-sm">
       <div class="flex items-center gap-2">
@@ -521,6 +475,8 @@
     </div>
 
     <div class="w-full max-w-6xl px-3 sm:px-5 pt-2.5 pb-4 grid grid-cols-2 lg:grid-cols-12 gap-2.5 lg:gap-5 items-start my-auto">
+
+      <!-- Equip Blau -->
       <div id="duel-box-blau" class="col-span-1 lg:col-span-3 order-1 lg:order-1 bg-white dark:bg-slate-800 border-2 border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
         <div>
           <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-1 mb-1.5 text-center sm:text-left">
@@ -547,6 +503,7 @@
         </div>
       </div>
 
+      <!-- Zona Central del Taulell Duel -->
       <div class="col-span-2 lg:col-span-6 order-3 lg:order-2 w-full max-w-md mx-auto flex flex-col items-center gap-2">
         <div class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2">
           <span id="duel-rusc-label">Mode 2 jugadors/es</span>
@@ -634,6 +591,7 @@
         </p>
       </div>
 
+      <!-- Equip Vermell -->
       <div id="duel-box-vermell" class="col-span-1 lg:col-span-3 order-2 lg:order-3 bg-white dark:bg-slate-800 border-2 border-slate-200/90 dark:border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
         <div>
           <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-1 mb-1.5 text-center sm:text-left">
@@ -663,6 +621,7 @@
     </div>
   </div>
 
+  <!-- MODAL GUANYADOR DEL DUEL -->
   <div id="duel-winner-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop border border-slate-200/80 dark:border-slate-700/80">
       <div class="w-14 h-14 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-2xl flex items-center justify-center mx-auto p-2.5 shadow-inner">
@@ -698,6 +657,156 @@
     </div>
   </div>
 
+  <!-- FITXA PER IMPRIMIR (PDF) -->
+  <div id="printable-sheet" class="hidden bg-white w-full max-w-[210mm] p-6 rounded-3xl border border-slate-200">
+    <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2 mb-2">
+      <div class="flex items-center gap-3">
+        <img src="./img/logo.png" alt="Matelògic" class="h-7 w-auto">
+        <div>
+          <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block leading-tight">Fitxa de Càlcul Diari</span>
+          <span id="sheet-challenge-num" class="text-xs font-black text-slate-800">Repte #---</span>
+        </div>
+      </div>
+      <div class="flex flex-col text-right text-[11px] text-slate-500 font-bold">
+        <span>Data: <strong id="sheet-date" class="text-slate-800 font-mono">--/--/----</strong></span>
+        <span class="text-[9px] text-slate-400">www.matelogic.cat</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-2.5 bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs">
+      <div class="col-span-2 flex items-baseline gap-2">
+        <span class="text-slate-700 font-bold whitespace-nowrap text-[11px]">Nom i cognoms:</span>
+        <span class="border-b border-slate-400 grow h-4"></span>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-slate-700 font-bold whitespace-nowrap text-[11px]">Grup / Curs:</span>
+        <span class="border-b border-slate-400 grow h-4"></span>
+      </div>
+    </div>
+
+    <div class="flex flex-row items-center justify-around gap-4 mb-2.5 p-3 rounded-2xl bg-slate-50/70 border border-slate-200 relative overflow-hidden">
+      <div class="absolute inset-0 z-10 pointer-events-none flex items-center justify-center opacity-10">
+        <img src="./img/logo.png" alt="" class="w-72 -rotate-12 mix-blend-multiply">
+      </div>
+
+      <div class="flex flex-col items-center z-20">
+        <span class="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-1">Nombre Objectiu</span>
+        <div class="w-22 h-13 bg-white border-2 border-slate-800 rounded-xl flex items-center justify-center shadow-xs px-2">
+          <span id="sheet-target" class="text-2xl font-black font-mono text-slate-900">--</span>
+        </div>
+        <span class="text-[8.5px] text-slate-500 font-semibold mt-1 text-center max-w-[110px]">Arriba a la meta combinant xifres</span>
+      </div>
+
+      <div class="z-20 flex flex-col items-center">
+        <div class="flex flex-col items-center gap-[2px]">
+          <div class="flex justify-center gap-[4px]">
+            <div class="w-13 h-[58px]">
+              <svg class="w-full h-full" viewBox="0 0 100 110">
+                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
+                <text id="sheet-val-0" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
+              </svg>
+            </div>
+            <div class="w-13 h-[58px]">
+              <svg class="w-full h-full" viewBox="0 0 100 110">
+                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
+                <text id="sheet-val-1" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
+              </svg>
+            </div>
+          </div>
+          <div class="flex justify-center gap-[4px] -mt-3.5">
+            <div class="w-13 h-[58px]">
+              <svg class="w-full h-full" viewBox="0 0 100 110">
+                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
+                <text id="sheet-val-2" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
+              </svg>
+            </div>
+            <div class="w-13 h-[58px] scale-105 z-10">
+              <svg class="w-full h-full" viewBox="0 0 100 110">
+                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#e63946" stroke="#b91c1c" stroke-width="2"/>
+                <text id="sheet-val-center" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
+              </svg>
+            </div>
+            <div class="w-13 h-[58px]">
+              <svg class="w-full h-full" viewBox="0 0 100 110">
+                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
+                <text id="sheet-val-3" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
+              </svg>
+            </div>
+          </div>
+          <div class="flex justify-center gap-[4px] -mt-3.5">
+            <div class="w-13 h-[58px]">
+              <svg class="w-full h-full" viewBox="0 0 100 110">
+                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
+                <text id="sheet-val-4" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
+              </svg>
+            </div>
+            <div class="w-13 h-[58px]">
+              <svg class="w-full h-full" viewBox="0 0 100 110">
+                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
+                <text id="sheet-val-5" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1 mt-2">
+          <span class="text-[8px] font-extrabold uppercase text-slate-400 mr-0.5">Operadors:</span>
+          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">+</span>
+          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">−</span>
+          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">×</span>
+          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">÷</span>
+          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">(</span>
+          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">)</span>
+        </div>
+      </div>
+
+      <div class="z-20 text-[9px] text-slate-600 space-y-1 max-w-[160px] border-l border-slate-200 pl-3">
+        <p class="font-extrabold text-slate-800 uppercase tracking-wider text-[8px]">Instruccions:</p>
+        <p>🔴 El dígit central és <strong class="text-brand-red">obligatori</strong>.</p>
+        <p>⬡ Cada xifra màxim 1 cop per càlcul.</p>
+        <p>÷ Divisions exactes (sense decimals).</p>
+        <p>🌟 <strong>Tuti:</strong> Els 7 dígits alhora!</p>
+      </div>
+    </div>
+
+    <div class="grow flex flex-col justify-between">
+      <div class="flex justify-between items-center mb-1">
+        <h3 class="text-[10px] font-black uppercase tracking-wider text-slate-700">Espai per a les teves operacions (fins a 20):</h3>
+        <span class="text-[8px] text-slate-400 font-bold">Pinta l'estrella si fas un Tuti</span>
+      </div>
+
+      <div class="flex flex-col justify-between grow">
+        <!-- 20 files de línies puntejades per imprimir -->
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">01.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">02.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">03.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">04.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">05.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">06.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">07.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">08.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">09.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">10.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">11.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">12.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">13.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">14.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">15.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">16.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">17.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">18.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">19.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">20.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
+      </div>
+    </div>
+
+    <div class="mt-2 pt-1 border-t border-slate-200 flex justify-between items-center text-[8px] text-slate-400">
+      <span>Matelògic · El repte matemàtic diari en català</span>
+      <span>www.matelogic.cat</span>
+    </div>
+  </div>
+
+  <!-- MODALS DEL JOC INDIVIDUAL -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3.5 max-h-[90vh] overflow-y-auto animate-pop">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
@@ -903,157 +1012,8 @@
     </div>
   </div>
 
-  <div id="printable-sheet" class="hidden bg-white w-full max-w-[210mm] p-6 rounded-3xl border border-slate-200">
-    <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2 mb-2">
-      <div class="flex items-center gap-3">
-        <img src="./img/logo.png" alt="Matelògic" class="h-7 w-auto">
-        <div>
-          <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block leading-tight">Fitxa de Càlcul Diari</span>
-          <span id="sheet-challenge-num" class="text-xs font-black text-slate-800">Repte #---</span>
-        </div>
-      </div>
-      <div class="flex flex-col text-right text-[11px] text-slate-500 font-bold">
-        <span>Data: <strong id="sheet-date" class="text-slate-800 font-mono">--/--/----</strong></span>
-        <span class="text-[9px] text-slate-400">www.matelogic.cat</span>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-3 gap-3 mb-2.5 bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs">
-      <div class="col-span-2 flex items-baseline gap-2">
-        <span class="text-slate-700 font-bold whitespace-nowrap text-[11px]">Nom i cognoms:</span>
-        <span class="border-b border-slate-400 grow h-4"></span>
-      </div>
-      <div class="flex items-baseline gap-2">
-        <span class="text-slate-700 font-bold whitespace-nowrap text-[11px]">Grup / Curs:</span>
-        <span class="border-b border-slate-400 grow h-4"></span>
-      </div>
-    </div>
-
-    <div class="flex flex-row items-center justify-around gap-4 mb-2.5 p-3 rounded-2xl bg-slate-50/70 border border-slate-200 relative overflow-hidden">
-      <div class="absolute inset-0 z-10 pointer-events-none flex items-center justify-center opacity-10">
-        <img src="./img/logo.png" alt="" class="w-72 -rotate-12 mix-blend-multiply">
-      </div>
-
-      <div class="flex flex-col items-center z-20">
-        <span class="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-1">Nombre Objectiu</span>
-        <div class="w-22 h-13 bg-white border-2 border-slate-800 rounded-xl flex items-center justify-center shadow-xs px-2">
-          <span id="sheet-target" class="text-2xl font-black font-mono text-slate-900">--</span>
-        </div>
-        <span class="text-[8.5px] text-slate-500 font-semibold mt-1 text-center max-w-[110px]">Arriba a la meta combinant xifres</span>
-      </div>
-
-      <div class="z-20 flex flex-col items-center">
-        <div class="flex flex-col items-center gap-[2px]">
-          <div class="flex justify-center gap-[4px]">
-            <div class="w-13 h-[58px]">
-              <svg class="w-full h-full" viewBox="0 0 100 110">
-                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
-                <text id="sheet-val-0" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
-              </svg>
-            </div>
-            <div class="w-13 h-[58px]">
-              <svg class="w-full h-full" viewBox="0 0 100 110">
-                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
-                <text id="sheet-val-1" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
-              </svg>
-            </div>
-          </div>
-          <div class="flex justify-center gap-[4px] -mt-3.5">
-            <div class="w-13 h-[58px]">
-              <svg class="w-full h-full" viewBox="0 0 100 110">
-                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
-                <text id="sheet-val-2" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
-              </svg>
-            </div>
-            <div class="w-13 h-[58px] scale-105 z-10">
-              <svg class="w-full h-full" viewBox="0 0 100 110">
-                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#e63946" stroke="#b91c1c" stroke-width="2"/>
-                <text id="sheet-val-center" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
-              </svg>
-            </div>
-            <div class="w-13 h-[58px]">
-              <svg class="w-full h-full" viewBox="0 0 100 110">
-                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
-                <text id="sheet-val-3" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
-              </svg>
-            </div>
-          </div>
-          <div class="flex justify-center gap-[4px] -mt-3.5">
-            <div class="w-13 h-[58px]">
-              <svg class="w-full h-full" viewBox="0 0 100 110">
-                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
-                <text id="sheet-val-4" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
-              </svg>
-            </div>
-            <div class="w-13 h-[58px]">
-              <svg class="w-full h-full" viewBox="0 0 100 110">
-                <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" fill="#48bfe3" stroke="#0284c7" stroke-width="2"/>
-                <text id="sheet-val-5" x="50" y="66" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="900" fill="white" text-anchor="middle">-</text>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-1 mt-2">
-          <span class="text-[8px] font-extrabold uppercase text-slate-400 mr-0.5">Operadors:</span>
-          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">+</span>
-          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">−</span>
-          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">×</span>
-          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">÷</span>
-          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">(</span>
-          <span class="px-1.5 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[9.5px] text-slate-700">)</span>
-        </div>
-      </div>
-
-      <div class="z-20 text-[9px] text-slate-600 space-y-1 max-w-[160px] border-l border-slate-200 pl-3">
-        <p class="font-extrabold text-slate-800 uppercase tracking-wider text-[8px]">Instruccions:</p>
-        <p>🔴 El dígit central és <strong class="text-brand-red">obligatori</strong>.</p>
-        <p>⬡ Cada xifra màxim 1 cop per càlcul.</p>
-        <p>÷ Divisions exactes (sense decimals).</p>
-        <p>🌟 <strong>Tuti:</strong> Els 7 dígits alhora!</p>
-      </div>
-    </div>
-
-    <div class="grow flex flex-col justify-between">
-      <div class="flex justify-between items-center mb-1">
-        <h3 class="text-[10px] font-black uppercase tracking-wider text-slate-700">Espai per a les teves operacions (fins a 20):</h3>
-        <span class="text-[8px] text-slate-400 font-bold">Pinta l'estrella si fas un Tuti</span>
-      </div>
-
-      <div class="flex flex-col justify-between grow">
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">01.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">02.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">03.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">04.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">05.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">06.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">07.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">08.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">09.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">10.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">11.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">12.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">13.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">14.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">15.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">16.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">17.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">18.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">19.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-        <div class="flex items-center gap-2 border-b border-dashed border-slate-300 py-1 font-mono"><span class="text-slate-400 font-bold w-6 text-[10px]">20.</span><span class="grow"></span><div class="flex items-center gap-1.5 text-slate-600 shrink-0 pr-2 select-none"><svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8"/></svg><span class="text-[9px] font-bold text-slate-500 tracking-wider">TUTI</span></div></div>
-      </div>
-    </div>
-
-    <div class="mt-2 pt-1 border-t border-slate-200 flex justify-between items-center text-[8px] text-slate-400">
-      <span>Matelògic · El repte matemàtic diari en català</span>
-      <span>www.matelogic.cat</span>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/joc.js"></script>
   <script src="./js/duel-local.js"></script>
-
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -1063,280 +1023,12 @@
       });
     }
 
-    function switchDuelTab(tab) {
-      const isLocal = tab === 'local';
-      
-      document.getElementById('tab-duel-local').className = isLocal 
-        ? "flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-xs font-bold text-slate-800 dark:text-white transition-all"
-        : "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all";
-        
-      document.getElementById('tab-duel-remot').className = !isLocal 
-        ? "flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-xs font-bold text-brand-blue dark:text-brand-blue transition-all"
-        : "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all";
-
-      document.getElementById('duel-content-local').style.display = isLocal ? 'block' : 'none';
-      document.getElementById('duel-content-remot').style.display = !isLocal ? 'block' : 'none';
-    }
-
     window.addEventListener('DOMContentLoaded', () => {
       initUI();
       if (typeof initDuelLocal === 'function') {
         initDuelLocal();
       }
     });
-
-    const SUPABASE_URL = "https://wxmqaaxiexvnwbtgvyas.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_4-mTzuGMadeDwQX21vP4Pw_nY3K6zMv";
-
-    let supabaseClient = null;
-    let duelChannel = null;
-    let remoteSession = {
-      salaId: "",
-      playerId: localStorage.getItem('matelogic_player_uuid') || ('p_' + Math.random().toString(36).substring(2, 10)),
-      role: 'guest',
-      active: false,
-      isHost: false,
-      salaState: null 
-    };
-    localStorage.setItem('matelogic_player_uuid', remoteSession.playerId);
-
-    function getSupabase() {
-      if (supabaseClient) return supabaseClient;
-      
-      if (!SUPABASE_URL.startsWith('http')) {
-        alert("Falta configurar les claus reals de Supabase a l'HTML.");
-        throw new Error("Supabase URL invalida.");
-      }
-      
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      return supabaseClient;
-    }
-
-    async function initSupabaseChannel(salaId, role) {
-      const sb = getSupabase(); 
-      
-      if (duelChannel) {
-        await sb.removeChannel(duelChannel);
-      }
-      
-      remoteSession.salaId = salaId;
-      remoteSession.role = role;
-      remoteSession.isHost = (role === 'host');
-      
-      duelChannel = sb.channel(`room-${salaId}`, {
-        config: { broadcast: { ack: false, self: false } }
-      });
-
-      duelChannel
-        .on('broadcast', { event: 'STATE_UPDATE' }, ({ payload }) => {
-          if (!remoteSession.isHost) {
-            handleRemoteStateUpdate(payload.sala);
-          }
-        })
-        .on('broadcast', { event: 'PLAYER_ACTION' }, ({ payload }) => {
-          if (remoteSession.isHost) {
-            processHostAction(payload);
-          }
-        })
-        .on('broadcast', { event: 'SYNC_INPUT' }, ({ payload }) => {
-          if (payload.playerId !== remoteSession.playerId && !canInteractRemote()) {
-            if (typeof duelState !== 'undefined') {
-              duelState.tokens = payload.tokens || [];
-              duelState.cursorIndex = payload.cursorIndex || 0;
-            }
-            if (typeof updateDuelDisplay === 'function') updateDuelDisplay();
-          }
-        })
-        .on('broadcast', { event: 'GUEST_JOINED' }, ({ payload }) => {
-          if (remoteSession.isHost && remoteSession.salaState) {
-            if (!remoteSession.salaState.vermell.id) {
-              remoteSession.salaState.vermell.id = payload.playerId;
-              remoteSession.salaState.status = 'PLAYING';
-              if (remoteSession.salaState.config.temps > 0) {
-                remoteSession.salaState.timerDeadline = Date.now() + (remoteSession.salaState.config.temps * 1000);
-              }
-            }
-            broadcastStateFromHost();
-          }
-        })
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED' && !remoteSession.isHost) {
-            duelChannel.send({ type: 'broadcast', event: 'GUEST_JOINED', payload: { playerId: remoteSession.playerId } });
-          }
-        });
-    }
-
-    function createRemoteDuelRoom() {
-      try {
-        getSupabase();
-      } catch (err) {
-        return;
-      }
-
-      const salaId = Math.random().toString(36).substring(2, 6).toUpperCase();
-      remoteSession.active = true;
-      
-      document.getElementById('duel-remote-join-box').classList.add('hidden');
-      document.getElementById('duel-remote-lobby-box').classList.remove('hidden');
-      document.getElementById('duel-room-code-display').textContent = salaId;
-
-      let gameData;
-      if (typeof duelConfig !== 'undefined' && duelConfig.rusc === 'avui' && window.DAILY_GAME) {
-        gameData = { target: DAILY_GAME.target, center: DAILY_GAME.center, outer: [...DAILY_GAME.outer] };
-      } else if (typeof generarRuscAleatoriLocal === 'function') {
-        gameData = generarRuscAleatoriLocal();
-      } else {
-        gameData = { target: 100, center: 5, outer: [1,2,3,4,6,7] }; 
-      }
-
-      remoteSession.salaState = {
-        id: salaId,
-        status: 'WAITING',
-        config: typeof duelConfig !== 'undefined' ? duelConfig : { rondes: 3, temps: 45 },
-        gameData: gameData,
-        turn: 0,
-        totalTurns: ((typeof duelConfig !== 'undefined' ? duelConfig.rondes : 3) || 3) * 2,
-        currentRound: 1,
-        timerDeadline: 0,
-        blau: { id: remoteSession.playerId, score: 0, solutions: [] },
-        vermell: { id: null, score: 0, solutions: [] },
-        usedCanonics: []
-      };
-
-      initSupabaseChannel(salaId, 'host');
-    }
-
-    function joinRemoteDuelRoom() {
-      const code = document.getElementById('duel-join-input').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      if (code.length < 4) return;
-      
-      try {
-        getSupabase();
-      } catch (err) {
-        return;
-      }
-      
-      remoteSession.active = true;
-      initSupabaseChannel(code, 'guest');
-    }
-
-    function handleRemoteStateUpdate(sala) {
-      remoteSession.salaState = sala;
-      if (sala.status === 'WAITING') return;
-      
-      if (typeof closeModal === 'function') closeModal('duel-setup-modal');
-      
-      const duelScreen = document.getElementById('duel-screen');
-      if (duelScreen) duelScreen.classList.remove('hidden');
-      
-      if (typeof duelState !== 'undefined') {
-        duelState.isRemote = true;
-        duelState.active = (sala.status === 'PLAYING');
-        duelState.game = sala.gameData;
-        duelState.outer = [...sala.gameData.outer];
-        duelState.turn = sala.turn;
-        duelState.blau = sala.blau;
-        duelState.vermell = sala.vermell;
-        duelState.usedCanonics = new Set(sala.usedCanonics || []);
-      }
-      
-      const targetVal = document.getElementById('duel-target-val');
-      const centerVal = document.getElementById('duel-center-val');
-      if (targetVal) targetVal.textContent = sala.gameData.target;
-      if (centerVal) centerVal.textContent = sala.gameData.center;
-      
-      if (typeof updateDuelScoreboard === 'function') updateDuelScoreboard();
-      if (typeof renderDuelHexagons === 'function') renderDuelHexagons();
-      if (typeof updateDuelTurnUI === 'function') updateDuelTurnUI();
-      if (typeof updateRemoteLockUI === 'function') updateRemoteLockUI();
-
-      if (sala.status === 'FINISHED' && typeof finishDuelGame === 'function') {
-        finishDuelGame();
-      }
-    }
-
-    function processHostAction(actionData) {
-      const sala = remoteSession.salaState;
-      if (!sala || sala.status !== 'PLAYING') return;
-
-      const isBlau = (sala.turn % 2 === 0);
-      const activeId = isBlau ? sala.blau.id : sala.vermell.id;
-
-      if (activeId === actionData.playerId) {
-        if (actionData.type === 'SUBMIT') {
-          const equip = isBlau ? sala.blau : sala.vermell;
-          equip.score += actionData.points;
-          equip.solutions.push(actionData.solutionObj);
-          sala.usedCanonics.push(actionData.canonic);
-          if (actionData.clauComm) sala.usedCanonics.push(actionData.clauComm);
-          avancaTornHost();
-        } else if (actionData.type === 'PASS' || actionData.type === 'TIMEOUT') {
-          avancaTornHost();
-        }
-      }
-    }
-
-    function avancaTornHost() {
-      const sala = remoteSession.salaState;
-      sala.turn++;
-      sala.currentRound = Math.floor(sala.turn / 2) + 1;
-      
-      if (sala.turn >= sala.totalTurns) {
-        sala.status = 'FINISHED';
-      } else if (sala.config.temps > 0) {
-        sala.timerDeadline = Date.now() + (sala.config.temps * 1000);
-      }
-      
-      broadcastStateFromHost();
-      handleRemoteStateUpdate(sala);
-    }
-
-    function broadcastStateFromHost() {
-      if (duelChannel && remoteSession.isHost) {
-        duelChannel.send({ type: 'broadcast', event: 'STATE_UPDATE', payload: { sala: remoteSession.salaState } });
-      }
-    }
-
-    function sendSocketAction(type, extra = {}) {
-      if (remoteSession.isHost) {
-        processHostAction({ type, playerId: remoteSession.playerId, ...extra });
-      } else if (duelChannel) {
-        duelChannel.send({ type: 'broadcast', event: 'PLAYER_ACTION', payload: { type, playerId: remoteSession.playerId, ...extra } });
-      }
-    }
-
-    function syncRemoteInputLive() {
-      if (typeof duelState === 'undefined' || !duelState.isRemote || !canInteractRemote() || !duelChannel) return;
-      duelChannel.send({ 
-        type: 'broadcast', 
-        event: 'SYNC_INPUT', 
-        payload: { playerId: remoteSession.playerId, tokens: duelState.tokens, cursorIndex: duelState.cursorIndex } 
-      });
-    }
-
-    function canInteractRemote() {
-      if (typeof duelState === 'undefined' || !duelState.active || !duelState.isRemote || !remoteSession.salaState) return true;
-      const isBlau = (remoteSession.salaState.turn % 2 === 0);
-      return (isBlau && remoteSession.salaState.blau.id === remoteSession.playerId) || 
-             (!isBlau && remoteSession.salaState.vermell.id === remoteSession.playerId);
-    }
-
-    function updateRemoteLockUI() {
-      const pad = document.getElementById('duel-interactive-pad') || document.querySelector('.grid.grid-cols-6').parentElement;
-      const interactuable = canInteractRemote();
-      if (pad) {
-        pad.style.opacity = interactuable ? '1' : '0.4';
-        pad.style.pointerEvents = interactuable ? 'auto' : 'none';
-      }
-    }
-
-    function closeWebSocket() {
-      if (duelChannel && supabaseClient) {
-        supabaseClient.removeChannel(duelChannel);
-        duelChannel = null;
-      }
-      remoteSession.active = false;
-    }
   </script>
 </body>
 </html>
