@@ -1,8 +1,7 @@
 const SUPABASE_URL = "https://wxmqaaxiexvnwbtgvyas.supabase.co";
 const SUPABASE_KEY = "sb_publishable_4-mTzuGMadeDwQX21vP4Pw_nY3K6zMv";
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+let supabaseClient = null;
 let duelChannel = null;
 let remoteSession = {
   salaId: "",
@@ -15,16 +14,31 @@ let remoteSession = {
 };
 localStorage.setItem('matelogic_player_uuid', remoteSession.playerId);
 
+// Aquesta funció crea la connexió només quan fa falta, evitant que la pàgina falli en arrencar
+function getSupabase() {
+  if (supabaseClient) return supabaseClient;
+  
+  if (!SUPABASE_URL.startsWith('http')) {
+    alert("Falta configurar les claus reals de Supabase al fitxer duel-remot.js!");
+    throw new Error("Supabase URL invàlida. Posa la teva URL real.");
+  }
+  
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  return supabaseClient;
+}
+
 async function initSupabaseChannel(salaId, role) {
+  const sb = getSupabase(); // Inicialitzem aquí!
+  
   if (duelChannel) {
-    await supabaseClient.removeChannel(duelChannel);
+    await sb.removeChannel(duelChannel);
   }
   
   remoteSession.salaId = salaId;
   remoteSession.role = role;
   remoteSession.isHost = (role === 'host');
   
-  duelChannel = supabaseClient.channel(`room-${salaId}`, {
+  duelChannel = sb.channel(`room-${salaId}`, {
     config: { broadcast: { ack: false, self: false } }
   });
 
@@ -66,6 +80,12 @@ async function initSupabaseChannel(salaId, role) {
 }
 
 function createRemoteDuelRoom() {
+  try {
+    const sb = getSupabase(); // Comprovem claus abans de continuar
+  } catch (err) {
+    return; // Si no hi ha claus, aturem sense trencar res
+  }
+
   const salaId = Math.random().toString(36).substring(2, 6).toUpperCase();
   remoteSession.active = true;
   
@@ -73,17 +93,23 @@ function createRemoteDuelRoom() {
   document.getElementById('duel-remote-lobby-box').classList.remove('hidden');
   document.getElementById('duel-room-code-display').textContent = salaId;
 
-  const gameData = duelConfig.rusc === 'avui' && window.DAILY_GAME ? 
-    { target: DAILY_GAME.target, center: DAILY_GAME.center, outer: [...DAILY_GAME.outer] } : 
-    generarRuscAleatoriLocal();
+  // Usa les funcions globals si existeixen
+  let gameData;
+  if (typeof duelConfig !== 'undefined' && duelConfig.rusc === 'avui' && window.DAILY_GAME) {
+    gameData = { target: DAILY_GAME.target, center: DAILY_GAME.center, outer: [...DAILY_GAME.outer] };
+  } else if (typeof generarRuscAleatoriLocal === 'function') {
+    gameData = generarRuscAleatoriLocal();
+  } else {
+    gameData = { target: 100, center: 5, outer: [1,2,3,4,6,7] }; // Fallback de seguretat
+  }
 
   remoteSession.salaState = {
     id: salaId,
     status: 'WAITING',
-    config: duelConfig,
+    config: typeof duelConfig !== 'undefined' ? duelConfig : { rondes: 3, temps: 45 },
     gameData: gameData,
     turn: 0,
-    totalTurns: (duelConfig.rondes || 3) * 2,
+    totalTurns: ((typeof duelConfig !== 'undefined' ? duelConfig.rondes : 3) || 3) * 2,
     currentRound: 1,
     timerDeadline: 0,
     blau: { id: remoteSession.playerId, score: 0, solutions: [] },
@@ -97,6 +123,13 @@ function createRemoteDuelRoom() {
 function joinRemoteDuelRoom() {
   const code = document.getElementById('duel-join-input').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (code.length < 4) return;
+  
+  try {
+    getSupabase(); // Comprovem claus
+  } catch (err) {
+    return;
+  }
+  
   remoteSession.active = true;
   initSupabaseChannel(code, 'guest');
 }
@@ -106,19 +139,25 @@ function handleRemoteStateUpdate(sala) {
   if (sala.status === 'WAITING') return;
   
   if (typeof closeModal === 'function') closeModal('duel-setup-modal');
-  document.getElementById('duel-screen').classList.remove('hidden');
   
-  duelState.isRemote = true;
-  duelState.active = (sala.status === 'PLAYING');
-  duelState.game = sala.gameData;
-  duelState.outer = [...sala.gameData.outer];
-  duelState.turn = sala.turn;
-  duelState.blau = sala.blau;
-  duelState.vermell = sala.vermell;
-  duelState.usedCanonics = new Set(sala.usedCanonics || []);
+  const duelScreen = document.getElementById('duel-screen');
+  if (duelScreen) duelScreen.classList.remove('hidden');
   
-  document.getElementById('duel-target-val').textContent = sala.gameData.target;
-  document.getElementById('duel-center-val').textContent = sala.gameData.center;
+  if (typeof duelState !== 'undefined') {
+    duelState.isRemote = true;
+    duelState.active = (sala.status === 'PLAYING');
+    duelState.game = sala.gameData;
+    duelState.outer = [...sala.gameData.outer];
+    duelState.turn = sala.turn;
+    duelState.blau = sala.blau;
+    duelState.vermell = sala.vermell;
+    duelState.usedCanonics = new Set(sala.usedCanonics || []);
+  }
+  
+  const targetVal = document.getElementById('duel-target-val');
+  const centerVal = document.getElementById('duel-center-val');
+  if (targetVal) targetVal.textContent = sala.gameData.target;
+  if (centerVal) centerVal.textContent = sala.gameData.center;
   
   if (typeof updateDuelScoreboard === 'function') updateDuelScoreboard();
   if (typeof renderDuelHexagons === 'function') renderDuelHexagons();
@@ -181,17 +220,16 @@ function sendSocketAction(type, extra = {}) {
 }
 
 function syncRemoteInputLive() {
-  if (duelState.isRemote && canInteractRemote() && duelChannel) {
-    duelChannel.send({ 
-      type: 'broadcast', 
-      event: 'SYNC_INPUT', 
-      payload: { playerId: remoteSession.playerId, tokens: duelState.tokens, cursorIndex: duelState.cursorIndex } 
-    });
-  }
+  if (typeof duelState === 'undefined' || !duelState.isRemote || !canInteractRemote() || !duelChannel) return;
+  duelChannel.send({ 
+    type: 'broadcast', 
+    event: 'SYNC_INPUT', 
+    payload: { playerId: remoteSession.playerId, tokens: duelState.tokens, cursorIndex: duelState.cursorIndex } 
+  });
 }
 
 function canInteractRemote() {
-  if (!duelState.active || !duelState.isRemote || !remoteSession.salaState) return true;
+  if (typeof duelState === 'undefined' || !duelState.active || !duelState.isRemote || !remoteSession.salaState) return true;
   const isBlau = (remoteSession.salaState.turn % 2 === 0);
   return (isBlau && remoteSession.salaState.blau.id === remoteSession.playerId) || 
          (!isBlau && remoteSession.salaState.vermell.id === remoteSession.playerId);
@@ -207,7 +245,7 @@ function updateRemoteLockUI() {
 }
 
 function closeWebSocket() {
-  if (duelChannel) {
+  if (duelChannel && supabaseClient) {
     supabaseClient.removeChannel(duelChannel);
     duelChannel = null;
   }
