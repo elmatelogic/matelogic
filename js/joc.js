@@ -637,14 +637,14 @@ async function handleSubmit() {
       if (typeof confetti === 'function') {
         setTimeout(() => {
           try { confetti({ particleCount: 75, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
-        }, 100);
+        }, 450);
       }
       showToast(`🌟 TUTI! Tots els nombres usats! +${puntsGuanyats} pts`, "success");
     } else if (rangAnterior !== nouRang && (nouRang.includes("Geni") || nouRang.includes("Euler"))) {
       if (typeof confetti === 'function') {
         setTimeout(() => {
           try { confetti({ particleCount: 60, spread: 60, origin: { y: 0.65 } }); } catch (e) {}
-        }, 100);
+        }, 450);
       }
       showToast(`🎉 Nou nivell desbloquejat: ${nouRang}! (+${puntsGuanyats} pts)`, "success");
     } else {
