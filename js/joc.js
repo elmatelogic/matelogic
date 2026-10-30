@@ -75,7 +75,6 @@ function updateThemeUI(selectedTheme) {
     light: document.getElementById('theme-btn-light'),
     dark: document.getElementById('theme-btn-dark')
   };
-  
   const activeClass = "bg-brand-red text-white font-bold shadow-xs";
   const inactiveClass = "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
 
@@ -92,7 +91,6 @@ function updateThemeUI(selectedTheme) {
 function setAppTheme(theme) {
   localStorage.setItem('matelogic_theme', theme);
   const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
   if (theme === 'dark' || (theme === 'system' && systemDark)) {
     document.documentElement.classList.add('dark');
   } else {
@@ -136,9 +134,7 @@ function updatePrintableSheet() {
 function printWorksheet() {
   if (typeof stopDuelTimer === 'function') stopDuelTimer();
   updatePrintableSheet();
-  try {
-    navigator.sendBeacon(`${API_URL}api/fitxa`);
-  } catch (e) {}
+  try { navigator.sendBeacon(`${API_URL}api/fitxa`); } catch (e) {}
   window.print();
 }
 
@@ -146,20 +142,13 @@ async function initUI() {
   try {
     const initialTheme = localStorage.getItem('matelogic_theme') || 'system';
     updateThemeUI(initialTheme);
-
-    const res = await fetch(`${API_URL}api/repte?t=${Date.now()}`, {
-      cache: 'no-store'
-    });
+    const res = await fetch(`${API_URL}api/repte?t=${Date.now()}`, { cache: 'no-store' });
     DAILY_GAME = await res.json();
-
     const newChallengeId = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;
-    if (CURRENT_CHALLENGE_ID && CURRENT_CHALLENGE_ID !== newChallengeId) {
-      clearTokensSession();
-    }
+    if (CURRENT_CHALLENGE_ID && CURRENT_CHALLENGE_ID !== newChallengeId) clearTokensSession();
     CURRENT_CHALLENGE_ID = newChallengeId;
     cleanOldProgress(DAILY_GAME.num);
     outerPositions = [...DAILY_GAME.outer];
-
     tokens = [];
     cursorIndex = 0;
     loadTokensSession();
@@ -185,16 +174,13 @@ async function initUI() {
       eventsInitialized = true;
     }
   } catch (err) {
-    console.error("Error initUI:", err);
     showToast("Error de connexió carregant el repte", "error");
   }
 }
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && DAILY_GAME && (!window.duelState || !window.duelState.active)) {
-    if (DAILY_GAME.data !== getCurrentMadridDateShort()) {
-      initUI();
-    }
+    if (DAILY_GAME.data !== getCurrentMadridDateShort()) initUI();
   }
 });
 
@@ -204,9 +190,7 @@ function triggerShakeDisplay() {
     displayEl.classList.remove('animate-shake', 'text-red-500', 'border-red-400');
     void displayEl.offsetWidth;
     displayEl.classList.add('animate-shake', 'text-red-500', 'border-red-400');
-    setTimeout(() => {
-      displayEl.classList.remove('animate-shake', 'text-red-500', 'border-red-400');
-    }, 400);
+    setTimeout(() => displayEl.classList.remove('animate-shake', 'text-red-500', 'border-red-400'), 400);
   }
 }
 
@@ -229,15 +213,11 @@ function loadSavedProgress() {
     } else {
       gameState = { solutions: [], score: 0 };
     }
-  } catch (e) {
-    console.error("Error loadSavedProgress:", e);
-  }
+  } catch (e) {}
 }
 
 function persistProgress() {
-  try {
-    localStorage.setItem(CURRENT_CHALLENGE_ID, JSON.stringify(gameState));
-  } catch (e) {}
+  try { localStorage.setItem(CURRENT_CHALLENGE_ID, JSON.stringify(gameState)); } catch (e) {}
 }
 
 function renderOuterHexagons() {
@@ -280,11 +260,9 @@ function shuffleOuterHexagons() {
 function updateDisplay() {
   const container = document.getElementById('display-tokens');
   container.innerHTML = '';
-
   const oberts = tokens.filter(t => t.val === '(').length;
   const tancats = tokens.filter(t => t.val === ')').length;
   const pendents = Math.max(0, oberts - tancats);
-
   const totalChars = tokens.reduce((acc, t) => acc + t.display.length, 0) + tokens.length + pendents;
   if (totalChars > 16) {
     container.className = "flex items-center min-w-full text-base sm:text-lg transition-all";
@@ -293,21 +271,16 @@ function updateDisplay() {
   } else {
     container.className = "flex items-center min-w-full text-2xl sm:text-3xl transition-all";
   }
-
   const cursorSpan = document.createElement('span');
   cursorSpan.id = "display-cursor-el";
   cursorSpan.className = "w-2 h-6 bg-brand-red rounded-xs cursor-blink mx-0.5 inline-block shrink-0";
 
   for (let i = 0; i <= tokens.length; i++) {
-    if (i === cursorIndex) {
-      container.appendChild(cursorSpan);
-    }
-
+    if (i === cursorIndex) container.appendChild(cursorSpan);
     if (i < tokens.length) {
       const t = tokens[i];
       const span = document.createElement('span');
       span.innerText = t.display;
-      
       let baseClass = "px-1 py-0.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors ";
       if (['+', '−', '×', '÷'].includes(t.display)) {
         baseClass += "text-slate-400 font-medium mx-0.5";
@@ -318,12 +291,8 @@ function updateDisplay() {
       } else {
         baseClass += "text-slate-900 dark:text-white font-bold";
       }
-      
       span.className = baseClass;
-      span.onclick = (e) => {
-        e.stopPropagation();
-        setCursorPosition(i + 1);
-      };
+      span.onclick = (e) => { e.stopPropagation(); setCursorPosition(i + 1); };
       container.appendChild(span);
     }
   }
@@ -333,21 +302,14 @@ function updateDisplay() {
     ghostSpan.innerText = ')'.repeat(pendents);
     ghostSpan.title = "Toca per tancar el parèntesi";
     ghostSpan.className = "px-1 py-0.5 text-brand-blue/50 dark:text-brand-blue/40 font-black cursor-pointer hover:text-brand-blue transition-colors select-none";
-    ghostSpan.onclick = (e) => {
-      e.stopPropagation();
-      setCursorPosition(tokens.length);
-      appendChar(')');
-    };
+    ghostSpan.onclick = (e) => { e.stopPropagation(); setCursorPosition(tokens.length); appendChar(')'); };
     container.appendChild(ghostSpan);
   }
 
   saveTokensSession();
-
   setTimeout(() => {
     const cEl = document.getElementById('display-cursor-el');
-    if (cEl) {
-      cEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-    }
+    if (cEl) cEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }, 10);
 }
 
@@ -362,8 +324,7 @@ function moveCursor(delta) {
 
 function handleDisplayClick(e) {
   const rect = e.currentTarget.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  if (clickX < rect.width / 3) {
+  if (e.clientX - rect.left < rect.width / 3) {
     setCursorPosition(0);
   } else {
     setCursorPosition(tokens.length);
@@ -424,8 +385,7 @@ function appendChar(char) {
   if (char === '÷') raw = '/';
   if (char === '−') raw = '-';
 
-  const newToken = { type: 'op', val: raw, display: char, id: null };
-  tokens.splice(cursorIndex, 0, newToken);
+  tokens.splice(cursorIndex, 0, { type: 'op', val: raw, display: char, id: null });
   cursorIndex++;
   updateDisplay();
 }
@@ -433,7 +393,6 @@ function appendChar(char) {
 function handleHexClick(index) {
   const val = outerPositions[index];
   if (usedNumbers.has(val)) return;
-
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
   const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
@@ -444,7 +403,6 @@ function handleHexClick(index) {
     updateDisplay();
     return;
   }
-
   if (prevToken && (prevToken.type === 'num' || prevToken.val === ')')) {
     triggerShakeDisplay();
     return showToast("Cal un operador!", "warning");
@@ -453,9 +411,7 @@ function handleHexClick(index) {
     triggerShakeDisplay();
     return showToast("Cal un operador abans del número següent!", "warning");
   }
-
-  const newToken = { type: 'num', val: val.toString(), display: val.toString(), id: `hex-${index}` };
-  tokens.splice(cursorIndex, 0, newToken);
+  tokens.splice(cursorIndex, 0, { type: 'num', val: val.toString(), display: val.toString(), id: `hex-${index}` });
   cursorIndex++;
   renderOuterHexagons();
   updateDisplay();
@@ -464,7 +420,6 @@ function handleHexClick(index) {
 function handleHexCenterClick() {
   const val = DAILY_GAME.center;
   if (usedNumbers.has(val)) return;
-
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
   const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
@@ -475,7 +430,6 @@ function handleHexCenterClick() {
     updateDisplay();
     return;
   }
-
   if (prevToken && (prevToken.type === 'num' || prevToken.val === ')')) {
     triggerShakeDisplay();
     return showToast("Cal un operador!", "warning");
@@ -484,9 +438,7 @@ function handleHexCenterClick() {
     triggerShakeDisplay();
     return showToast("Cal un operador abans del número següent!", "warning");
   }
-
-  const newToken = { type: 'num', val: val.toString(), display: val.toString(), id: 'hex-center' };
-  tokens.splice(cursorIndex, 0, newToken);
+  tokens.splice(cursorIndex, 0, { type: 'num', val: val.toString(), display: val.toString(), id: 'hex-center' });
   cursorIndex++;
   renderOuterHexagons();
   updateDisplay();
@@ -494,7 +446,6 @@ function handleHexCenterClick() {
 
 function handleDelete() {
   if (cursorIndex === 0) return;
-
   const prevToken = tokens[cursorIndex - 1];
   const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
   const tokenDespres = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
@@ -503,16 +454,13 @@ function handleDelete() {
     if (tokenAbans && tokenAbans.type === 'num' && tokenDespres && tokenDespres.type === 'num') {
       tokens.splice(cursorIndex - 1, 1);
       cursorIndex--;
-
       tokens.splice(cursorIndex - 1, 1);
       cursorIndex--;
-
       renderOuterHexagons();
       updateDisplay();
       return;
     }
   }
-
   tokens.splice(cursorIndex - 1, 1);
   cursorIndex--;
   renderOuterHexagons();
@@ -537,60 +485,37 @@ function setupDeleteEvents() {
 
   const startPress = () => {
     isLongPress = false;
-    pressTimer = setTimeout(() => {
-      isLongPress = true;
-      clearAllTokens();
-    }, 500);
+    pressTimer = setTimeout(() => { isLongPress = true; clearAllTokens(); }, 500);
   };
-
   const endPress = (e) => {
     clearTimeout(pressTimer);
-    if (!isLongPress && e.type !== 'mouseleave') {
-      handleDelete();
-    }
+    if (!isLongPress && e.type !== 'mouseleave') handleDelete();
   };
 
   btn.addEventListener('mousedown', startPress);
   btn.addEventListener('mouseup', endPress);
   btn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-
-  btn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startPress();
-  }, { passive: false });
-
-  btn.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    endPress(e);
-  }, { passive: false });
+  btn.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(); }, { passive: false });
+  btn.addEventListener('touchend', (e) => { e.preventDefault(); endPress(e); }, { passive: false });
 }
 
 function setupBackdropCloseEvents() {
   document.querySelectorAll('[id$="-modal"]').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal(modal.id);
-    });
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
   });
 }
 
 window.addEventListener('keydown', (e) => {
   if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
-
   if (window.duelState && window.duelState.active) return;
 
   if (e.key === 'Backspace' || e.key === 'Delete') {
     e.preventDefault();
-    if (e.repeat) {
-      clearAllTokens();
-    } else {
-      handleDelete();
-    }
+    if (e.repeat) clearAllTokens();
+    else handleDelete();
   } else if (e.key === 'Escape') {
     const modalObert = document.querySelector('[id$="-modal"]:not(.hidden)');
-    if (modalObert) {
-      closeModal(modalObert.id);
-      return;
-    }
+    if (modalObert) { closeModal(modalObert.id); return; }
     clearAllTokens();
   } else if (e.key === ' ') {
     e.preventDefault();
@@ -623,43 +548,34 @@ async function handleSubmit() {
     showToast("Escriu una operació primer", "warning");
     return;
   }
-
   if (DAILY_GAME && DAILY_GAME.data !== getCurrentMadridDateShort()) {
     await initUI();
     showToast("S'ha carregat el nou repte d'avui!", "warning");
     return;
   }
-
   const ultimToken = tokens[tokens.length - 1];
   if (ultimToken && ultimToken.type === 'op' && ultimToken.val !== ')') {
     triggerShakeDisplay();
     showToast("L'operació està incompleta!", "warning");
     return;
   }
-
   const oberts = tokens.filter(t => t.val === '(').length;
   const tancats = tokens.filter(t => t.val === ')').length;
   if (oberts > tancats && ultimToken && (ultimToken.type === 'num' || ultimToken.val === ')')) {
-    const mancants = oberts - tancats;
-    for (let i = 0; i < mancants; i++) {
-      tokens.push({ type: 'op', val: ')', display: ')', id: null });
-    }
+    for (let i = 0; i < oberts - tancats; i++) tokens.push({ type: 'op', val: ')', display: ')', id: null });
     cursorIndex = tokens.length;
     updateDisplay();
   }
-
   const digitsUsats = tokens.filter(t => t.type === 'num').length;
   if (digitsUsats < 2) {
     triggerShakeDisplay();
     showToast("Cal combinar almenys dues xifres!", "warning");
     return;
   }
-
-  const centerStr = DAILY_GAME ? String(DAILY_GAME.center) : '';
-  const usaCentreLocal = tokens.some(t => t.id === 'hex-center' || (t.type === 'num' && t.val === centerStr));
+  const usaCentreLocal = tokens.some(t => t.id === 'hex-center' || (t.type === 'num' && t.val === String(DAILY_GAME.center)));
   if (!usaCentreLocal) {
     triggerShakeDisplay();
-    showToast(`Cal fer servir el dígit central (${centerStr})!`, "warning");
+    showToast(`Cal fer servir el dígit central (${DAILY_GAME.center})!`, "warning");
     return;
   }
 
@@ -673,11 +589,7 @@ async function handleSubmit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ expressio: rawExpr })
     });
-
-    if (!res.ok) {
-      throw new Error(`Error del servidor: ${res.status}`);
-    }
-
+    if (!res.ok) throw new Error(`Error del servidor: ${res.status}`);
     const data = await res.json();
     const displayContainer = document.getElementById('display-container');
 
@@ -689,13 +601,10 @@ async function handleSubmit() {
 
     const expressioDisplay = tokens.map(t => t.display).join(' ');
     const expressioNeta = rawExpr.replace(/\s+/g, '');
-
     const jaExisteix = gameState.solutions.some(s => {
       const sExpr = (s.raw || s.expression || '').replace(/\s+/g, '');
       if (sExpr === expressioNeta || s.expression === expressioDisplay) return true;
-      if (data.canonic && typeof data.canonic === 'string' && data.canonic !== 'tuti' && s.canonic === data.canonic) {
-        return true;
-      }
+      if (data.canonic && typeof data.canonic === 'string' && data.canonic !== 'tuti' && s.canonic === data.canonic) return true;
       return false;
     });
 
@@ -707,22 +616,16 @@ async function handleSubmit() {
 
     if (displayContainer) {
       displayContainer.classList.add('animate-pop', 'text-emerald-500', 'border-emerald-400', 'bg-emerald-50', 'dark:bg-emerald-950/30');
-      setTimeout(() => {
-        displayContainer.classList.remove('animate-pop', 'text-emerald-500', 'border-emerald-400', 'bg-emerald-50', 'dark:bg-emerald-950/30');
-      }, 500);
+      setTimeout(() => displayContainer.classList.remove('animate-pop', 'text-emerald-500', 'border-emerald-400', 'bg-emerald-50', 'dark:bg-emerald-950/30'), 500);
     }
 
     const puntsGuanyats = Number(data.punts) || 1;
     const esTutiReal = !!(data.esTuti || data.tuti || digitsUsats === 7);
-
     const rangAnterior = document.getElementById('rank-label').innerText;
 
     gameState.solutions.push({
-      expression: expressioDisplay,
-      raw: expressioNeta,
-      canonic: data.canonic || rawExpr,
-      points: puntsGuanyats,
-      esTuti: esTutiReal
+      expression: expressioDisplay, raw: expressioNeta,
+      canonic: data.canonic || rawExpr, points: puntsGuanyats, esTuti: esTutiReal
     });
     gameState.score += puntsGuanyats;
 
@@ -730,17 +633,11 @@ async function handleSubmit() {
     try { updateScoreboard(); } catch (e) {}
 
     const nouRang = document.getElementById('rank-label').innerText;
-    const haPujatRang = rangAnterior !== nouRang;
-
     if (esTutiReal) {
-      if (typeof confetti === 'function') {
-        try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
-      }
+      if (typeof confetti === 'function') try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
       showToast(`🌟 TUTI! Tots els nombres usats! +${puntsGuanyats} pts`, "success");
-    } else if (haPujatRang && (nouRang.includes("Geni") || nouRang.includes("Euler"))) {
-      if (typeof confetti === 'function') {
-        try { confetti({ particleCount: 70, spread: 60, origin: { y: 0.65 } }); } catch (e) {}
-      }
+    } else if (rangAnterior !== nouRang && (nouRang.includes("Geni") || nouRang.includes("Euler"))) {
+      if (typeof confetti === 'function') try { confetti({ particleCount: 70, spread: 60, origin: { y: 0.65 } }); } catch (e) {}
       showToast(`🎉 Nou nivell desbloquejat: ${nouRang}! (+${puntsGuanyats} pts)`, "success");
     } else {
       showToast(`Correcte! +${puntsGuanyats} pts`, "success");
@@ -751,9 +648,7 @@ async function handleSubmit() {
     clearTokensSession();
     renderOuterHexagons();
     updateDisplay();
-
   } catch (err) {
-    console.error("Error a handleSubmit:", err);
     triggerShakeDisplay();
     showToast("Sense connexió. Comprova la xarxa per validar", "error");
   } finally {
@@ -764,7 +659,6 @@ async function handleSubmit() {
 function updateScoreboard() {
   const trobades = gameState.solutions.length;
   const objectiu = (DAILY_GAME && DAILY_GAME.total) ? DAILY_GAME.total : 22;
-
   const solCountEl = document.getElementById('solutions-count');
   const solBoxEl = document.getElementById('solutions-box');
   const solTargetDisplay = document.getElementById('solutions-target-display');
@@ -776,13 +670,10 @@ function updateScoreboard() {
   if (scoreCounter) scoreCounter.innerText = gameState.score;
 
   const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
-  const pctBarra = Math.min(pctReal, 100);
-
   const rankBar = document.getElementById('rank-bar');
-  if (rankBar) rankBar.style.width = `${pctBarra}%`;
+  if (rankBar) rankBar.style.width = `${Math.min(pctReal, 100)}%`;
 
   const baseBoxClasses = "group flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer select-none active:scale-95";
-
   let rangText = "Principiant";
   let hintText = "";
 
@@ -801,15 +692,12 @@ function updateScoreboard() {
     if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
   } else if (pctReal >= 50) {
     rangText = "Mestre/a 🎖";
-    const faltaGeni = objectiu - trobades;
-    hintText = `🎖️ Molt bé! Et falten només <strong>${faltaGeni} solucions</strong> per assolir el nivell <strong>Geni 🎓</strong>.`;
+    hintText = `🎖️ Molt bé! Et falten només <strong>${objectiu - trobades} solucions</strong> per assolir el nivell <strong>Geni 🎓</strong>.`;
     if (solBoxEl) solBoxEl.className = `${baseBoxClasses} hover:bg-slate-50 dark:hover:bg-slate-700/40`;
     if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
     if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
   } else {
-    const metaMestre = Math.ceil(objectiu * 0.5);
-    const faltaMestre = metaMestre - trobades;
-    hintText = `🎯 Et falten <strong>${faltaMestre} solucions</strong> per arribar al rang <strong>Mestre/a 🎖</strong>.`;
+    hintText = `🎯 Et falten <strong>${Math.ceil(objectiu * 0.5) - trobades} solucions</strong> per arribar al rang <strong>Mestre/a 🎖</strong>.`;
     if (solBoxEl) solBoxEl.className = `${baseBoxClasses} hover:bg-slate-50 dark:hover:bg-slate-700/40`;
     if (solCountEl) solCountEl.className = "text-2xl sm:text-3xl font-black text-brand-red font-mono";
     if (solTargetDisplay) solTargetDisplay.innerHTML = `/ ${objectiu}+`;
@@ -817,14 +705,10 @@ function updateScoreboard() {
 
   const rankLabel = document.getElementById('rank-label');
   if (rankLabel) rankLabel.innerText = rangText;
-
   const hintEl = document.getElementById('solutions-target-hint');
   if (hintEl) hintEl.innerHTML = hintText;
-
   const pillShareText = document.getElementById('pill-share-text');
-  if (pillShareText) {
-    pillShareText.textContent = `Comparteix [${trobades}/${objectiu}+]`;
-  }
+  if (pillShareText) pillShareText.textContent = `Comparteix [${trobades}/${objectiu}+]`;
 
   const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
   const tutiBadge = document.getElementById('tuti-badge');
@@ -832,8 +716,7 @@ function updateScoreboard() {
   
   if (tutiBadge && tutiCountEl) {
     if (tutisCount > 0) {
-      tutiBadge.classList.add('actiu');
-      tutiBadge.classList.add('tuti-animacio');
+      tutiBadge.classList.add('actiu', 'tuti-animacio');
       tutiCountEl.innerText = `x${tutisCount}`;
       setTimeout(() => tutiBadge.classList.remove('tuti-animacio'), 650);
     } else {
@@ -860,13 +743,9 @@ function updateScoreboard() {
 
 function clickTutiBadge() {
   const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
-  if (tutisCount === 0) {
-    showToast("🌟 Troba una fórmula que empri els 7 dígits alhora!", "warning");
-  } else if (tutisCount === 1) {
-    showToast("🌟 Portes 1 Tuti descobert! Impressionant!", "success");
-  } else {
-    showToast(`🌟 Portes ${tutisCount} Tutis descoberts! Impressionant!`, "success");
-  }
+  if (tutisCount === 0) showToast("🌟 Troba una fórmula que empri els 7 dígits alhora!", "warning");
+  else if (tutisCount === 1) showToast("🌟 Portes 1 Tuti descobert! Impressionant!", "success");
+  else showToast(`🌟 Portes ${tutisCount} Tutis descoberts! Impressionant!`, "success");
 }
 
 function renderYesterday(data) {
@@ -884,11 +763,7 @@ function renderYesterday(data) {
     solucions.forEach((expr, idx) => {
       const esTuti = tutisSet.has(expr);
       const item = document.createElement('div');
-      if (esTuti) {
-        item.className = "p-2 bg-amber-50/90 dark:bg-amber-950/35 rounded-lg border border-amber-300 dark:border-amber-800/70 flex justify-between items-center";
-      } else {
-        item.className = "p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center";
-      }
+      item.className = esTuti ? "p-2 bg-amber-50/90 dark:bg-amber-950/35 rounded-lg border border-amber-300 dark:border-amber-800/70 flex justify-between items-center" : "p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center";
       item.innerHTML = `<span><span class="text-slate-400 text-[10px] mr-1">#${idx + 1}</span> ${expr} ${esTuti ? '🌟' : ''}</span> <strong>= ${data.target}</strong>`;
       list.appendChild(item);
     });
@@ -898,13 +773,9 @@ function renderYesterday(data) {
 
 async function openYesterdayModal() {
   try {
-    const res = await fetch(`${API_URL}api/ahir?t=${Date.now()}`, {
-      cache: 'no-store'
-    });
-    const dadesAhir = await res.json();
-    renderYesterday(dadesAhir);
+    const res = await fetch(`${API_URL}api/ahir?t=${Date.now()}`, { cache: 'no-store' });
+    renderYesterday(await res.json());
   } catch (err) {
-    console.error("Error openYesterdayModal:", err);
     showToast("Error carregant les solucions d'ahir", "error");
   }
 }
@@ -914,8 +785,8 @@ function updateCountdown() {
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
-
   const diff = tomorrow - now;
+  
   if (diff <= 0) {
     const el = document.getElementById('countdown-timer');
     if (el) el.innerText = "00:00:00";
@@ -924,11 +795,10 @@ function updateCountdown() {
     showToast("Nou repte del Matelògic disponible!", "success");
     return;
   }
-
+  
   const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
   const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
   const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-
   const el = document.getElementById('countdown-timer');
   if (el) el.innerText = `${h}:${m}:${s}`;
 }
@@ -965,41 +835,28 @@ function closeModal(id) {
 async function copyShareText() {
   const trobades = gameState.solutions.length;
   const objectiu = (DAILY_GAME && DAILY_GAME.total) ? DAILY_GAME.total : 22;
-  const numRepte = DAILY_GAME ? DAILY_GAME.num : '001';
-  const target = DAILY_GAME ? DAILY_GAME.target : '--';
-  const rang = document.getElementById('rank-label').innerText;
-  
   const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
   const plens = Math.min(5, Math.floor(pctReal / 20));
   const buits = Math.max(0, 5 - plens);
-  const barraVisual = '🟥'.repeat(plens) + '⬜'.repeat(buits);
-
   const tutisCount = gameState.solutions.filter(s => s.esTuti === true).length;
+  
   let liniaTuti = '';
-  if (tutisCount > 1) {
-    liniaTuti = `\n🌟 ${tutisCount} TUTIS DESCOBERTS!`;
-  } else if (tutisCount === 1) {
-    liniaTuti = '\n🌟 TUTI DESCOBERT!';
-  }
+  if (tutisCount > 1) liniaTuti = `\n🌟 ${tutisCount} TUTIS DESCOBERTS!`;
+  else if (tutisCount === 1) liniaTuti = '\n🌟 TUTI DESCOBERT!';
 
-  const shareText = `Matelògic #${numRepte} ⬡\n` +
-                    `🎯 Objectiu: ${target}\n` +
-                    `🎖 Rang: ${rang}\n` +
-                    `📊 Progrés: ${barraVisual} ${pctReal}%\n` +
+  const shareText = `Matelògic #${DAILY_GAME ? DAILY_GAME.num : '001'} ⬡\n` +
+                    `🎯 Objectiu: ${DAILY_GAME ? DAILY_GAME.target : '--'}\n` +
+                    `🎖 Rang: ${document.getElementById('rank-label').innerText}\n` +
+                    `📊 Progrés: ${'🟥'.repeat(plens) + '⬜'.repeat(buits)} ${pctReal}%\n` +
                     `✨ Solucions: ${trobades} (${objectiu}+)${liniaTuti}\n\n` +
-                    `T'atreveixes a superar-me? 🤔\n` +
-                    `👉 https://www.matelogic.cat`;
+                    `T'atreveixes a superar-me? 🤔\n👉 https://www.matelogic.cat`;
 
   if (navigator.share) {
     try {
-      await navigator.share({ 
-        title: `Matelògic #${numRepte}`,
-        text: shareText 
-      });
+      await navigator.share({ title: `Matelògic #${DAILY_GAME ? DAILY_GAME.num : '001'}`, text: shareText });
       return;
     } catch (e) {}
   }
-
   try {
     await navigator.clipboard.writeText(shareText);
     showToast("Resultat copiat al porta-retalls!", "success");
