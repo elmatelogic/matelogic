@@ -201,10 +201,12 @@ document.addEventListener('visibilitychange', () => {
 function triggerShakeDisplay() {
   const displayEl = document.getElementById('display-container');
   if (displayEl) {
-    displayEl.classList.remove('animate-shake');
+    displayEl.classList.remove('animate-shake', 'text-red-500', 'border-red-400');
     void displayEl.offsetWidth;
-    displayEl.classList.add('animate-shake');
-    setTimeout(() => displayEl.classList.remove('animate-shake'), 360);
+    displayEl.classList.add('animate-shake', 'text-red-500', 'border-red-400');
+    setTimeout(() => {
+      displayEl.classList.remove('animate-shake', 'text-red-500', 'border-red-400');
+    }, 400);
   }
 }
 
@@ -305,7 +307,19 @@ function updateDisplay() {
       const t = tokens[i];
       const span = document.createElement('span');
       span.innerText = t.display;
-      span.className = "px-1 py-0.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors";
+      
+      let baseClass = "px-1 py-0.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors ";
+      if (['+', '−', '×', '÷'].includes(t.display)) {
+        baseClass += "text-slate-400 font-medium mx-0.5";
+      } else if (t.display === '(' || t.display === ')') {
+        baseClass += "text-brand-blue font-black mx-0.5";
+      } else if (DAILY_GAME && t.val === DAILY_GAME.center.toString()) {
+        baseClass += "text-brand-red font-black";
+      } else {
+        baseClass += "text-slate-900 dark:text-white font-bold";
+      }
+      
+      span.className = baseClass;
       span.onclick = (e) => {
         e.stopPropagation();
         setCursorPosition(i + 1);
@@ -318,7 +332,7 @@ function updateDisplay() {
     const ghostSpan = document.createElement('span');
     ghostSpan.innerText = ')'.repeat(pendents);
     ghostSpan.title = "Toca per tancar el parèntesi";
-    ghostSpan.className = "px-1 py-0.5 text-slate-300 dark:text-slate-600 cursor-pointer hover:text-slate-400 transition-colors select-none";
+    ghostSpan.className = "px-1 py-0.5 text-brand-blue/50 dark:text-brand-blue/40 font-black cursor-pointer hover:text-brand-blue transition-colors select-none";
     ghostSpan.onclick = (e) => {
       e.stopPropagation();
       setCursorPosition(tokens.length);
@@ -562,7 +576,6 @@ function setupBackdropCloseEvents() {
 window.addEventListener('keydown', (e) => {
   if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
-  // Si el duel està actiu, el duel-local.js té el control
   if (window.duelState && window.duelState.active) return;
 
   if (e.key === 'Backspace' || e.key === 'Delete') {
@@ -666,6 +679,7 @@ async function handleSubmit() {
     }
 
     const data = await res.json();
+    const displayContainer = document.getElementById('display-container');
 
     if (!data.ok) {
       triggerShakeDisplay();
@@ -689,6 +703,13 @@ async function handleSubmit() {
       triggerShakeDisplay();
       showToast("Ja havies trobat aquesta operació!", "warning");
       return;
+    }
+
+    if (displayContainer) {
+      displayContainer.classList.add('animate-pop', 'text-emerald-500', 'border-emerald-400', 'bg-emerald-50', 'dark:bg-emerald-950/30');
+      setTimeout(() => {
+        displayContainer.classList.remove('animate-pop', 'text-emerald-500', 'border-emerald-400', 'bg-emerald-50', 'dark:bg-emerald-950/30');
+      }, 500);
     }
 
     const puntsGuanyats = Number(data.punts) || 1;
