@@ -125,6 +125,7 @@
     .animate-pop { animation: pop 0.25s ease-out forwards; }
     .display-scroll::-webkit-scrollbar { display: none; }
     .display-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    
     .tuti-badge {
       display: inline-flex;
       align-items: center;
@@ -174,12 +175,12 @@
     .tuti-badge.actiu .tuti-count { display: inline-block; }
     
     @keyframes tutiExplosio {
-      0% { transform: scale(0.9) translateZ(0) translate(-50%, -50%); }
-      40% { transform: scale(1.25) rotate(10deg) translateZ(0) translate(-50%, -50%); }
-      75% { transform: scale(0.98) rotate(-5deg) translateZ(0) translate(-50%, -50%); }
-      100% { transform: scale(1.04) rotate(0deg) translateZ(0) translate(-50%, -50%); }
+      0% { transform: scale(0.9) translateZ(0); }
+      40% { transform: scale(1.25) rotate(10deg) translateZ(0); }
+      75% { transform: scale(0.98) rotate(-5deg) translateZ(0); }
+      100% { transform: scale(1.04) rotate(0deg) translateZ(0); }
     }
-    .tuti-animacio { animation: tutiExplosio 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; transform-origin: top left; }
+    .tuti-animacio { animation: tutiExplosio 0.65s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
     .btn-share-pill {
       display: inline-flex;
@@ -263,12 +264,17 @@
   <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
     <div class="relative flex items-center justify-between w-full min-h-[26px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
       <span id="challenge-day-label" class="truncate pr-2">Carregant repte...</span>
-      <div id="tuti-badge" class="tuti-badge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10" onclick="clickTutiBadge()" title="Tuti del dia">
-        <svg class="tuti-star-icon" viewBox="0 0 24 24">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-        <span id="tuti-count" class="tuti-count"></span>
+      
+      <!-- CONTENIDOR EMBOLCALL PER L'ESTRELLA -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
+        <div id="tuti-badge" class="tuti-badge" onclick="clickTutiBadge()" title="Tuti del dia">
+          <svg class="tuti-star-icon" viewBox="0 0 24 24">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span id="tuti-count" class="tuti-count"></span>
+        </div>
       </div>
+      
       <span id="challenge-date-label" class="whitespace-nowrap pl-2">-- / -- / ----</span>
     </div>
 
@@ -862,6 +868,7 @@
   </div>
 
   <script src="./js/joc.js"></script>
+  <script src="./js/duel-local.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -870,6 +877,7 @@
     }
     window.addEventListener('DOMContentLoaded', () => {
       initUI();
+      if (typeof initDuelLocal === 'function') initDuelLocal();
     });
   </script>
 </body>
