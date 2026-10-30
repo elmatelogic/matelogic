@@ -247,12 +247,11 @@
       <button onclick="printWorksheet()" aria-label="Imprimir fitxa de treball (PDF)" title="Imprimeix o desa la fitxa en PDF" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
       </button>
-      <div id="tuti-badge" class="tuti-badge" onclick="clickTutiBadge()" title="Tuti del dia">
-        <svg class="tuti-star-icon" viewBox="0 0 24 24">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      <button onclick="openDuelSetup()" aria-label="Mode 2 jugadors" title="Mode 2 jugadors" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
-        <span id="tuti-count" class="tuti-count"></span>
-      </div>
+      </button>
     </div>
     <div class="flex items-center cursor-pointer select-none py-0.5" onclick="window.scrollTo({top:0, behavior:'smooth'})">
       <img src="./img/logo.png" alt="Matelògic" class="block dark:hidden h-9 sm:h-11 w-auto max-w-[170px] sm:max-w-[210px] object-contain">
@@ -263,12 +262,12 @@
   <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
     <div class="relative flex items-center justify-between w-full min-h-[26px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
       <span id="challenge-day-label" class="truncate pr-2">Carregant repte...</span>
-      <button onclick="openDuelSetup()" aria-label="Mode 2 jugadors" title="Mode 2 jugadors" class="absolute left-1/2 -translate-x-1/2 inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-bold text-[11px] border border-slate-200/90 dark:border-slate-700 shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap z-10">
-        <svg class="w-3.5 h-3.5 text-brand-red shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      <div id="tuti-badge" class="tuti-badge absolute left-1/2 -translate-x-1/2 z-10" onclick="clickTutiBadge()" title="Tuti del dia">
+        <svg class="tuti-star-icon" viewBox="0 0 24 24">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
-        <span class="normal-case tracking-normal">2 jugadors/es</span>
-      </button>
+        <span id="tuti-count" class="tuti-count"></span>
+      </div>
       <span id="challenge-date-label" class="whitespace-nowrap pl-2">-- / -- / ----</span>
     </div>
 
@@ -858,6 +857,7 @@
   </div>
 
   <script src="./js/joc.js"></script>
+  <script src="./js/duel-local.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -866,6 +866,7 @@
     }
     window.addEventListener('DOMContentLoaded', () => {
       initUI();
+      if (typeof initDuelLocal === 'function') initDuelLocal();
     });
   </script>
 </body>
