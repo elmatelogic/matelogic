@@ -670,14 +670,52 @@ function updateScoreboard() {
   if (scoreCounter) scoreCounter.innerText = gameState.score;
 
   const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
+  const pctBarra = Math.min(pctReal, 100);
+
   const rankBar = document.getElementById('rank-bar');
-  if (rankBar) rankBar.style.width = `${Math.min(pctReal, 100)}%`;
+  const rankKnob = document.getElementById('rank-knob');
+  if (rankBar) rankBar.style.width = `${pctBarra}%`;
+  if (rankKnob) rankKnob.style.left = `${pctBarra}%`;
+
+  const m50 = document.getElementById('milestone-50');
+  const m100 = document.getElementById('milestone-100');
+  const isEuler = trobades > objectiu;
+
+  if (m50) {
+    if (pctReal >= 50) m50.className = `absolute left-1/2 -translate-x-1/2 w-1.5 h-3.5 rounded-full shadow-sm transition-colors ${isEuler ? 'bg-amber-400' : 'bg-brand-red dark:bg-rose-400'}`;
+    else m50.className = "absolute left-1/2 -translate-x-1/2 w-1 h-3 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-300 dark:border-slate-600 transition-colors";
+  }
+  
+  if (m100) {
+    if (pctReal >= 100) m100.className = `absolute right-0.5 w-1.5 h-3.5 rounded-full shadow-sm transition-colors ${isEuler ? 'bg-amber-400' : 'bg-brand-red dark:bg-rose-400'}`;
+    else m100.className = "absolute right-0.5 w-1 h-3 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-300 dark:border-slate-600 transition-colors";
+  }
+
+  if (isEuler) {
+    if (rankBar) {
+      rankBar.classList.remove('from-brand-red', 'to-rose-400', 'shadow-[0_0_8px_rgba(230,57,70,0.6)]');
+      rankBar.classList.add('from-amber-400', 'to-yellow-400', 'shadow-[0_0_12px_rgba(251,191,36,0.8)]');
+    }
+    if (rankKnob) {
+      rankKnob.classList.remove('bg-slate-800', 'dark:bg-white', 'border-white', 'dark:border-slate-800');
+      rankKnob.classList.add('bg-amber-400', 'border-amber-200', 'shadow-[0_0_10px_rgba(251,191,36,0.8)]');
+    }
+  } else {
+    if (rankBar) {
+      rankBar.classList.add('from-brand-red', 'to-rose-400', 'shadow-[0_0_8px_rgba(230,57,70,0.6)]');
+      rankBar.classList.remove('from-amber-400', 'to-yellow-400', 'shadow-[0_0_12px_rgba(251,191,36,0.8)]');
+    }
+    if (rankKnob) {
+      rankKnob.classList.add('bg-slate-800', 'dark:bg-white', 'border-white', 'dark:border-slate-800');
+      rankKnob.classList.remove('bg-amber-400', 'border-amber-200', 'shadow-[0_0_10px_rgba(251,191,36,0.8)]');
+    }
+  }
 
   const baseBoxClasses = "group flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer select-none active:scale-95";
   let rangText = "Principiant";
   let hintText = "";
 
-  if (trobades > objectiu) {
+  if (isEuler) {
     rangText = "Euler ✨";
     const extra = trobades - objectiu;
     hintText = `✨ Has superat el repte amb <strong>+${extra} solucions extres</strong>! Ets al màxim nivell <strong>Euler</strong>!`;
@@ -704,7 +742,17 @@ function updateScoreboard() {
   }
 
   const rankLabel = document.getElementById('rank-label');
-  if (rankLabel) rankLabel.innerText = rangText;
+  if (rankLabel) {
+    rankLabel.innerText = rangText;
+    if (isEuler) {
+      rankLabel.classList.remove('text-brand-red');
+      rankLabel.classList.add('text-amber-500');
+    } else {
+      rankLabel.classList.add('text-brand-red');
+      rankLabel.classList.remove('text-amber-500');
+    }
+  }
+  
   const hintEl = document.getElementById('solutions-target-hint');
   if (hintEl) hintEl.innerHTML = hintText;
   const pillShareText = document.getElementById('pill-share-text');
