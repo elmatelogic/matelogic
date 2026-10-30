@@ -634,10 +634,18 @@ async function handleSubmit() {
 
     const nouRang = document.getElementById('rank-label').innerText;
     if (esTutiReal) {
-      if (typeof confetti === 'function') try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+      if (typeof confetti === 'function') {
+        setTimeout(() => {
+          try { confetti({ particleCount: 75, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+        }, 100);
+      }
       showToast(`🌟 TUTI! Tots els nombres usats! +${puntsGuanyats} pts`, "success");
     } else if (rangAnterior !== nouRang && (nouRang.includes("Geni") || nouRang.includes("Euler"))) {
-      if (typeof confetti === 'function') try { confetti({ particleCount: 70, spread: 60, origin: { y: 0.65 } }); } catch (e) {}
+      if (typeof confetti === 'function') {
+        setTimeout(() => {
+          try { confetti({ particleCount: 60, spread: 60, origin: { y: 0.65 } }); } catch (e) {}
+        }, 100);
+      }
       showToast(`🎉 Nou nivell desbloquejat: ${nouRang}! (+${puntsGuanyats} pts)`, "success");
     } else {
       showToast(`Correcte! +${puntsGuanyats} pts`, "success");
@@ -764,7 +772,10 @@ function updateScoreboard() {
   
   if (tutiBadge && tutiCountEl) {
     if (tutisCount > 0) {
-      tutiBadge.classList.add('actiu', 'tuti-animacio');
+      tutiBadge.classList.add('actiu');
+      tutiBadge.classList.remove('tuti-animacio');
+      void tutiBadge.offsetWidth;
+      tutiBadge.classList.add('tuti-animacio');
       tutiCountEl.innerText = `x${tutisCount}`;
       setTimeout(() => tutiBadge.classList.remove('tuti-animacio'), 650);
     } else {
