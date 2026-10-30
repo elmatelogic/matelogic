@@ -125,7 +125,6 @@
     .animate-pop { animation: pop 0.25s ease-out forwards; }
     .display-scroll::-webkit-scrollbar { display: none; }
     .display-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-    
     .tuti-badge {
       display: inline-flex;
       align-items: center;
@@ -180,7 +179,7 @@
       75% { transform: scale(0.98) rotate(-5deg) translateZ(0); }
       100% { transform: scale(1.04) rotate(0deg) translateZ(0); }
     }
-    .tuti-animacio { animation: tutiExplosio 0.65s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .tuti-animacio { animation: tutiExplosio 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; transform-origin: center; }
 
     .btn-share-pill {
       display: inline-flex;
