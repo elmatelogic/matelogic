@@ -925,6 +925,14 @@ function openModal(id) {
     if (countdownInterval) clearInterval(countdownInterval);
     countdownInterval = setInterval(updateCountdown, 1000);
   }
+  
+  if (id === 'info-modal' && DAILY_GAME) {
+    const infoTarget = document.getElementById('info-target-val');
+    if (infoTarget) infoTarget.innerText = DAILY_GAME.target;
+    const infoCenter = document.getElementById('info-center-val');
+    if (infoCenter) infoCenter.innerText = DAILY_GAME.center;
+  }
+  
   document.getElementById(id).classList.remove('hidden');
 }
 
