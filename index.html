@@ -90,8 +90,6 @@
     input, textarea { user-select: auto; }
     html, body { overscroll-behavior-y: contain; }
     button { touch-action: manipulation; }
-    
-    /* CSS corregit pels filtres a Safari/iOS */
     .hex-cell {
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
       -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
@@ -102,9 +100,7 @@
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15)) grayscale(0%);
       -webkit-filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15)) grayscale(0%);
     }
-    .hex-cell-blue { 
-      background: linear-gradient(180deg, #53c7eb 0%, #3bb4d9 100%); 
-    }
+    .hex-cell-blue { background: linear-gradient(180deg, #53c7eb 0%, #3bb4d9 100%); }
     .hex-cell-red {
       background: linear-gradient(180deg, #ed4b58 0%, #db2c3b 100%);
       filter: drop-shadow(0 0 5px rgba(230, 57, 70, 0.45)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2)) grayscale(0%);
@@ -122,7 +118,6 @@
       filter: grayscale(100%) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.08)) !important;
       -webkit-filter: grayscale(100%) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.08)) !important;
     }
-
     .key-3d { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1), 0 6px 12px rgba(0, 0, 0, 0.05); transition: all 0.12s ease; }
     .key-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.05); }
     .honeycomb-grid { display: flex; flex-direction: column; align-items: center; gap: 5px; }
@@ -174,12 +169,14 @@
       background: linear-gradient(135deg, #fef3c7, #fde68a);
       border: 1px solid #f59e0b;
       color: #b45309;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.55), 0 2px 5px rgba(180, 83, 9, 0.25);
       transform: scale(1.04);
     }
     .dark .tuti-badge.actiu {
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
       border: 1px solid #f59e0b;
       color: #fbbf24;
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
     }
     .tuti-badge.actiu .tuti-star-icon { fill: #f59e0b; stroke: #d97706; filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.8)); }
     .tuti-badge.actiu .tuti-count { display: inline-block; }
@@ -274,8 +271,6 @@
   <main class="w-full max-w-md flex flex-col items-center justify-start px-4 pt-2.5 pb-4 gap-2">
     <div class="relative flex items-center justify-between w-full min-h-[26px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
       <span id="challenge-day-label" class="truncate pr-2">Carregant repte...</span>
-      
-      <!-- CONTENIDOR EMBOLCALL PER L'ESTRELLA -->
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
         <div id="tuti-badge" class="tuti-badge" onclick="clickTutiBadge()" title="Tuti del dia">
           <svg class="tuti-star-icon" viewBox="0 0 24 24">
@@ -284,7 +279,6 @@
           <span id="tuti-count" class="tuti-count"></span>
         </div>
       </div>
-      
       <span id="challenge-date-label" class="whitespace-nowrap pl-2">-- / -- / ----</span>
     </div>
 
@@ -344,8 +338,9 @@
       <button onclick="moveCursor(-1)" aria-label="Moure cursor a l'esquerra" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
         ‹
       </button>
-      <div id="display-container" onclick="handleDisplayClick(event)" class="display-scroll grow h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none">
+      <div id="display-container" onclick="handleDisplayClick(event)" class="display-scroll grow h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none relative">
         <div id="display-tokens" class="flex items-center min-w-full justify-center transition-all"></div>
+        <div id="assist-result" class="hidden absolute right-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-brand-blue font-black text-lg px-2 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 pointer-events-none"></div>
       </div>
       <button onclick="moveCursor(1)" aria-label="Moure cursor a la dreta" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
         ›
@@ -607,6 +602,13 @@
           <button id="theme-btn-system" onclick="setAppTheme('system')" class="px-2.5 py-1 rounded-lg text-[11px] transition-all">Sistema</button>
           <button id="theme-btn-light" onclick="setAppTheme('light')" class="px-2.5 py-1 rounded-lg text-[11px] transition-all">Clar</button>
           <button id="theme-btn-dark" onclick="setAppTheme('dark')" class="px-2.5 py-1 rounded-lg text-[11px] transition-all">Fosc</button>
+        </div>
+      </div>
+      <div class="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-2xl flex items-center justify-between gap-1 text-xs font-bold border border-slate-200/80 dark:border-slate-700/70 mt-2">
+        <span class="text-[11px] text-slate-500 dark:text-slate-400 pl-2 uppercase tracking-wider">Mode assistit:</span>
+        <div class="inline-flex bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
+          <button id="assist-btn-off" onclick="setAssistMode(false)" class="px-2.5 py-1 rounded-lg text-[11px] transition-all bg-brand-red text-white font-bold shadow-xs">Desactivat</button>
+          <button id="assist-btn-on" onclick="setAssistMode(true)" class="px-2.5 py-1 rounded-lg text-[11px] transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Activat</button>
         </div>
       </div>
       <div class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
