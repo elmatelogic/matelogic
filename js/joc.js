@@ -166,6 +166,11 @@ async function initUI() {
     document.getElementById('target-value').innerText = DAILY_GAME.target;
     document.getElementById('center-val').innerText = DAILY_GAME.center;
 
+    const infoTarget = document.getElementById('info-target-val');
+    if (infoTarget) infoTarget.innerText = DAILY_GAME.target;
+    const infoCenter = document.getElementById('info-center-val');
+    if (infoCenter) infoCenter.innerText = DAILY_GAME.center;
+
     const hContainer = document.getElementById('honeycomb-container');
     if (hContainer) hContainer.classList.remove('opacity-60');
 
@@ -192,7 +197,6 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function triggerShakeDisplay() {
-  if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
   const displayEl = document.getElementById('display-container');
   if (displayEl) {
     displayEl.classList.remove('animate-shake', 'text-red-500', 'border-red-400');
@@ -258,7 +262,6 @@ function renderOuterHexagons() {
 }
 
 function shuffleOuterHexagons() {
-  if (navigator.vibrate) navigator.vibrate(15);
   for (let i = outerPositions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [outerPositions[i], outerPositions[j]] = [outerPositions[j], outerPositions[i]];
@@ -297,6 +300,7 @@ function updateDisplay() {
   const tancats = tokens.filter(t => t.val === ')').length;
   const pendents = Math.max(0, oberts - tancats);
   const totalChars = tokens.reduce((acc, t) => acc + t.display.length, 0) + tokens.length + pendents;
+  
   if (totalChars > 16) {
     container.className = "flex items-center min-w-full text-base sm:text-lg transition-all";
   } else if (totalChars > 11) {
@@ -304,6 +308,7 @@ function updateDisplay() {
   } else {
     container.className = "flex items-center min-w-full text-2xl sm:text-3xl transition-all";
   }
+  
   const cursorSpan = document.createElement('span');
   cursorSpan.id = "display-cursor-el";
   cursorSpan.className = "w-2 h-6 bg-brand-red rounded-xs cursor-blink mx-0.5 inline-block shrink-0";
@@ -357,7 +362,6 @@ function updateDisplay() {
 }
 
 function setCursorPosition(newPos) {
-  if (navigator.vibrate) navigator.vibrate(10);
   cursorIndex = Math.max(0, Math.min(newPos, tokens.length));
   updateDisplay();
 }
@@ -376,7 +380,6 @@ function handleDisplayClick(e) {
 }
 
 function appendChar(char) {
-  if (navigator.vibrate) navigator.vibrate(15);
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
   const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
@@ -436,7 +439,6 @@ function appendChar(char) {
 }
 
 function handleHexClick(index) {
-  if (navigator.vibrate) navigator.vibrate(20);
   const val = outerPositions[index];
   if (usedNumbers.has(val)) return;
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
@@ -464,7 +466,6 @@ function handleHexClick(index) {
 }
 
 function handleHexCenterClick() {
-  if (navigator.vibrate) navigator.vibrate(20);
   const val = DAILY_GAME.center;
   if (usedNumbers.has(val)) return;
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
@@ -492,7 +493,6 @@ function handleHexCenterClick() {
 }
 
 function handleDelete() {
-  if (navigator.vibrate) navigator.vibrate(15);
   if (cursorIndex === 0) return;
   const prevToken = tokens[cursorIndex - 1];
   const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
@@ -516,7 +516,6 @@ function handleDelete() {
 }
 
 function clearAllTokens() {
-  if (navigator.vibrate) navigator.vibrate([20, 30, 20]);
   if (tokens.length === 0) return;
   tokens = [];
   cursorIndex = 0;
@@ -592,7 +591,6 @@ window.addEventListener('keydown', (e) => {
 });
 
 async function handleSubmit() {
-  if (navigator.vibrate) navigator.vibrate(20);
   if (!tokens || tokens.length === 0) {
     triggerShakeDisplay();
     showToast("Escriu una operació primer", "warning");
@@ -942,7 +940,6 @@ function closeModal(id) {
 }
 
 async function copyShareText() {
-  if (navigator.vibrate) navigator.vibrate(15);
   const trobades = gameState.solutions.length;
   const objectiu = (DAILY_GAME && DAILY_GAME.total) ? DAILY_GAME.total : 22;
   const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
