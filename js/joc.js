@@ -9,6 +9,7 @@ let gameState = { solutions: [], score: 0 };
 let CURRENT_CHALLENGE_ID = "";
 let countdownInterval = null;
 let eventsInitialized = false;
+let assistMode = localStorage.getItem('matelogic_assist') === 'true';
 
 const LOCAL_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Europe/Madrid',
@@ -49,7 +50,6 @@ function cleanOldProgress(currentNumStr) {
   try {
     const currentDayNum = parseInt(currentNumStr, 10);
     if (isNaN(currentDayNum)) return;
-
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -75,16 +75,12 @@ function updateThemeUI(selectedTheme) {
     light: document.getElementById('theme-btn-light'),
     dark: document.getElementById('theme-btn-dark')
   };
-  const activeClass = "bg-brand-red text-white font-bold shadow-xs";
-  const inactiveClass = "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
-
+  const activeClass = "px-2.5 py-1 rounded-lg text-[11px] transition-all bg-brand-red text-white font-bold shadow-xs";
+  const inactiveClass = "px-2.5 py-1 rounded-lg text-[11px] transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
   Object.keys(btns).forEach(key => {
     if (!btns[key]) return;
-    if (key === selectedTheme) {
-      btns[key].className = `px-2.5 py-1 rounded-lg text-[11px] transition-all ${activeClass}`;
-    } else {
-      btns[key].className = `px-2.5 py-1 rounded-lg text-[11px] transition-all ${inactiveClass}`;
-    }
+    if (key === selectedTheme) btns[key].className = activeClass;
+    else btns[key].className = inactiveClass;
   });
 }
 
@@ -99,14 +95,25 @@ function setAppTheme(theme) {
   updateThemeUI(theme);
 }
 
+function setAssistMode(state) {
+  assistMode = state;
+  localStorage.setItem('matelogic_assist', state);
+  const btnOn = document.getElementById('assist-btn-on');
+  const btnOff = document.getElementById('assist-btn-off');
+  const activeClass = "px-2.5 py-1 rounded-lg text-[11px] transition-all bg-brand-red text-white font-bold shadow-xs";
+  const inactiveClass = "px-2.5 py-1 rounded-lg text-[11px] transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+  if (btnOn && btnOff) {
+    btnOn.className = state ? activeClass : inactiveClass;
+    btnOff.className = state ? inactiveClass : activeClass;
+  }
+  updateDisplay();
+}
+
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
   const currentTheme = localStorage.getItem('matelogic_theme') || 'system';
   if (currentTheme === 'system') {
-    if (e.matches) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    if (e.matches) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
     updateThemeUI('system');
   }
 });
@@ -117,12 +124,10 @@ function updatePrintableSheet() {
   const dateEl = document.getElementById('sheet-date');
   const targetEl = document.getElementById('sheet-target');
   const centerEl = document.getElementById('sheet-val-center');
-
   if (numEl) numEl.innerText = `Repte #${DAILY_GAME.num}`;
   if (dateEl) dateEl.innerText = DAILY_GAME.data;
   if (targetEl) targetEl.innerText = DAILY_GAME.target;
   if (centerEl) centerEl.textContent = DAILY_GAME.center;
-
   if (Array.isArray(DAILY_GAME.outer)) {
     DAILY_GAME.outer.forEach((val, idx) => {
       const el = document.getElementById(`sheet-val-${idx}`);
@@ -142,6 +147,8 @@ async function initUI() {
   try {
     const initialTheme = localStorage.getItem('matelogic_theme') || 'system';
     updateThemeUI(initialTheme);
+    setAssistMode(assistMode);
+
     const res = await fetch(`${API_URL}api/repte?t=${Date.now()}`, { cache: 'no-store' });
     DAILY_GAME = await res.json();
     const newChallengeId = `matelogic_d${DAILY_GAME.num}_t${DAILY_GAME.target}`;
@@ -185,6 +192,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function triggerShakeDisplay() {
+  if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
   const displayEl = document.getElementById('display-container');
   if (displayEl) {
     displayEl.classList.remove('animate-shake', 'text-red-500', 'border-red-400');
@@ -250,11 +258,36 @@ function renderOuterHexagons() {
 }
 
 function shuffleOuterHexagons() {
+  if (navigator.vibrate) navigator.vibrate(15);
   for (let i = outerPositions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [outerPositions[i], outerPositions[j]] = [outerPositions[j], outerPositions[i]];
   }
   renderOuterHexagons();
+}
+
+function evaluateExpression() {
+  if (tokens.length === 0) return '';
+  let expr = tokens.map(t => {
+    if (t.val === '×') return '*';
+    if (t.val === '÷') return '/';
+    if (t.val === '−') return '-';
+    return t.val;
+  }).join('');
+  let oberts = (expr.match(/\(/g) || []).length;
+  let tancats = (expr.match(/\)/g) || []).length;
+  expr += ')'.repeat(Math.max(0, oberts - tancats));
+  if (/[+\-*/]$/.test(expr)) return '...';
+  try {
+    let result = new Function('return ' + expr)();
+    if (Number.isFinite(result)) {
+      if (result % 1 !== 0) return '≈ ' + parseFloat(result.toFixed(2));
+      return '= ' + result;
+    }
+    return '...';
+  } catch (e) {
+    return '...';
+  }
 }
 
 function updateDisplay() {
@@ -306,6 +339,16 @@ function updateDisplay() {
     container.appendChild(ghostSpan);
   }
 
+  const assistEl = document.getElementById('assist-result');
+  if (assistEl) {
+    if (assistMode && tokens.length > 0) {
+      assistEl.innerText = evaluateExpression();
+      assistEl.classList.remove('hidden');
+    } else {
+      assistEl.classList.add('hidden');
+    }
+  }
+
   saveTokensSession();
   setTimeout(() => {
     const cEl = document.getElementById('display-cursor-el');
@@ -314,6 +357,7 @@ function updateDisplay() {
 }
 
 function setCursorPosition(newPos) {
+  if (navigator.vibrate) navigator.vibrate(10);
   cursorIndex = Math.max(0, Math.min(newPos, tokens.length));
   updateDisplay();
 }
@@ -332,6 +376,7 @@ function handleDisplayClick(e) {
 }
 
 function appendChar(char) {
+  if (navigator.vibrate) navigator.vibrate(15);
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
   const nextToken = cursorIndex < tokens.length ? tokens[cursorIndex] : null;
 
@@ -391,6 +436,7 @@ function appendChar(char) {
 }
 
 function handleHexClick(index) {
+  if (navigator.vibrate) navigator.vibrate(20);
   const val = outerPositions[index];
   if (usedNumbers.has(val)) return;
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
@@ -418,6 +464,7 @@ function handleHexClick(index) {
 }
 
 function handleHexCenterClick() {
+  if (navigator.vibrate) navigator.vibrate(20);
   const val = DAILY_GAME.center;
   if (usedNumbers.has(val)) return;
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
@@ -445,6 +492,7 @@ function handleHexCenterClick() {
 }
 
 function handleDelete() {
+  if (navigator.vibrate) navigator.vibrate(15);
   if (cursorIndex === 0) return;
   const prevToken = tokens[cursorIndex - 1];
   const tokenAbans = cursorIndex > 1 ? tokens[cursorIndex - 2] : null;
@@ -468,6 +516,7 @@ function handleDelete() {
 }
 
 function clearAllTokens() {
+  if (navigator.vibrate) navigator.vibrate([20, 30, 20]);
   if (tokens.length === 0) return;
   tokens = [];
   cursorIndex = 0;
@@ -543,6 +592,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 async function handleSubmit() {
+  if (navigator.vibrate) navigator.vibrate(20);
   if (!tokens || tokens.length === 0) {
     triggerShakeDisplay();
     showToast("Escriu una operació primer", "warning");
@@ -892,6 +942,7 @@ function closeModal(id) {
 }
 
 async function copyShareText() {
+  if (navigator.vibrate) navigator.vibrate(15);
   const trobades = gameState.solutions.length;
   const objectiu = (DAILY_GAME && DAILY_GAME.total) ? DAILY_GAME.total : 22;
   const pctReal = objectiu ? Math.round((trobades / objectiu) * 100) : 0;
