@@ -208,7 +208,6 @@
     .dark .btn-share-pill:hover { background: rgba(22, 101, 52, 0.35); }
     .btn-share-pill:active { transform: scale(0.97); }
     .btn-share-pill svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
-    
     .duel-halo-blau {
       border-color: #48bfe3 !important;
       box-shadow: 0 0 0 3px rgba(72, 191, 227, 0.28), 0 8px 20px -4px rgba(0, 119, 182, 0.22) !important;
@@ -217,10 +216,7 @@
       border-color: #e63946 !important;
       box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.28), 0 8px 20px -4px rgba(230, 57, 70, 0.22) !important;
     }
-
-    /* Utilitat per ocultar elements de detall i llistes nativament en impressió */
     details summary::-webkit-details-marker { display: none; }
-    
     @media print {
       @page { size: A4 portrait; margin: 6mm 10mm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -246,9 +242,7 @@
   </style>
 </head>
 <body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-[100dvh] flex flex-col justify-start items-center font-sans antialiased selection:bg-brand-blue selection:text-white pb-10">
-  
   <div id="toast-container" class="fixed top-5 z-[60] flex flex-col gap-2 items-center pointer-events-none w-full max-w-sm px-4"></div>
-  
   <header class="w-full max-w-lg border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-3 py-2 flex items-center justify-between shadow-sm">
     <div class="flex items-center gap-1.5 shrink-0">
       <button onclick="openModal('info-modal')" aria-label="Instruccions" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -276,7 +270,6 @@
     <div class="relative flex items-center justify-between w-full min-h-[26px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
       <span id="challenge-day-label" class="truncate pr-2">Carregant repte...</span>
       
-      <!-- CONTENIDOR EMBOLCALL PER L'ESTRELLA -->
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
         <div id="tuti-badge" class="tuti-badge" onclick="clickTutiBadge()" title="Tuti del dia">
           <svg class="tuti-star-icon" viewBox="0 0 24 24">
@@ -341,14 +334,13 @@
       </div>
     </div>
 
-    <!-- Visor de l'equació amb el badge del Mode Assistit flotant per fora -->
     <div class="w-full relative flex items-center gap-1 mt-0.5">
       <button onclick="moveCursor(-1)" aria-label="Moure cursor a l'esquerra" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">
         ‹
       </button>
       
       <div class="grow relative">
-        <div id="assist-result" class="hidden absolute -top-2.5 right-1.5 bg-brand-blue text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm border border-blue-400 dark:border-blue-500 pointer-events-none z-20"></div>
+        <div id="assist-result" class="hidden absolute -top-3 right-1.5 bg-brand-blue text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm border border-blue-400 dark:border-blue-500 pointer-events-none z-20"></div>
         <div id="display-container" onclick="handleDisplayClick(event)" class="display-scroll w-full h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none">
           <div id="display-tokens" class="flex items-center min-w-full justify-center transition-all"></div>
         </div>
@@ -399,7 +391,6 @@
     </div>
   </main>
 
-  <!-- Modal de Setup del Duel -->
   <div id="duel-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-4 animate-pop border border-slate-200/80 dark:border-slate-700/80">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
@@ -446,7 +437,6 @@
     </div>
   </div>
 
-  <!-- Pantalla Completa Duel -->
   <div id="duel-screen" class="fixed inset-0 bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 z-40 hidden flex flex-col justify-start items-center overflow-y-auto pb-8">
     <div class="w-full max-w-6xl border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-3 sm:px-5 py-2 flex items-center justify-between shadow-sm">
       <div class="flex items-center gap-2">
@@ -513,12 +503,11 @@
           </div>
         </div>
         
-        <!-- Visor del Duel amb assist-result fora -->
         <div class="w-full relative flex items-center gap-1 mt-0.5">
           <button onclick="moveDuelCursor(-1)" aria-label="Moure cursor a l'esquerra" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">‹</button>
           
           <div class="grow relative">
-            <div id="duel-assist-result" class="hidden absolute -top-2.5 right-1.5 bg-brand-blue text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm border border-blue-400 dark:border-blue-500 pointer-events-none z-20"></div>
+            <div id="duel-assist-result" class="hidden absolute -top-3 right-1.5 bg-brand-blue text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm border border-blue-400 dark:border-blue-500 pointer-events-none z-20"></div>
             <div id="duel-display-container" onclick="handleDuelDisplayClick(event)" class="display-scroll w-full h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none">
               <div id="duel-display-tokens" class="flex items-center min-w-full justify-center transition-all"></div>
             </div>
@@ -615,7 +604,6 @@
     </div>
   </div>
 
-  <!-- NOU MODAL INFO I AJUSTOS (Estil App Nativa) -->
   <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-pop border border-slate-200/80 dark:border-slate-700/80">
       
@@ -656,14 +644,14 @@
         <div class="space-y-3">
           <h4 class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 pl-1">Com s'hi juga</h4>
           
-          <div class="grid gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex gap-3.5 items-center transition-colors">
-              <div class="w-10 h-10 shrink-0 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-[17px] font-black text-slate-800 dark:text-white font-mono shadow-sm">110</div>
+              <div class="w-10 h-10 shrink-0 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-[17px] font-black text-slate-800 dark:text-white font-mono shadow-sm" id="info-target-val">110</div>
               <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">Troba operacions matemàtiques que donin exactament el <strong>Nombre objectiu</strong>.</p>
             </div>
 
             <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex gap-3.5 items-center transition-colors">
-              <div class="w-10 h-10 shrink-0 bg-gradient-to-b from-brand-red to-[#db2c3b] rounded-xl flex items-center justify-center text-xl font-black text-white font-mono shadow-[0_2px_8px_rgba(230,57,70,0.4)]">9</div>
+              <div class="w-10 h-10 shrink-0 bg-gradient-to-b from-brand-red to-[#db2c3b] rounded-xl flex items-center justify-center text-xl font-black text-white font-mono shadow-[0_2px_8px_rgba(230,57,70,0.4)]" id="info-center-val">9</div>
               <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">El <strong>dígit central vermell</strong> s'ha d'utilitzar obligatòriament a cada fórmula.</p>
             </div>
 
@@ -692,7 +680,7 @@
 
       <div class="border-t border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 shrink-0 bg-slate-50/80 dark:bg-slate-900/80 flex flex-col items-center gap-3 backdrop-blur-sm z-10">
          <button onclick="closeModal('info-modal')" class="w-full py-3.5 rounded-xl bg-brand-red text-white font-bold text-sm shadow-lg active:scale-[0.98] transition-all">Desa i continua jugant</button>
-         <div class="flex flex-col items-center gap-0.5">
+         <div class="flex flex-col items-center gap-0.5 mt-1">
            <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Projecte lliure i sense anuncis</span>
            <a href="mailto:hola@matelogic.cat" class="text-[11px] text-slate-500 dark:text-slate-400 hover:text-brand-red font-bold transition-colors">hola@matelogic.cat</a>
          </div>
