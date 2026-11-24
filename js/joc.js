@@ -1,13 +1,4 @@
-import { avaluarExpressioAssistida } from './motor-matematic.js';
-import {
-  API_URL,
-  getCurrentMadridDateShort,
-  showToast,
-  openAccessibleModal,
-  closeAccessibleModal,
-  bindLongPressDelete
-} from './utilitats-ui.js';
-import { initDuelLocal, stopDuelTimer, openDuelSetup } from './duel-local.js';
+const API_URL = "https://matelogicbd.elmatelogic.workers.dev/";
 
 let DAILY_GAME = null;
 let tokens = [];
@@ -20,8 +11,16 @@ let countdownInterval = null;
 let eventsInitialized = false;
 let assistMode = localStorage.getItem('matelogic_assist') === 'true';
 
-export function getDailyGame() {
-  return DAILY_GAME;
+const LOCAL_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Madrid',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+});
+
+function getCurrentMadridDateShort() {
+  const [y, m, d] = LOCAL_DATE_FORMATTER.format(new Date()).split('-');
+  return `${d}/${m}/${y.slice(-2)}`;
 }
 
 function saveTokensSession() {
@@ -138,7 +137,7 @@ function updatePrintableSheet() {
 }
 
 function printWorksheet() {
-  stopDuelTimer();
+  if (typeof stopDuelTimer === 'function') stopDuelTimer();
   updatePrintableSheet();
   try { navigator.sendBeacon(`${API_URL}api/fitxa`); } catch (e) {}
   window.print();
@@ -182,7 +181,7 @@ async function initUI() {
     updatePrintableSheet();
 
     if (!eventsInitialized) {
-      bindLongPressDelete('delete-btn', handleDelete, clearAllTokens);
+      setupDeleteEvents();
       setupBackdropCloseEvents();
       eventsInitialized = true;
     }
@@ -270,6 +269,30 @@ function shuffleOuterHexagons() {
   renderOuterHexagons();
 }
 
+function evaluateExpression() {
+  if (tokens.length === 0) return '';
+  let expr = tokens.map(t => {
+    if (t.val === '×') return '*';
+    if (t.val === '÷') return '/';
+    if (t.val === '−') return '-';
+    return t.val;
+  }).join('');
+  let oberts = (expr.match(/\(/g) || []).length;
+  let tancats = (expr.match(/\)/g) || []).length;
+  expr += ')'.repeat(Math.max(0, oberts - tancats));
+  if (/[+\-*/]$/.test(expr)) return '...';
+  try {
+    let result = new Function('return ' + expr)();
+    if (Number.isFinite(result)) {
+      if (result % 1 !== 0) return '≈ ' + parseFloat(result.toFixed(2));
+      return '= ' + result;
+    }
+    return '...';
+  } catch (e) {
+    return '...';
+  }
+}
+
 function updateDisplay() {
   const container = document.getElementById('display-tokens');
   container.innerHTML = '';
@@ -324,13 +347,9 @@ function updateDisplay() {
   const assistEl = document.getElementById('assist-result');
   if (assistEl) {
     if (assistMode && tokens.length > 0) {
-      const textAssist = avaluarExpressioAssistida(tokens);
-      if (assistEl.innerText !== textAssist) {
-        assistEl.innerText = textAssist;
-      }
+      assistEl.innerText = evaluateExpression();
       assistEl.classList.remove('hidden');
     } else {
-      assistEl.innerText = '';
       assistEl.classList.add('hidden');
     }
   }
@@ -447,7 +466,6 @@ function handleHexClick(index) {
 }
 
 function handleHexCenterClick() {
-  if (!DAILY_GAME) return;
   const val = DAILY_GAME.center;
   if (usedNumbers.has(val)) return;
   const prevToken = cursorIndex > 0 ? tokens[cursorIndex - 1] : null;
@@ -507,6 +525,28 @@ function clearAllTokens() {
   showToast("Operació buidada", "warning");
 }
 
+function setupDeleteEvents() {
+  const btn = document.getElementById('delete-btn');
+  if (!btn) return;
+  let pressTimer = null;
+  let isLongPress = false;
+
+  const startPress = () => {
+    isLongPress = false;
+    pressTimer = setTimeout(() => { isLongPress = true; clearAllTokens(); }, 500);
+  };
+  const endPress = (e) => {
+    clearTimeout(pressTimer);
+    if (!isLongPress && e.type !== 'mouseleave') handleDelete();
+  };
+
+  btn.addEventListener('mousedown', startPress);
+  btn.addEventListener('mouseup', endPress);
+  btn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+  btn.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(); }, { passive: false });
+  btn.addEventListener('touchend', (e) => { e.preventDefault(); endPress(e); }, { passive: false });
+}
+
 function setupBackdropCloseEvents() {
   document.querySelectorAll('[id$="-modal"]').forEach(modal => {
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
@@ -517,20 +557,14 @@ window.addEventListener('keydown', (e) => {
   if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
   if (window.duelState && window.duelState.active) return;
 
-  if (e.key === 'Escape') {
-    const modalObert = document.querySelector('[id$="-modal"]:not(.hidden)');
-    if (modalObert) { closeModal(modalObert.id); return; }
-    clearAllTokens();
-    return;
-  }
-
-  const modalObert = document.querySelector('[id$="-modal"]:not(.hidden)');
-  if (modalObert) return;
-
   if (e.key === 'Backspace' || e.key === 'Delete') {
     e.preventDefault();
     if (e.repeat) clearAllTokens();
     else handleDelete();
+  } else if (e.key === 'Escape') {
+    const modalObert = document.querySelector('[id$="-modal"]:not(.hidden)');
+    if (modalObert) { closeModal(modalObert.id); return; }
+    clearAllTokens();
   } else if (e.key === ' ') {
     e.preventDefault();
     shuffleOuterHexagons();
@@ -876,38 +910,41 @@ function updateCountdown() {
   if (el) el.innerText = `${h}:${m}:${s}`;
 }
 
-export function openModal(id) {
-  openAccessibleModal(id, () => {
-    if (id === 'share-modal') {
-      const trobades = gameState.solutions.length;
-      const total = DAILY_GAME ? DAILY_GAME.total : 22;
-      document.getElementById('share-modal-num').innerText = `#${DAILY_GAME ? DAILY_GAME.num : '001'}`;
-      document.getElementById('share-modal-target').innerText = DAILY_GAME ? DAILY_GAME.target : 0;
-      document.getElementById('share-modal-count').innerText = trobades;
-      document.getElementById('share-modal-total').innerText = total;
-      document.getElementById('share-modal-rank').innerText = document.getElementById('rank-label').innerText;
-      
-      updateCountdown();
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = setInterval(updateCountdown, 1000);
-    }
+function openModal(id) {
+  document.body.classList.add('overflow-hidden');
+  if (id === 'share-modal') {
+    const trobades = gameState.solutions.length;
+    const total = DAILY_GAME ? DAILY_GAME.total : 22;
+    document.getElementById('share-modal-num').innerText = `#${DAILY_GAME ? DAILY_GAME.num : '001'}`;
+    document.getElementById('share-modal-target').innerText = DAILY_GAME ? DAILY_GAME.target : 0;
+    document.getElementById('share-modal-count').innerText = trobades;
+    document.getElementById('share-modal-total').innerText = total;
+    document.getElementById('share-modal-rank').innerText = document.getElementById('rank-label').innerText;
     
-    if (id === 'info-modal' && DAILY_GAME) {
-      const infoTarget = document.getElementById('info-target-val');
-      if (infoTarget) infoTarget.innerText = DAILY_GAME.target;
-      const infoCenter = document.getElementById('info-center-val');
-      if (infoCenter) infoCenter.innerText = DAILY_GAME.center;
-    }
-  });
+    updateCountdown();
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(updateCountdown, 1000);
+  }
+  
+  if (id === 'info-modal' && DAILY_GAME) {
+    const infoTarget = document.getElementById('info-target-val');
+    if (infoTarget) infoTarget.innerText = DAILY_GAME.target;
+    const infoCenter = document.getElementById('info-center-val');
+    if (infoCenter) infoCenter.innerText = DAILY_GAME.center;
+  }
+  
+  document.getElementById(id).classList.remove('hidden');
 }
 
-export function closeModal(id) {
+function closeModal(id) {
+  if (!window.duelState || !window.duelState.active) {
+    document.body.classList.remove('overflow-hidden');
+  }
   if (id === 'share-modal' && countdownInterval) {
     clearInterval(countdownInterval);
     countdownInterval = null;
   }
-  const keepLocked = Boolean(window.duelState && window.duelState.active);
-  closeAccessibleModal(id, keepLocked);
+  document.getElementById(id).classList.add('hidden');
 }
 
 async function copyShareText() {
@@ -943,26 +980,11 @@ async function copyShareText() {
   }
 }
 
-Object.assign(window, {
-  openModal,
-  closeModal,
-  openYesterdayModal,
-  printWorksheet,
-  openDuelSetup,
-  clickTutiBadge,
-  moveCursor,
-  handleDisplayClick,
-  handleHexClick,
-  handleHexCenterClick,
-  appendChar,
-  shuffleOuterHexagons,
-  handleSubmit,
-  setAppTheme,
-  setAssistMode,
-  copyShareText
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-  initUI();
-  initDuelLocal();
-});
+function showToast(msg, tipus) {
+  const cont = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `px-4 py-2 rounded-full text-xs font-bold text-white shadow-lg ${tipus === 'error' ? 'bg-red-600' : tipus === 'warning' ? 'bg-amber-500' : 'bg-emerald-600'}`;
+  t.innerText = msg;
+  cont.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
