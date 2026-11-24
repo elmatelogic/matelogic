@@ -242,10 +242,10 @@
   </style>
 </head>
 <body class="bg-brand-bg dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-[100dvh] flex flex-col justify-start items-center font-sans antialiased selection:bg-brand-blue selection:text-white pb-10">
-  <div id="toast-container" class="fixed top-5 z-[60] flex flex-col gap-2 items-center pointer-events-none w-full max-w-sm px-4"></div>
+  <div id="toast-container" aria-live="polite" aria-atomic="true" class="fixed top-5 z-[60] flex flex-col gap-2 items-center pointer-events-none w-full max-w-sm px-4"></div>
   <header class="w-full max-w-lg border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-3 py-2 flex items-center justify-between shadow-sm">
     <div class="flex items-center gap-1.5 shrink-0">
-      <button onclick="openModal('info-modal')" aria-label="Instruccions" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+      <button onclick="openModal('info-modal')" aria-label="Ajustos i instruccions" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       </button>
       <button onclick="openYesterdayModal()" aria-label="Solucions d'ahir" title="Solucions d'ahir" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -271,12 +271,12 @@
       <span id="challenge-day-label" class="truncate pr-2">Carregant repte...</span>
       
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
-        <div id="tuti-badge" class="tuti-badge" onclick="clickTutiBadge()" title="Tuti del dia">
-          <svg class="tuti-star-icon" viewBox="0 0 24 24">
+        <button id="tuti-badge" type="button" class="tuti-badge" onclick="clickTutiBadge()" aria-label="Estat del Tuti del dia" title="Tuti del dia">
+          <svg class="tuti-star-icon" viewBox="0 0 24 24" aria-hidden="true">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
           <span id="tuti-count" class="tuti-count"></span>
-        </div>
+        </button>
       </div>
       
       <span id="challenge-date-label" class="whitespace-nowrap pl-2">-- / -- / ----</span>
@@ -287,10 +287,10 @@
         <span class="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Objectiu</span>
         <span id="target-value" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono transition-opacity">--</span>
       </div>
-      <div id="solutions-box" onclick="openModal('solutions-modal')" role="button" aria-label="Veure solucions descobertes" class="group flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/40 active:scale-95 select-none">
+      <div id="solutions-box" onclick="openModal('solutions-modal')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal('solutions-modal');}" role="button" tabindex="0" aria-label="Veure solucions descobertes" class="group flex flex-col items-center justify-center px-1 rounded-xl transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/40 active:scale-95 select-none">
         <div class="flex items-center gap-1">
           <span class="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Solucions</span>
-          <svg class="w-3 h-3 text-slate-500 dark:text-slate-400 group-hover:text-brand-red transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3 h-3 text-slate-500 dark:text-slate-400 group-hover:text-brand-red transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
@@ -340,8 +340,8 @@
       </button>
       
       <div class="grow relative min-w-0">
-        <div id="assist-result" class="hidden absolute -top-3 right-1.5 bg-brand-blue text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm border border-blue-400 dark:border-blue-500 pointer-events-none z-20"></div>
-        <div id="display-container" onclick="handleDisplayClick(event)" class="display-scroll w-full h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none">
+        <div id="assist-result" aria-live="polite" aria-atomic="true" class="hidden absolute -top-3 right-1.5 bg-brand-blue text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm border border-blue-400 dark:border-blue-500 pointer-events-none z-20"></div>
+        <div id="display-container" onclick="handleDisplayClick(event)" role="region" aria-label="Visor de l'operació matemàtica" class="display-scroll w-full h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none">
           <div id="display-tokens" class="flex items-center min-w-full justify-center transition-all"></div>
         </div>
       </div>
@@ -383,7 +383,7 @@
         Suprimeix
       </button>
       <button onclick="shuffleOuterHexagons()" aria-label="Barrejar les xifres exteriors" title="Barreja les xifres (Espai)" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center">
-        <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
       </button>
       <button id="submit-btn" onclick="handleSubmit()" aria-label="Introdueix l'operació per validar" class="key-3d h-12 bg-brand-red text-white font-bold text-sm rounded-full shadow-md">
         Introdueix
@@ -391,16 +391,16 @@
     </div>
   </main>
 
-  <div id="duel-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+  <div id="duel-setup-modal" role="dialog" aria-modal="true" aria-labelledby="duel-setup-title" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-4 animate-pop border border-slate-200/80 dark:border-slate-700/80">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
         <div class="flex items-center gap-2">
           <div class="w-7 h-7 rounded-full bg-red-50 dark:bg-red-950/50 flex items-center justify-center text-brand-red">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           </div>
-          <h3 class="text-lg font-black text-slate-900 dark:text-white">Mode 2 jugadors/es</h3>
+          <h3 id="duel-setup-title" class="text-lg font-black text-slate-900 dark:text-white">Mode 2 jugadors/es</h3>
         </div>
         <button onclick="closeModal('duel-setup-modal')" aria-label="Tancar" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
@@ -441,11 +441,11 @@
     <div class="w-full max-w-6xl border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-3 sm:px-5 py-2 flex items-center justify-between shadow-sm">
       <div class="flex items-center gap-2">
         <button onclick="exitDuelConfirm()" aria-label="Tornar al mode individual" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
           <span>Surt del duel</span>
         </button>
         <button onclick="openDuelSetup()" aria-label="Configuració del duel" title="Canvia opcions del duel" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
         </button>
       </div>
       <div class="flex items-center select-none py-0.5">
@@ -507,8 +507,7 @@
           <button onclick="moveDuelCursor(-1)" aria-label="Moure cursor a l'esquerra" class="h-12 w-8 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white active:scale-95 transition-all text-sm font-bold shadow-xs">‹</button>
           
           <div class="grow relative min-w-0">
-            <div id="duel-assist-result" class="hidden absolute -top-2.5 right-1.5 bg-brand-blue text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow-sm border border-blue-400 dark:border-blue-500 pointer-events-none z-20"></div>
-            <div id="duel-display-container" onclick="handleDuelDisplayClick(event)" class="display-scroll w-full h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none">
+            <div id="duel-display-container" onclick="handleDuelDisplayClick(event)" role="region" aria-label="Visor de l'operació del duel" class="display-scroll w-full h-14 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-3 flex items-center font-mono font-bold tracking-wider text-slate-800 dark:text-white shadow-inner overflow-x-auto whitespace-nowrap cursor-text select-none">
               <div id="duel-display-tokens" class="flex items-center min-w-full justify-center transition-all"></div>
             </div>
           </div>
@@ -518,17 +517,17 @@
 
         <div class="honeycomb-grid my-1.5 select-none">
           <div class="hex-row">
-            <button id="duel-hex-0" onclick="handleDuelHexClick(0)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-            <button id="duel-hex-1" onclick="handleDuelHexClick(1)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-0" onclick="handleDuelHexClick(0)" aria-label="Xifra exterior 1" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-1" onclick="handleDuelHexClick(1)" aria-label="Xifra exterior 2" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
           </div>
           <div class="hex-row hex-row-offset z-10">
-            <button id="duel-hex-2" onclick="handleDuelHexClick(2)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-            <button id="duel-hex-center" onclick="handleDuelHexCenterClick()" class="hex-cell hex-cell-red w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black"><span id="duel-center-val">-</span></button>
-            <button id="duel-hex-3" onclick="handleDuelHexClick(3)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-2" onclick="handleDuelHexClick(2)" aria-label="Xifra exterior 3" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-center" onclick="handleDuelHexCenterClick()" aria-label="Dígit central obligatori" class="hex-cell hex-cell-red w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black"><span id="duel-center-val">-</span></button>
+            <button id="duel-hex-3" onclick="handleDuelHexClick(3)" aria-label="Xifra exterior 4" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
           </div>
           <div class="hex-row">
-            <button id="duel-hex-4" onclick="handleDuelHexClick(4)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
-            <button id="duel-hex-5" onclick="handleDuelHexClick(5)" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-4" onclick="handleDuelHexClick(4)" aria-label="Xifra exterior 5" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
+            <button id="duel-hex-5" onclick="handleDuelHexClick(5)" aria-label="Xifra exterior 6" class="hex-cell hex-cell-blue w-20 h-20 text-white flex items-center justify-center font-mono text-3xl font-black">-</button>
           </div>
         </div>
         <div class="w-full grid grid-cols-6 gap-1.5 max-w-sm mt-0.5">
@@ -544,7 +543,7 @@
             Suprimeix
           </button>
           <button onclick="shuffleDuelHexagons()" aria-label="Barrejar les xifres" title="Barreja les xifres (Espai)" class="key-3d h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center">
-            <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
           </button>
           <button onclick="duelPassTurn()" aria-label="Passar el torn" class="key-3d h-12 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs sm:text-sm rounded-full active:scale-95 transition-all">Passa</button>
           <button onclick="submitDuelTurn()" aria-label="Introdueix l'operació" class="key-3d h-12 bg-brand-red text-white font-bold text-xs sm:text-sm rounded-full shadow-md">Introdueix</button>
@@ -579,7 +578,7 @@
     </div>
   </div>
 
-  <div id="duel-winner-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+  <div id="duel-winner-modal" role="dialog" aria-modal="true" aria-labelledby="duel-winner-title" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop border border-slate-200/80 dark:border-slate-700/80">
       <div class="w-14 h-14 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-2xl flex items-center justify-center mx-auto p-2.5 shadow-inner">
         <img src="./favicon.png?v=4" alt="Matelògic" class="w-full h-full object-contain">
@@ -606,11 +605,11 @@
     </div>
   </div>
 
-  <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+  <div id="info-modal" role="dialog" aria-modal="true" aria-labelledby="info-modal-title" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-pop border border-slate-200/80 dark:border-slate-700/80">
       
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 p-4 sm:p-5 shrink-0 bg-white dark:bg-slate-800 z-10">
-        <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight">Ajustos i Ajuda</h3>
+        <h3 id="info-modal-title" class="text-xl font-black text-slate-900 dark:text-white tracking-tight">Ajustos i Ajuda</h3>
         <button onclick="closeModal('info-modal')" aria-label="Tancar" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-bold">✕</button>
       </div>
 
@@ -673,21 +672,21 @@
 
             <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex gap-3.5 items-center transition-colors">
               <div class="w-10 h-10 shrink-0 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
               </div>
               <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">Les divisions han de ser <strong>exactes</strong>. S'aplica la <strong>propietat commutativa</strong> per defecte.</p>
             </div>
 
             <div class="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-2xl border border-amber-200 dark:border-amber-800/60 flex gap-3.5 items-center transition-colors">
               <div class="w-10 h-10 shrink-0 bg-gradient-to-br from-amber-300 to-amber-500 rounded-xl flex items-center justify-center shadow-[0_2px_8px_rgba(245,158,11,0.4)]">
-                 <svg class="w-5 h-5 text-white drop-shadow-sm" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                 <svg class="w-5 h-5 text-white drop-shadow-sm" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
-              <p class="text-[11px] text-amber-900 dark:text-amber-200 leading-snug"><strong>TUTI:</strong> Si aconsegueixes arribar a l'objectiu combinant els 7 dígits, guanyes 46 punts extra!</p>
+              <p class="text-[11px] text-amber-900 dark:text-amber-200 leading-snug"><strong>TUTI:</strong> Si aconsegueixes arribar a l'objectiu combinant els 7 dígits, guanyes 20 punts extra!</p>
             </div>
 
             <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex gap-3.5 items-center transition-colors">
               <div class="w-10 h-10 shrink-0 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-emerald-500 dark:text-emerald-400 shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
               </div>
               <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">Projecte sense ànim de lucre i sense anuncis. Les teves partides es guarden <strong>només al teu dispositiu</strong> de forma 100% privada.</p>
             </div>
@@ -708,10 +707,10 @@
     </div>
   </div>
 
-  <div id="solutions-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+  <div id="solutions-modal" role="dialog" aria-modal="true" aria-labelledby="solutions-modal-title" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] animate-pop">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions descobertes</h3>
+        <h3 id="solutions-modal-title" class="text-lg font-black text-slate-900 dark:text-white">Solucions descobertes</h3>
         <button onclick="closeModal('solutions-modal')" aria-label="Tancar finestra de solucions" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
       <div id="solutions-target-hint" class="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/80 p-2.5 rounded-xl text-xs text-slate-600 dark:text-slate-300">Carregant estat...</div>
@@ -720,10 +719,10 @@
     </div>
   </div>
 
-  <div id="yesterday-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+  <div id="yesterday-modal" role="dialog" aria-modal="true" aria-labelledby="yesterday-modal-title" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] animate-pop">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-black text-slate-900 dark:text-white">Solucions d'ahir</h3>
+        <h3 id="yesterday-modal-title" class="text-lg font-black text-slate-900 dark:text-white">Solucions d'ahir</h3>
         <button onclick="closeModal('yesterday-modal')" aria-label="Tancar finestra d'ahir" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
       </div>
       <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl flex justify-between text-xs font-mono border border-slate-200/70 dark:border-slate-700/70">
@@ -735,12 +734,12 @@
     </div>
   </div>
 
-  <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+  <div id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-modal-title" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-center animate-pop">
       <div class="w-14 h-14 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-2xl flex items-center justify-center mx-auto p-2.5 shadow-inner">
         <img src="./favicon.png?v=4" alt="Matelògic" class="w-full h-full object-contain">
       </div>
-      <h3 class="text-lg font-black text-slate-900 dark:text-white">Comparteix el teu progrés</h3>
+      <h3 id="share-modal-title" class="text-lg font-black text-slate-900 dark:text-white">Comparteix el teu progrés</h3>
       <div class="bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl text-left font-mono text-xs space-y-1 border border-slate-200/60 dark:border-slate-700/60">
         <p>Matelògic <span id="share-modal-num">#000</span></p>
         <p>🎯 Meta: <span id="share-modal-target">0</span></p>
@@ -753,7 +752,7 @@
       </div>
       <button onclick="copyShareText()" id="copy-btn" class="w-full py-3 rounded-xl bg-brand-red text-white font-bold text-sm shadow-md active:scale-98 transition-transform">Copia o Comparteix</button>
       <a href="https://whatsapp.com/channel/0029VbEJjj52ER6aLQplZp2Z" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm">
-        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.16C10.57 20.16 9.12 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.98 3.8 13.47 3.8 11.91C3.8 7.37 7.5 3.67 12.05 3.67C14.25 3.67 16.32 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.05 20.16ZM16.56 14.39C16.31 14.26 15.09 13.66 14.86 13.58C14.64 13.49 14.47 13.45 14.31 13.7C14.14 13.95 13.66 14.52 13.52 14.69C13.37 14.85 13.22 14.88 12.97 14.75C12.72 14.63 11.92 14.36 10.97 13.52C10.23 12.86 9.73 12.05 9.58 11.8C9.44 11.55 9.57 11.41 9.69 11.29C9.8 11.18 9.94 11 10.06 10.86C10.19 10.72 10.23 10.62 10.31 10.45C10.39 10.28 10.35 10.14 10.29 10.01C10.23 9.89 9.73 8.66 9.53 8.16C9.33 7.67 9.12 7.74 8.97 7.73C8.83 7.72 8.66 7.72 8.5 7.72C8.33 7.72 8.06 7.78 7.83 8.03C7.6 8.28 6.96 8.88 6.96 10.1C6.96 11.32 7.85 12.49 7.97 12.66C8.1 12.83 9.72 15.33 12.2 16.4C12.79 16.65 13.25 16.81 13.61 16.92C14.2 17.11 14.74 17.08 15.17 17.02C15.64 16.95 16.63 16.42 16.83 15.85C17.04 15.27 17.04 14.79 16.98 14.69C16.92 14.59 16.76 14.52 16.56 14.39Z"/></svg>
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.16C10.57 20.16 9.12 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.98 3.8 13.47 3.8 11.91C3.8 7.37 7.5 3.67 12.05 3.67C14.25 3.67 16.32 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.16 12.05 20.16ZM16.56 14.39C16.31 14.26 15.09 13.66 14.86 13.58C14.64 13.49 14.47 13.45 14.31 13.7C14.14 13.95 13.66 14.52 13.52 14.69C13.37 14.85 13.22 14.88 12.97 14.75C12.72 14.63 11.92 14.36 10.97 13.52C10.23 12.86 9.73 12.05 9.58 11.8C9.44 11.55 9.57 11.41 9.69 11.29C9.8 11.18 9.94 11 10.06 10.86C10.19 10.72 10.23 10.62 10.31 10.45C10.39 10.28 10.35 10.14 10.29 10.01C10.23 9.89 9.73 8.66 9.53 8.16C9.33 7.67 9.12 7.74 8.97 7.73C8.83 7.72 8.66 7.72 8.5 7.72C8.33 7.72 8.06 7.78 7.83 8.03C7.6 8.28 6.96 8.88 6.96 10.1C6.96 11.32 7.85 12.49 7.97 12.66C8.1 12.83 9.72 15.33 12.2 16.4C12.79 16.65 13.25 16.81 13.61 16.92C14.2 17.11 14.74 17.08 15.17 17.02C15.64 16.95 16.63 16.42 16.83 15.85C17.04 15.27 17.04 14.79 16.98 14.69C16.92 14.59 16.76 14.52 16.56 14.39Z"/></svg>
         Canal de WhatsApp
       </a>
       <div class="border-t border-slate-100 dark:border-slate-700/60 pt-3 mt-1 text-center w-full">
@@ -901,18 +900,13 @@
     </div>
   </div>
 
-  <script src="./js/joc.js"></script>
-  <script src="./js/duel-local.js"></script>
+  <script type="module" src="./js/joc.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch((err) => {});
       });
     }
-    window.addEventListener('DOMContentLoaded', () => {
-      initUI();
-      if (typeof initDuelLocal === 'function') initDuelLocal();
-    });
   </script>
 </body>
 </html>
