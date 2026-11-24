@@ -1,3 +1,7 @@
+import { generarClauCommutativa, calcularExpressioSegura } from './motor-matematic.js';
+import { showToast, bindLongPressDelete } from './utilitats-ui.js';
+import { getDailyGame, openModal, closeModal } from './joc.js';
+
 let duelConfig = { rusc: 'avui', temps: 45, rondes: 3 };
 let duelTimerId = null;
 let duelTurnDeadline = 0;
@@ -21,12 +25,12 @@ let duelState = {
 
 window.duelState = duelState;
 
-function initDuelLocal() {
-  setupDuelDeleteEvents();
+export function initDuelLocal() {
+  bindLongPressDelete('duel-delete-btn', handleDuelDelete, clearAllDuelTokens);
   setupDuelKeyEvents();
 }
 
-function stopDuelTimer() {
+export function stopDuelTimer() {
   if (duelTimerId !== null) {
     clearInterval(duelTimerId);
     duelTimerId = null;
@@ -37,7 +41,7 @@ function stopDuelTimer() {
   }
 }
 
-function openDuelSetup() {
+export function openDuelSetup() {
   stopDuelTimer();
   openModal('duel-setup-modal');
 }
@@ -108,15 +112,16 @@ function startDuelGame() {
   closeModal('duel-setup-modal');
   closeModal('duel-winner-modal');
 
+  const dailyGame = getDailyGame();
   let gameData;
   let ruscTitle = "Rusc a l'atzar";
-  if (duelConfig.rusc === 'avui' && DAILY_GAME) {
+  if (duelConfig.rusc === 'avui' && dailyGame) {
     gameData = {
-      target: DAILY_GAME.target,
-      center: DAILY_GAME.center,
-      outer: [...DAILY_GAME.outer]
+      target: dailyGame.target,
+      center: dailyGame.center,
+      outer: [...dailyGame.outer]
     };
-    ruscTitle = `Repte Núm. ${DAILY_GAME.num}`;
+    ruscTitle = `Repte Núm. ${dailyGame.num}`;
   } else {
     gameData = generarRuscAleatoriLocal();
   }
@@ -340,19 +345,25 @@ function renderDuelHexagons() {
     const btn = document.getElementById(`duel-hex-${idx}`);
     if (btn) {
       btn.textContent = val;
+      btn.setAttribute('aria-label', `Xifra ${val}`);
       if (duelState.usedNumbers.has(val)) {
         btn.classList.add('used');
+        btn.setAttribute('aria-disabled', 'true');
       } else {
         btn.classList.remove('used');
+        btn.setAttribute('aria-disabled', 'false');
       }
     }
   });
   const cBtn = document.getElementById('duel-hex-center');
   if (cBtn && duelState.game) {
+    cBtn.setAttribute('aria-label', `Dígit central ${duelState.game.center} (obligatori)`);
     if (duelState.usedNumbers.has(duelState.game.center)) {
       cBtn.classList.add('used');
+      cBtn.setAttribute('aria-disabled', 'true');
     } else {
       cBtn.classList.remove('used');
+      cBtn.setAttribute('aria-disabled', 'false');
     }
   }
 }
@@ -609,46 +620,13 @@ function clearAllDuelTokens() {
   showToast("Operació buidada", "warning");
 }
 
-function setupDuelDeleteEvents() {
-  const btn = document.getElementById('duel-delete-btn');
-  if (!btn) return;
-  let pressTimer = null;
-  let isLongPress = false;
-
-  const startPress = () => {
-    isLongPress = false;
-    pressTimer = setTimeout(() => {
-      isLongPress = true;
-      clearAllDuelTokens();
-    }, 500);
-  };
-
-  const endPress = (e) => {
-    clearTimeout(pressTimer);
-    if (!isLongPress && e.type !== 'mouseleave') {
-      handleDuelDelete();
-    }
-  };
-
-  btn.addEventListener('mousedown', startPress);
-  btn.addEventListener('mouseup', endPress);
-  btn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-
-  btn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startPress();
-  }, { passive: false });
-
-  btn.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    endPress(e);
-  }, { passive: false });
-}
-
 function setupDuelKeyEvents() {
   window.addEventListener('keydown', (e) => {
     if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
     if (!duelState.active) return;
+
+    const modalObert = document.querySelector('[id$="-modal"]:not(.hidden)');
+    if (modalObert) return;
 
     if (e.key === 'Backspace' || e.key === 'Delete') {
       e.preventDefault();
@@ -683,198 +661,6 @@ function setupDuelKeyEvents() {
       }
     }
   });
-}
-
-function generarClauCommutativaLocal(expr) {
-  let clean = expr.split('×').join('*').split('÷').join('/').split('−').join('-').split(' ').join('');
-  const tks = [];
-  let i = 0;
-  while (i < clean.length) {
-    const c = clean.charAt(i);
-    if (c >= '0' && c <= '9') {
-      let num = '';
-      while (i < clean.length && clean.charAt(i) >= '0' && clean.charAt(i) <= '9') {
-        num += clean.charAt(i);
-        i++;
-      }
-      tks.push({ type: 'num', val: num });
-      continue;
-    }
-    tks.push({ type: 'op', val: c });
-    i++;
-  }
-
-  const outputQueue = [];
-  const opStack = [];
-  const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
-
-  for (let k = 0; k < tks.length; k++) {
-    const t = tks[k];
-    if (t.type === 'num') {
-      outputQueue.push(t.val);
-    } else if (t.val === '(') {
-      opStack.push(t.val);
-    } else if (t.val === ')') {
-      while (opStack.length > 0 && opStack[opStack.length - 1] !== '(') {
-        outputQueue.push(opStack.pop());
-      }
-      opStack.pop();
-    } else {
-      while (
-        opStack.length > 0 &&
-        opStack[opStack.length - 1] !== '(' &&
-        precedence[opStack[opStack.length - 1]] >= precedence[t.val]
-      ) {
-        outputQueue.push(opStack.pop());
-      }
-      opStack.push(t.val);
-    }
-  }
-
-  while (opStack.length > 0) {
-    outputQueue.push(opStack.pop());
-  }
-
-  const stack = [];
-  for (let m = 0; m < outputQueue.length; m++) {
-    const item = outputQueue[m];
-    if (item !== '+' && item !== '-' && item !== '*' && item !== '/') {
-      stack.push({ type: 'lit', str: item });
-    } else {
-      const b = stack.pop();
-      const a = stack.pop();
-      if (item === '+' || item === '-') {
-        const aPos = a.type === 'add' ? a.pos : [a.str];
-        const aNeg = a.type === 'add' ? a.neg : [];
-        const bPos = b.type === 'add' ? b.pos : [b.str];
-        const bNeg = b.type === 'add' ? b.neg : [];
-        const pos = (item === '+' ? [...aPos, ...bPos] : [...aPos, ...bNeg]).sort();
-        const neg = (item === '+' ? [...aNeg, ...bNeg] : [...aNeg, ...bPos]).sort();
-        const str = `(+${pos.join(',')}|-${neg.join(',')})`;
-        stack.push({ type: 'add', pos, neg, str });
-      } else {
-        const aMul = a.type === 'mul' ? a.mul : [a.str];
-        const aDiv = a.type === 'mul' ? a.div : [];
-        const bMul = b.type === 'mul' ? b.mul : [b.str];
-        const bDiv = b.type === 'mul' ? b.div : [];
-        const mul = (item === '*' ? [...aMul, ...bMul] : [...aMul, ...bDiv]).sort();
-        const div = (item === '*' ? [...aDiv, ...bDiv] : [...aDiv, ...bMul]).sort();
-        const str = `(*${mul.join(',')}|/${div.join(',')})`;
-        stack.push({ type: 'mul', mul, div, str });
-      }
-    }
-  }
-  return stack.length === 1 ? stack[0].str : clean;
-}
-
-function calcularExpressioLocal(expr) {
-  let clean = expr.split('×').join('*').split('÷').join('/').split('−').join('-').split('–').join('-').split(' ').join('');
-  if (!clean) throw new Error("Expressió buida");
-
-  for (let idx = 0; idx < clean.length - 1; idx++) {
-    const act = clean.charAt(idx);
-    const seg = clean.charAt(idx + 1);
-    const esNumAct = (act >= '0' && act <= '9');
-    const esNumSeg = (seg >= '0' && seg <= '9');
-    const esOpAct = (act === '+' || act === '-' || act === '*' || act === '/');
-    const esOpSeg = (seg === '+' || seg === '-' || seg === '*' || seg === '/');
-
-    if (esNumAct && seg === '(') throw new Error("Cal especificar el signe de la multiplicació (×)!");
-    if (act === ')' && esNumSeg) throw new Error("Cal especificar el signe de la multiplicació (×)!");
-    if (act === ')' && seg === '(') throw new Error("Cal un operador entre els parèntesis!");
-    if (act === '(' && seg === ')') throw new Error("No es permeten parèntesis buits!");
-    if (act === '(' && esOpSeg) throw new Error("Operació incompleta dins del parèntesi!");
-    if (esOpAct && seg === ')') throw new Error("Operació incompleta abans de tancar parèntesi!");
-    if (esOpAct && esOpSeg) throw new Error("No es poden posar dos operadors seguits!");
-  }
-
-  const primer = clean.charAt(0);
-  const ultim = clean.charAt(clean.length - 1);
-  if (['+', '-', '*', '/', ')'].includes(primer) || ['+', '-', '*', '/', '('].includes(ultim)) {
-    throw new Error("Operació matemàtica incompleta");
-  }
-
-  const tks = [];
-  let i = 0;
-  while (i < clean.length) {
-    const c = clean.charAt(i);
-    if (c >= '0' && c <= '9') {
-      let num = '';
-      while (i < clean.length && clean.charAt(i) >= '0' && clean.charAt(i) <= '9') {
-        num += clean.charAt(i);
-        i++;
-      }
-      tks.push({ type: 'num', val: parseInt(num, 10) });
-      continue;
-    }
-    tks.push({ type: 'op', val: c });
-    i++;
-  }
-
-  const outputQueue = [];
-  const opStack = [];
-  const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
-
-  for (let k = 0; k < tks.length; k++) {
-    const t = tks[k];
-    if (t.type === 'num') {
-      outputQueue.push(t.val);
-    } else if (t.val === '(') {
-      opStack.push(t.val);
-    } else if (t.val === ')') {
-      while (opStack.length > 0 && opStack[opStack.length - 1] !== '(') {
-        outputQueue.push(opStack.pop());
-      }
-      if (opStack.length === 0) throw new Error("Parèntesis desquadrats");
-      opStack.pop();
-    } else {
-      while (
-        opStack.length > 0 &&
-        opStack[opStack.length - 1] !== '(' &&
-        precedence[opStack[opStack.length - 1]] >= precedence[t.val]
-      ) {
-        outputQueue.push(opStack.pop());
-      }
-      opStack.push(t.val);
-    }
-  }
-
-  while (opStack.length > 0) {
-    const op = opStack.pop();
-    if (op === '(' || op === ')') throw new Error("Parèntesis desquadrats");
-    outputQueue.push(op);
-  }
-
-  const evalStack = [];
-  for (let m = 0; m < outputQueue.length; m++) {
-    const item = outputQueue[m];
-    if (typeof item === 'number') {
-      evalStack.push({ val: item, str: String(item), prec: 3 });
-    } else {
-      if (evalStack.length < 2) throw new Error("Sintaxi matemàtica incompleta");
-      const b = evalStack.pop();
-      const a = evalStack.pop();
-      let res = 0;
-      if (item === '+') res = a.val + b.val;
-      else if (item === '-') res = a.val - b.val;
-      else if (item === '*') res = a.val * b.val;
-      else if (item === '/') {
-        if (b.val === 0) throw new Error("Divisió per zero");
-        if (a.val % b.val !== 0) throw new Error("Les divisions han de ser exactes (sense decimals)!");
-        res = Math.round(a.val / b.val);
-      }
-
-      const myPrec = precedence[item];
-      const leftStr = a.prec < myPrec ? `(${a.str})` : a.str;
-      const rightNeedsParens = b.prec < myPrec || (b.prec === myPrec && (item === '-' || item === '/'));
-      const rightStr = rightNeedsParens ? `(${b.str})` : b.str;
-
-      evalStack.push({ val: res, str: `${leftStr}${item}${rightStr}`, prec: myPrec });
-    }
-  }
-
-  if (evalStack.length !== 1) throw new Error("Operació no vàlida");
-  return { valor: evalStack[0].val, canonic: evalStack[0].str };
 }
 
 function submitDuelTurn() {
@@ -918,13 +704,13 @@ function submitDuelTurn() {
   const displayExpr = duelState.tokens.map(t => t.display).join(' ');
 
   try {
-    const { valor: res, canonic } = calcularExpressioLocal(rawExpr);
+    const { valor: res, canonic } = calcularExpressioSegura(rawExpr, false);
     if (Math.abs(res - duelState.game.target) > 0.0001) {
       triggerShakeDuelDisplay();
       return showToast(`El resultat és ${res}, no pas ${duelState.game.target}`, "error");
     }
 
-    const clauComm = generarClauCommutativaLocal(rawExpr);
+    const clauComm = generarClauCommutativa(rawExpr);
     if (duelState.usedCanonics.has(canonic) || duelState.usedCanonics.has(clauComm)) {
       triggerShakeDuelDisplay();
       return showToast("Les fórmules no es poden repetir!", "warning");
@@ -964,3 +750,20 @@ function submitDuelTurn() {
     showToast(err.message || "Operació no vàlida matemàticament", "error");
   }
 }
+
+Object.assign(window, {
+  setDuelRusc,
+  setDuelTemps,
+  setDuelRondes,
+  startDuelGame,
+  exitDuelConfirm,
+  exitDuel,
+  moveDuelCursor,
+  handleDuelDisplayClick,
+  handleDuelHexClick,
+  handleDuelHexCenterClick,
+  appendDuelChar,
+  shuffleDuelHexagons,
+  duelPassTurn,
+  submitDuelTurn
+});
